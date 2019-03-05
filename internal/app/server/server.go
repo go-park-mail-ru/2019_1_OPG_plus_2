@@ -19,6 +19,7 @@ func StartApp(params Params) error {
 	router := mux.NewRouter()
 
 	router.HandleFunc("/", controllers.MainHandler)
+	router.HandleFunc("/api/", controllers.IndexApiHandler)
 	router.PathPrefix("/docs").Handler(httpSwagger.WrapHandler)
 
 	return http.ListenAndServe(":"+params.Port, router)
