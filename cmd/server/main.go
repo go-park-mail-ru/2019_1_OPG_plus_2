@@ -1,10 +1,19 @@
 package main
 
 import (
-	"fmt"
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/app/server"
 	"os"
 )
+
+// @title Colors service API by OPG+2
+// @version 1.0
+// @description Game based on filling field with color cells
+
+// @contact.name @DanikNik @severush @Xatabch
+// @contact.email nikolsky.dan@gmail.com
+
+// @host localhost:8001
+// @BasePath /api
 
 func main() {
 	params := server.Params{Port: os.Getenv("PORT")}
@@ -14,6 +23,6 @@ func main() {
 
 	err := server.StartApp(params)
 	if err != nil {
-		fmt.Println()
+		panic(err)
 	}
 }

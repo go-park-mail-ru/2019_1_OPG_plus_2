@@ -2,8 +2,10 @@ package server
 
 import (
 	"fmt"
+	_ "github.com/go-park-mail-ru/2019_1_OPG_plus_2/docs"
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/controllers"
 	"github.com/gorilla/mux"
+	"github.com/swaggo/http-swagger"
 	"net/http"
 )
 
@@ -17,6 +19,8 @@ func StartApp(params Params) error {
 	router := mux.NewRouter()
 
 	router.HandleFunc("/", controllers.MainHandler)
+	router.HandleFunc("/api/", controllers.IndexApiHandler)
+	router.PathPrefix("/docs").Handler(httpSwagger.WrapHandler)
 
 	return http.ListenAndServe(":"+params.Port, router)
 }
