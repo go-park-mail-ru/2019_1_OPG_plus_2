@@ -402,6 +402,8 @@ func Welcome(w http.ResponseWriter, r *http.Request) {
 	_, _ = fmt.Fprintln(w, fmt.Sprintf("Welcome %s!", user.Username))
 }
 
+//тестовый контроллер чтобы понимать что творится на сервере, получая список активных сессий
+// TODO: DEPRECATED (mandatory)
 func GetSessions(w http.ResponseWriter, r *http.Request) {
 	message, _ := json.Marshal(sessionCache.Data)
 	_, _ = fmt.Fprintln(w, string(message))
