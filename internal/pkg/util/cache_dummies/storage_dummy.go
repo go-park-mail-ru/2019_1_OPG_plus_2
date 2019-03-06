@@ -11,6 +11,8 @@ type Cache interface {
 	Delete(sessionToken string) error
 }
 
+//
+
 type CookieCacheDummy struct {
 	Data map[string]*models.UserSessionRecord
 }
@@ -36,6 +38,8 @@ func (cache *CookieCacheDummy) Delete(sessionToken string) error {
 	delete(cache.Data, sessionToken)
 	return nil
 }
+
+//
 
 type UserStorage struct {
 	Data map[string]*models.UserData

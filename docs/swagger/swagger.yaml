@@ -1,9 +1,23 @@
 basePath: /api
 definitions:
+  models.Credentials:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
   models.IndexMessage:
     properties:
       message:
         type: string
+    type: object
+  models.SuccessOrErrorMessage:
+    properties:
+      message:
+        type: string
+      status:
+        type: integer
     type: object
 host: localhost:8001
 info:
@@ -28,4 +42,35 @@ paths:
             $ref: '#/definitions/models.IndexMessage'
             type: object
       summary: Site of OPG+2
+  /sign_in:
+    post:
+      consumes:
+      - application/json
+      description: Sign-in controller
+      parameters:
+      - description: User credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/models.Credentials'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            type: object
 swagger: "2.0"

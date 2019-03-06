@@ -13,18 +13,6 @@ import (
 //Authentification controllers
 var defaultTimeout = 300
 
-var _ = `
-#	/login
-#	/logout
-#	/sign_up
-/update_profile
-#	/update_session
-`
-var users = map[string]string{
-	"user1": "password1",
-	"user2": "password2",
-}
-
 var sessionCache = cache_dummies.NewCookieCacheDummy()
 var userCache = cache_dummies.NewUserStorage()
 
@@ -48,12 +36,16 @@ func init() {
 	}
 }
 
-/*
-{
-	username: ""
-	password: ""
-}
-*/
+// SignIn godoc
+// @title Sign-in
+// @description Sign-in controller
+// @accept json
+// @produce json
+// @param credentials body models.Credentials true "User credentials"
+// @success 200 {object} models.SuccessOrErrorMessage
+// @failure 400 {object} models.SuccessOrErrorMessage
+// @failure 401 {object} models.SuccessOrErrorMessage
+// @router /sign_in [post]
 func SignIn(w http.ResponseWriter, r *http.Request) {
 	var creds models.Credentials
 	var message models.SuccessOrErrorMessage
@@ -107,7 +99,7 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Finally, we set the client cookie for "session_token" as the session token we just generated
-	// we also set an expiry time of 120 seconds, the same as the sessionCache
+	// we also set an expiry time of ${defaultTimeout} seconds, the same as the sessionCache
 	http.SetCookie(w, &http.Cookie{
 		Name:    "session_token",
 		Value:   sessionToken,
@@ -331,7 +323,7 @@ func Welcome(w http.ResponseWriter, r *http.Request) {
 		if err == http.ErrNoCookie {
 			// If the cookie is not set, return an unauthorized status
 			w.WriteHeader(http.StatusUnauthorized)
-			_, _ = fmt.Fprintln(w, "UNAUTHORZED NO COOKIE SET")
+			_, _ = fmt.Fprintln(w, "UNAUTHORIZED NO COOKIE SET")
 			return
 		}
 		// For any other type of error, return a bad request status
@@ -356,4 +348,9 @@ func Welcome(w http.ResponseWriter, r *http.Request) {
 	}
 	// Finally, return the welcome message to the user
 	_, _ = fmt.Fprintln(w, fmt.Sprintf("Welcome %s!", user.Username))
+}
+
+func GetSessions(w http.ResponseWriter, r *http.Request) {
+	message, _ := json.Marshal(sessionCache.Data)
+	_, _ = fmt.Fprintln(w, string(message))
 }
