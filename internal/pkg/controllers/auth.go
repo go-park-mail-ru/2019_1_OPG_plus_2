@@ -37,6 +37,9 @@ func init() {
 }
 
 //TODO: проверять таймаут куки
+//TODO: завести стандартные тексты ошибок по статусам, либо завести метод и передавать туда
+
+//TODO: РЕФАКТОРЕНГ
 
 // SignIn godoc
 // @title Sign-in
@@ -52,10 +55,8 @@ func init() {
 func SignIn(w http.ResponseWriter, r *http.Request) {
 	var creds models.Credentials
 	var message models.SuccessOrErrorMessage
-	// Get the JSON body and decode into credentials
 	err := json.NewDecoder(r.Body).Decode(&creds)
 	if err != nil {
-		// If the structure of the body is wrong, return an HTTP error
 		w.WriteHeader(http.StatusBadRequest)
 		message.Status = http.StatusBadRequest
 		message.Message = "Json parsing error"
@@ -64,15 +65,11 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Println(creds)
-	// Get the expected password from our in memory map
 	user, err := userCache.Get(creds.Username)
 	fmt.Println(user)
 
 	expectedPassword := user.Password
 
-	// If a password exists for the given user
-	// AND, if it is the same as the password we received, the we can move ahead
-	// if NOT, then we return an "Unauthorized" status
 	if err != nil || expectedPassword != creds.Password {
 		w.WriteHeader(http.StatusUnauthorized)
 		message.Status = http.StatusUnauthorized
@@ -82,18 +79,15 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Create a new random session token
 	sessionToken := uuid.New().String()
 	fmt.Println(sessionToken)
-	// Set the token in the sessionCache, along with the user whom it represents
-	// The token has an expiry time of ${defaultTimeout} seconds
+
 	err = sessionCache.Set(sessionToken, &models.UserSessionRecord{
 		Username:     creds.Username,
 		SessionToken: sessionToken,
 		Timeout:      defaultTimeout,
 	})
 	if err != nil {
-		// If there is an error in setting the sessionCache, return an internal server error
 		w.WriteHeader(http.StatusInternalServerError)
 		message.Status = http.StatusInternalServerError
 		message.Message = "Error while saving user session"
@@ -101,8 +95,7 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 		_, _ = fmt.Fprintln(w, string(msg))
 		return
 	}
-	// Finally, we set the client cookie for "session_token" as the session token we just generated
-	// we also set an expiry time of ${defaultTimeout} seconds, the same as the sessionCache
+
 	http.SetCookie(w, &http.Cookie{
 		Name:    "session_token",
 		Value:   sessionToken,
@@ -127,7 +120,6 @@ func SignOut(w http.ResponseWriter, r *http.Request) {
 	var message models.SuccessOrErrorMessage
 	if err != nil {
 		if err == http.ErrNoCookie {
-			// If the cookie is not set, return an unauthorized status
 			w.WriteHeader(http.StatusUnauthorized)
 			message.Status = http.StatusUnauthorized
 			message.Message = "User is not logged in to log out)"
@@ -135,7 +127,6 @@ func SignOut(w http.ResponseWriter, r *http.Request) {
 			_, _ = fmt.Fprintln(w, string(msg))
 			return
 		}
-		// For any other type of error, return a bad request status
 		w.WriteHeader(http.StatusBadRequest)
 		message.Status = http.StatusBadRequest
 		message.Message = "Bad request sent"
@@ -281,7 +272,6 @@ func UpdateProfile(w http.ResponseWriter, r *http.Request) {
 // @router /refresh_token [post]
 func Refresh(w http.ResponseWriter, r *http.Request) {
 	var message models.SuccessOrErrorMessage
-	// (BEGIN) The code uptil this point is the same as the first part of the `Welcome` route
 	c, err := r.Cookie("session_token")
 	if err != nil {
 		if err == http.ErrNoCookie {
@@ -318,9 +308,7 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 		_, _ = fmt.Fprintln(w, string(msg))
 		return
 	}
-	// (END) The code uptil this point is the same as the first part of the `Welcome` route
 
-	// Now, create a new session token for the current user
 	newSessionToken := uuid.New().String()
 	userName := userRecord.Username
 	timeout := userRecord.Timeout
@@ -338,14 +326,12 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Delete the older session token
 	err = sessionCache.Delete(sessionToken)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	// Set the new token as the users `session_token` cookie
 	http.SetCookie(w, &http.Cookie{
 		Name:    "session_token",
 		Value:   newSessionToken,
@@ -370,36 +356,29 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 // @failure 500 {string} string "Internal server error"
 // @router /welcome [get]
 func Welcome(w http.ResponseWriter, r *http.Request) {
-	// We can obtain the session token from the requests cookies, which come with every request
 	c, err := r.Cookie("session_token")
 	if err != nil {
 		if err == http.ErrNoCookie {
-			// If the cookie is not set, return an unauthorized status
 			w.WriteHeader(http.StatusUnauthorized)
 			_, _ = fmt.Fprintln(w, "UNAUTHORIZED NO COOKIE SET")
 			return
 		}
-		// For any other type of error, return a bad request status
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	sessionToken := c.Value
 
-	// We then get the name of the user from our sessionCache, where we set the session token
 	user, err := sessionCache.Get(sessionToken)
 	if err != nil {
-		// If there is an error fetching from sessionCache, return an internal server error status
 		w.WriteHeader(http.StatusInternalServerError)
 		_, _ = fmt.Fprintln(w, "INTERNAL SERVER ERROR")
 		return
 	}
 	if user == nil {
-		// If the session token is not present in sessionCache, return an unauthorized error
 		w.WriteHeader(http.StatusUnauthorized)
-		_, _ = fmt.Fprintln(w, "UNAUTHORZED NO COOKIE IN CACHE")
+		_, _ = fmt.Fprintln(w, "UNAUTHORIZED NO COOKIE IN CACHE")
 		return
 	}
-	// Finally, return the welcome message to the user
 	_, _ = fmt.Fprintln(w, fmt.Sprintf("Welcome %s!", user.Username))
 }
 
