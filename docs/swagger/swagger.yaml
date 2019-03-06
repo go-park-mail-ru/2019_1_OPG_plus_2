@@ -9,7 +9,7 @@ host: localhost:8001
 info:
   contact:
     email: nikolsky.dan@gmail.com
-    name: '@DanikNik @severush @Xatabch'
+    name: '@Xatabch'
   description: Game based on filling field with color cells
   license:
     name: Apache 2.0

@@ -3,6 +3,8 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"
+	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/util/cache_dummies"
 	"github.com/google/uuid"
 	"net/http"
 	"time"
@@ -12,108 +14,314 @@ import (
 var defaultTimeout = 300
 
 var _ = `
-/login
-/logout
-/sign_up
+#	/login
+#	/logout
+#	/sign_up
 /update_profile
-/update_session
+#	/update_session
 `
 var users = map[string]string{
 	"user1": "password1",
 	"user2": "password2",
 }
 
-type UserRecordDummy struct {
-	Username     string `json:"username, string"`
-	SessionToken string `json:"session_token, string"`
-	Timeout      int    `json:"timeout, int"` // seconds
-}
+var sessionCache = cache_dummies.NewCookieCacheDummy()
+var userCache = cache_dummies.NewUserStorage()
 
-type Cache interface {
-	Get(sessionToken string) (*UserRecordDummy, error)
-	Set(sessionToken string, dummy *UserRecordDummy) error
-	Delete(sessionToken string) error
-}
-
-type CookieCacheDummy struct {
-	Data map[string]*UserRecordDummy
-}
-
-func NewCookieCacheDummy() *CookieCacheDummy {
-	return &CookieCacheDummy{Data: make(map[string]*UserRecordDummy)}
-}
-
-func (cache *CookieCacheDummy) Set(sessionToken string, dummy *UserRecordDummy) error {
-	cache.Data[sessionToken] = dummy
-	return nil
-}
-
-func (cache *CookieCacheDummy) Get(sessionToken string) (*UserRecordDummy, error) {
-	result := cache.Data[sessionToken]
-	if result == nil {
-		return nil, fmt.Errorf("No cookie in cache")
+func init() {
+	err := userCache.Set("user1", &models.UserData{
+		Username: "user1",
+		Password: "password1",
+		EMail:    "user1@example.com",
+	})
+	if err != nil {
+		panic(err)
 	}
-	return result, nil
+
+	err = userCache.Set("user2", &models.UserData{
+		Username: "user2",
+		Password: "password2",
+		EMail:    "user2@example.com",
+	})
+	if err != nil {
+		panic(err)
+	}
 }
 
-func (cache *CookieCacheDummy) Delete(sessionToken string) error {
-	delete(cache.Data, sessionToken)
-	return nil
+/*
+{
+	username: ""
+	password: ""
 }
-
-type Credentials struct {
-	Password string `json:"password"`
-	Username string `json:"username"`
-}
-
-var cache = NewCookieCacheDummy()
-
+*/
 func SignIn(w http.ResponseWriter, r *http.Request) {
-	var creds Credentials
+	var creds models.Credentials
+	var message models.SuccessOrErrorMessage
 	// Get the JSON body and decode into credentials
 	err := json.NewDecoder(r.Body).Decode(&creds)
 	if err != nil {
 		// If the structure of the body is wrong, return an HTTP error
 		w.WriteHeader(http.StatusBadRequest)
+		message.Status = http.StatusBadRequest
+		message.Message = "Json parsing error"
+		msg, _ := json.Marshal(message)
+		_, _ = fmt.Fprintln(w, string(msg))
 		return
 	}
 	fmt.Println(creds)
 	// Get the expected password from our in memory map
-	expectedPassword, ok := users[creds.Username]
-	fmt.Println(expectedPassword)
+	user, err := userCache.Get(creds.Username)
+	fmt.Println(user)
+
+	expectedPassword := user.Password
 
 	// If a password exists for the given user
 	// AND, if it is the same as the password we received, the we can move ahead
 	// if NOT, then we return an "Unauthorized" status
-	if !ok || expectedPassword != creds.Password {
+	if err != nil || expectedPassword != creds.Password {
 		w.WriteHeader(http.StatusUnauthorized)
+		message.Status = http.StatusUnauthorized
+		message.Message = "User credentials are incorrect"
+		msg, _ := json.Marshal(message)
+		_, _ = fmt.Fprintln(w, string(msg))
 		return
 	}
 
 	// Create a new random session token
 	sessionToken := uuid.New().String()
 	fmt.Println(sessionToken)
-	// Set the token in the cache, along with the user whom it represents
+	// Set the token in the sessionCache, along with the user whom it represents
 	// The token has an expiry time of ${defaultTimeout} seconds
-	err = cache.Set(sessionToken, &UserRecordDummy{
+	err = sessionCache.Set(sessionToken, &models.UserSessionRecord{
 		Username:     creds.Username,
 		SessionToken: sessionToken,
 		Timeout:      defaultTimeout,
 	})
-	fmt.Println(cache.Get(sessionToken))
 	if err != nil {
-		// If there is an error in setting the cache, return an internal server error
+		// If there is an error in setting the sessionCache, return an internal server error
 		w.WriteHeader(http.StatusInternalServerError)
+		message.Status = http.StatusInternalServerError
+		message.Message = "Error while saving user session"
+		msg, _ := json.Marshal(message)
+		_, _ = fmt.Fprintln(w, string(msg))
 		return
 	}
-	fmt.Println("vse ok")
 	// Finally, we set the client cookie for "session_token" as the session token we just generated
-	// we also set an expiry time of 120 seconds, the same as the cache
+	// we also set an expiry time of 120 seconds, the same as the sessionCache
 	http.SetCookie(w, &http.Cookie{
 		Name:    "session_token",
 		Value:   sessionToken,
 		Expires: time.Now().Add(time.Duration(defaultTimeout) * time.Second),
 	})
+	message.Status = 200
+	message.Message = "Logged in"
+	msg, _ := json.Marshal(message)
+	_, _ = fmt.Fprintln(w, string(msg))
+}
+
+func SignOut(w http.ResponseWriter, r *http.Request) {
+	c, err := r.Cookie("session_token")
+	var message models.SuccessOrErrorMessage
+	if err != nil {
+		if err == http.ErrNoCookie {
+			// If the cookie is not set, return an unauthorized status
+			w.WriteHeader(http.StatusUnauthorized)
+			message.Status = http.StatusUnauthorized
+			message.Message = "User is not logged in to log out)"
+			msg, _ := json.Marshal(message)
+			_, _ = fmt.Fprintln(w, string(msg))
+			return
+		}
+		// For any other type of error, return a bad request status
+		w.WriteHeader(http.StatusBadRequest)
+		message.Status = http.StatusBadRequest
+		message.Message = "Bad request sent"
+		msg, _ := json.Marshal(message)
+		_, _ = fmt.Fprintln(w, string(msg))
+		return
+	}
+	err = sessionCache.Delete(c.Value)
+	if err != nil {
+		panic(err)
+	}
+	message.Status = 200
+	message.Message = "Logged out"
+	msg, _ := json.Marshal(message)
+	_, _ = fmt.Fprintln(w, string(msg))
+	return
+
+}
+
+func Refresh(w http.ResponseWriter, r *http.Request) {
+	var message models.SuccessOrErrorMessage
+	// (BEGIN) The code uptil this point is the same as the first part of the `Welcome` route
+	c, err := r.Cookie("session_token")
+	if err != nil {
+		if err == http.ErrNoCookie {
+			w.WriteHeader(http.StatusUnauthorized)
+			message.Status = http.StatusUnauthorized
+			message.Message = "User is not authorized to refresh session"
+			msg, _ := json.Marshal(message)
+			_, _ = fmt.Fprintln(w, string(msg))
+			return
+		}
+		w.WriteHeader(http.StatusBadRequest)
+		message.Status = 200
+		message.Message = "Cookie fucked up, I do not know"
+		msg, _ := json.Marshal(message)
+		_, _ = fmt.Fprintln(w, string(msg))
+		return
+	}
+	sessionToken := c.Value
+
+	userRecord, err := sessionCache.Get(sessionToken)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		message.Status = http.StatusInternalServerError
+		message.Message = "Error while getting your session"
+		msg, _ := json.Marshal(message)
+		_, _ = fmt.Fprintln(w, string(msg))
+		return
+	}
+	if userRecord == nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		message.Status = http.StatusUnauthorized
+		message.Message = "User is not authorized to refresh, no session saved"
+		msg, _ := json.Marshal(message)
+		_, _ = fmt.Fprintln(w, string(msg))
+		return
+	}
+	// (END) The code uptil this point is the same as the first part of the `Welcome` route
+
+	// Now, create a new session token for the current user
+	newSessionToken := uuid.New().String()
+	userName := userRecord.Username
+	timeout := userRecord.Timeout
+	err = sessionCache.Set(newSessionToken, &models.UserSessionRecord{
+		Username:     userName,
+		Timeout:      timeout,
+		SessionToken: newSessionToken,
+	})
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		message.Status = http.StatusInternalServerError
+		message.Message = "Error while saving session"
+		msg, _ := json.Marshal(message)
+		_, _ = fmt.Fprintln(w, string(msg))
+		return
+	}
+
+	// Delete the older session token
+	err = sessionCache.Delete(sessionToken)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	// Set the new token as the users `session_token` cookie
+	http.SetCookie(w, &http.Cookie{
+		Name:    "session_token",
+		Value:   newSessionToken,
+		Expires: time.Now().Add(time.Duration(defaultTimeout) * time.Second),
+	})
+	message.Status = 200
+	message.Message = "Refreshed successfully"
+	msg, _ := json.Marshal(message)
+	_, _ = fmt.Fprintln(w, string(msg))
+}
+
+func Register(w http.ResponseWriter, r *http.Request) {
+	var newUser models.UserData
+	var message models.SuccessOrErrorMessage
+	err := json.NewDecoder(r.Body).Decode(&newUser)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		message.Status = http.StatusBadRequest
+		message.Message = "Error while parsing profile json"
+		msg, _ := json.Marshal(message)
+		_, _ = fmt.Fprintln(w, string(msg))
+		return
+	}
+	fmt.Println(newUser)
+	err = userCache.Set(newUser.Username, &newUser)
+	if err != nil {
+		w.WriteHeader(http.StatusConflict)
+		message.Status = http.StatusConflict
+		message.Message = "Username already busy"
+		msg, _ := json.Marshal(message)
+		_, _ = fmt.Fprintln(w, string(msg))
+		return
+	}
+	result, err := json.Marshal(newUser)
+	_, _ = fmt.Fprintln(w, string(result))
+}
+
+func UpdateProfile(w http.ResponseWriter, r *http.Request) {
+	c, err := r.Cookie("session_token")
+	var message models.SuccessOrErrorMessage
+	if err != nil {
+		if err == http.ErrNoCookie {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+		w.WriteHeader(http.StatusBadRequest)
+		message.Status = http.StatusBadRequest
+		message.Message = "User is not authorized to refresh session"
+		msg, _ := json.Marshal(message)
+		_, _ = fmt.Fprintln(w, string(msg))
+		return
+	}
+	sessionToken := c.Value
+
+	userRecord, err := sessionCache.Get(sessionToken)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		message.Status = http.StatusInternalServerError
+		message.Message = "Error while getting session"
+		msg, _ := json.Marshal(message)
+		_, _ = fmt.Fprintln(w, string(msg))
+		return
+	}
+	if userRecord == nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		message.Status = http.StatusUnauthorized
+		message.Message = "User is not authorized to refresh session"
+		msg, _ := json.Marshal(message)
+		_, _ = fmt.Fprintln(w, string(msg))
+		return
+	}
+
+	var newProfile models.UserData
+	err = json.NewDecoder(r.Body).Decode(&newProfile)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		message.Status = http.StatusBadRequest
+		message.Message = "Error while parsing user profile JSON"
+		msg, _ := json.Marshal(message)
+		_, _ = fmt.Fprintln(w, string(msg))
+		return
+	}
+	_ = userCache.Delete(userRecord.Username)
+	_ = userCache.Set(newProfile.Username, &newProfile)
+
+	newSessionToken := uuid.New().String()
+	_ = sessionCache.Delete(sessionToken)
+	_ = sessionCache.Set(newSessionToken, &models.UserSessionRecord{
+		Username:     newProfile.Username,
+		SessionToken: newSessionToken,
+		Timeout:      defaultTimeout,
+	})
+
+	http.SetCookie(w, &http.Cookie{
+		Name:    "session_token",
+		Value:   newSessionToken,
+		Expires: time.Now().Add(time.Duration(defaultTimeout) * time.Second),
+	})
+
+	message.Status = 200
+	message.Message = fmt.Sprintf("profiled changed to %v", newProfile)
+	res, _ := json.Marshal(message)
+	_, _ = fmt.Fprintln(w, string(res))
 }
 
 func Welcome(w http.ResponseWriter, r *http.Request) {
@@ -132,73 +340,20 @@ func Welcome(w http.ResponseWriter, r *http.Request) {
 	}
 	sessionToken := c.Value
 
-	// We then get the name of the user from our cache, where we set the session token
-	user, err := cache.Get(sessionToken)
+	// We then get the name of the user from our sessionCache, where we set the session token
+	user, err := sessionCache.Get(sessionToken)
 	if err != nil {
-		// If there is an error fetching from cache, return an internal server error status
+		// If there is an error fetching from sessionCache, return an internal server error status
 		w.WriteHeader(http.StatusInternalServerError)
 		_, _ = fmt.Fprintln(w, "INTERNAL SERVER ERROR")
 		return
 	}
 	if user == nil {
-		// If the session token is not present in cache, return an unauthorized error
+		// If the session token is not present in sessionCache, return an unauthorized error
 		w.WriteHeader(http.StatusUnauthorized)
 		_, _ = fmt.Fprintln(w, "UNAUTHORZED NO COOKIE IN CACHE")
 		return
 	}
 	// Finally, return the welcome message to the user
 	_, _ = fmt.Fprintln(w, fmt.Sprintf("Welcome %s!", user.Username))
-}
-
-func Refresh(w http.ResponseWriter, r *http.Request) {
-	// (BEGIN) The code uptil this point is the same as the first part of the `Welcome` route
-	c, err := r.Cookie("session_token")
-	if err != nil {
-		if err == http.ErrNoCookie {
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-	sessionToken := c.Value
-
-	userRecord, err := cache.Get(sessionToken)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	if userRecord == nil {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-	// (END) The code uptil this point is the same as the first part of the `Welcome` route
-
-	// Now, create a new session token for the current user
-	newSessionToken := uuid.New().String()
-	userName := userRecord.Username
-	timeout := userRecord.Timeout
-	err = cache.Set(newSessionToken, &UserRecordDummy{
-		Username:     userName,
-		Timeout:      timeout,
-		SessionToken: newSessionToken,
-	})
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	// Delete the older session token
-	err = cache.Delete(sessionToken)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	// Set the new token as the users `session_token` cookie
-	http.SetCookie(w, &http.Cookie{
-		Name:    "session_token",
-		Value:   newSessionToken,
-		Expires: time.Now().Add(time.Duration(defaultTimeout) * time.Second),
-	})
 }

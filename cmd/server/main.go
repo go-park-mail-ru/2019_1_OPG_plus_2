@@ -10,8 +10,12 @@ import (
 // @description Game based on filling field with color cells
 // @license.name Apache 2.0
 
-// @contact.name @DanikNik @severush @Xatabch
+// @contact.name @DanikNik
 // @contact.email nikolsky.dan@gmail.com
+
+// @contact.name @severush
+
+// @contact.name @Xatabch
 
 // @host localhost:8001
 // @BasePath /api

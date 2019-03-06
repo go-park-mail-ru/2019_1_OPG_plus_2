@@ -25,6 +25,9 @@ func StartApp(params Params) error {
 	router.HandleFunc("/sign_in", controllers.SignIn).Methods("POST")
 	router.HandleFunc("/welcome", controllers.Welcome).Methods("GET")
 	router.HandleFunc("/refresh_token", controllers.Refresh).Methods("POST")
+	router.HandleFunc("/register", controllers.Register).Methods("POST")
+	router.HandleFunc("/sign_out", controllers.SignOut).Methods("POST")
+	router.HandleFunc("/update", controllers.UpdateProfile).Methods("POST")
 
 	return http.ListenAndServe(":"+params.Port, router)
 }
