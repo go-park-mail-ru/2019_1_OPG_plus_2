@@ -41,6 +41,10 @@ func init() {
 
 //TODO: РЕФАКТОРЕНГ
 
+//TODO: JWT ???
+
+// TODO: OAuth ???
+
 // SignIn godoc
 // @title Sign-in
 // @description Sign-in method
