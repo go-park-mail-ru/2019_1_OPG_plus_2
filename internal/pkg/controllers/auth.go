@@ -36,15 +36,18 @@ func init() {
 	}
 }
 
+//TODO: проверять таймаут куки
+
 // SignIn godoc
 // @title Sign-in
-// @description Sign-in controller
+// @description Sign-in method
 // @accept json
 // @produce json
 // @param credentials body models.Credentials true "User credentials"
 // @success 200 {object} models.SuccessOrErrorMessage
 // @failure 400 {object} models.SuccessOrErrorMessage
 // @failure 401 {object} models.SuccessOrErrorMessage
+// @failure 500 {object} models.SuccessOrErrorMessage
 // @router /sign_in [post]
 func SignIn(w http.ResponseWriter, r *http.Request) {
 	var creds models.Credentials
@@ -111,6 +114,14 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 	_, _ = fmt.Fprintln(w, string(msg))
 }
 
+// SignOut godoc
+// @title Sign-out
+// @description Sign-out method
+// @produce json
+// @success 200 {object} models.SuccessOrErrorMessage
+// @failure 400 {object} models.SuccessOrErrorMessage
+// @failure 401 {object} models.SuccessOrErrorMessage
+// @router /sign_out [post]
 func SignOut(w http.ResponseWriter, r *http.Request) {
 	c, err := r.Cookie("session_token")
 	var message models.SuccessOrErrorMessage
@@ -144,6 +155,130 @@ func SignOut(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// Register godoc
+// @title Registration
+// @description Method to register new user
+// @accept json
+// @produce json
+// @param user_data body models.UserData true "User profile"
+// @success 200 {object} models.SuccessOrErrorMessage
+// @failure 400 {object} models.SuccessOrErrorMessage
+// @failure 401 {object} models.SuccessOrErrorMessage
+// @router /register [post]
+func Register(w http.ResponseWriter, r *http.Request) {
+	var newUser models.UserData
+	var message models.SuccessOrErrorMessage
+	err := json.NewDecoder(r.Body).Decode(&newUser)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		message.Status = http.StatusBadRequest
+		message.Message = "Error while parsing profile json"
+		msg, _ := json.Marshal(message)
+		_, _ = fmt.Fprintln(w, string(msg))
+		return
+	}
+	fmt.Println(newUser)
+	err = userCache.Set(newUser.Username, &newUser)
+	if err != nil {
+		w.WriteHeader(http.StatusConflict)
+		message.Status = http.StatusConflict
+		message.Message = "Username already busy"
+		msg, _ := json.Marshal(message)
+		_, _ = fmt.Fprintln(w, string(msg))
+		return
+	}
+	result, err := json.Marshal(newUser)
+	_, _ = fmt.Fprintln(w, string(result))
+}
+
+// UpdateProfile godoc
+// @title Profile update
+// @description Method to update user's profile
+// @accept json
+// @produce json
+// @param user_data body models.UserData true "User profile"
+// @success 200 {object} models.SuccessOrErrorMessage
+// @failure 400 {object} models.SuccessOrErrorMessage
+// @failure 401 {object} models.SuccessOrErrorMessage
+// @failure 500 {object} models.SuccessOrErrorMessage
+// @router /update [post]
+func UpdateProfile(w http.ResponseWriter, r *http.Request) {
+	c, err := r.Cookie("session_token")
+	var message models.SuccessOrErrorMessage
+	if err != nil {
+		if err == http.ErrNoCookie {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+		w.WriteHeader(http.StatusBadRequest)
+		message.Status = http.StatusBadRequest
+		message.Message = "User is not authorized to refresh session"
+		msg, _ := json.Marshal(message)
+		_, _ = fmt.Fprintln(w, string(msg))
+		return
+	}
+	sessionToken := c.Value
+
+	userRecord, err := sessionCache.Get(sessionToken)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		message.Status = http.StatusInternalServerError
+		message.Message = "Error while getting session"
+		msg, _ := json.Marshal(message)
+		_, _ = fmt.Fprintln(w, string(msg))
+		return
+	}
+	if userRecord == nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		message.Status = http.StatusUnauthorized
+		message.Message = "User is not authorized to refresh session"
+		msg, _ := json.Marshal(message)
+		_, _ = fmt.Fprintln(w, string(msg))
+		return
+	}
+
+	var newProfile models.UserData
+	err = json.NewDecoder(r.Body).Decode(&newProfile)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		message.Status = http.StatusBadRequest
+		message.Message = "Error while parsing user profile JSON"
+		msg, _ := json.Marshal(message)
+		_, _ = fmt.Fprintln(w, string(msg))
+		return
+	}
+	_ = userCache.Delete(userRecord.Username)
+	_ = userCache.Set(newProfile.Username, &newProfile)
+
+	newSessionToken := uuid.New().String()
+	_ = sessionCache.Delete(sessionToken)
+	_ = sessionCache.Set(newSessionToken, &models.UserSessionRecord{
+		Username:     newProfile.Username,
+		SessionToken: newSessionToken,
+		Timeout:      defaultTimeout,
+	})
+
+	http.SetCookie(w, &http.Cookie{
+		Name:    "session_token",
+		Value:   newSessionToken,
+		Expires: time.Now().Add(time.Duration(defaultTimeout) * time.Second),
+	})
+
+	message.Status = 200
+	message.Message = fmt.Sprintf("profiled changed to %v", newProfile)
+	res, _ := json.Marshal(message)
+	_, _ = fmt.Fprintln(w, string(res))
+}
+
+// Refresh godoc
+// @title Registration
+// @description Method to register new user
+// @produce json
+// @success 200 {object} models.SuccessOrErrorMessage
+// @failure 400 {object} models.SuccessOrErrorMessage
+// @failure 401 {object} models.SuccessOrErrorMessage
+// @failure 500 {object} models.SuccessOrErrorMessage
+// @router /refresh_token [post]
 func Refresh(w http.ResponseWriter, r *http.Request) {
 	var message models.SuccessOrErrorMessage
 	// (BEGIN) The code uptil this point is the same as the first part of the `Welcome` route
@@ -222,100 +357,17 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 	_, _ = fmt.Fprintln(w, string(msg))
 }
 
-func Register(w http.ResponseWriter, r *http.Request) {
-	var newUser models.UserData
-	var message models.SuccessOrErrorMessage
-	err := json.NewDecoder(r.Body).Decode(&newUser)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		message.Status = http.StatusBadRequest
-		message.Message = "Error while parsing profile json"
-		msg, _ := json.Marshal(message)
-		_, _ = fmt.Fprintln(w, string(msg))
-		return
-	}
-	fmt.Println(newUser)
-	err = userCache.Set(newUser.Username, &newUser)
-	if err != nil {
-		w.WriteHeader(http.StatusConflict)
-		message.Status = http.StatusConflict
-		message.Message = "Username already busy"
-		msg, _ := json.Marshal(message)
-		_, _ = fmt.Fprintln(w, string(msg))
-		return
-	}
-	result, err := json.Marshal(newUser)
-	_, _ = fmt.Fprintln(w, string(result))
-}
+//
 
-func UpdateProfile(w http.ResponseWriter, r *http.Request) {
-	c, err := r.Cookie("session_token")
-	var message models.SuccessOrErrorMessage
-	if err != nil {
-		if err == http.ErrNoCookie {
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-		w.WriteHeader(http.StatusBadRequest)
-		message.Status = http.StatusBadRequest
-		message.Message = "User is not authorized to refresh session"
-		msg, _ := json.Marshal(message)
-		_, _ = fmt.Fprintln(w, string(msg))
-		return
-	}
-	sessionToken := c.Value
+// тестовый контроллер который сейчас контроллируется сессиями
 
-	userRecord, err := sessionCache.Get(sessionToken)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		message.Status = http.StatusInternalServerError
-		message.Message = "Error while getting session"
-		msg, _ := json.Marshal(message)
-		_, _ = fmt.Fprintln(w, string(msg))
-		return
-	}
-	if userRecord == nil {
-		w.WriteHeader(http.StatusUnauthorized)
-		message.Status = http.StatusUnauthorized
-		message.Message = "User is not authorized to refresh session"
-		msg, _ := json.Marshal(message)
-		_, _ = fmt.Fprintln(w, string(msg))
-		return
-	}
-
-	var newProfile models.UserData
-	err = json.NewDecoder(r.Body).Decode(&newProfile)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		message.Status = http.StatusBadRequest
-		message.Message = "Error while parsing user profile JSON"
-		msg, _ := json.Marshal(message)
-		_, _ = fmt.Fprintln(w, string(msg))
-		return
-	}
-	_ = userCache.Delete(userRecord.Username)
-	_ = userCache.Set(newProfile.Username, &newProfile)
-
-	newSessionToken := uuid.New().String()
-	_ = sessionCache.Delete(sessionToken)
-	_ = sessionCache.Set(newSessionToken, &models.UserSessionRecord{
-		Username:     newProfile.Username,
-		SessionToken: newSessionToken,
-		Timeout:      defaultTimeout,
-	})
-
-	http.SetCookie(w, &http.Cookie{
-		Name:    "session_token",
-		Value:   newSessionToken,
-		Expires: time.Now().Add(time.Duration(defaultTimeout) * time.Second),
-	})
-
-	message.Status = 200
-	message.Message = fmt.Sprintf("profiled changed to %v", newProfile)
-	res, _ := json.Marshal(message)
-	_, _ = fmt.Fprintln(w, string(res))
-}
-
+// Welcome godoc
+// @title Cheerful method
+// @description Method to check sessions consistency
+// @produce text/plain
+// @success 200 {string} string "Welcome"
+// @failure 401 {string} string "Unauthorized"
+// @router /welcome [get]
 func Welcome(w http.ResponseWriter, r *http.Request) {
 	// We can obtain the session token from the requests cookies, which come with every request
 	c, err := r.Cookie("session_token")

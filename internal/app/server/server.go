@@ -18,21 +18,22 @@ func StartApp(params Params) error {
 	fmt.Println("Server starting at " + params.Port)
 
 	router := mux.NewRouter()
-
-	router.Use(middleware.ApplyJsonContentType)
-	router.Use(middleware.CorsMiddleware)
+	apiRouter := router.PathPrefix("/api").Subrouter()
 
 	router.HandleFunc("/", controllers.MainHandler)
 	router.PathPrefix("/docs").Handler(httpSwagger.WrapHandler)
 
-	router.HandleFunc("/api/", controllers.IndexApiHandler)
-	router.HandleFunc("/api/sign_in", controllers.SignIn).Methods("POST")
-	router.HandleFunc("/api/welcome", controllers.Welcome).Methods("GET")
-	router.HandleFunc("/api/refresh_token", controllers.Refresh).Methods("POST")
-	router.HandleFunc("/api/register", controllers.Register).Methods("POST")
-	router.HandleFunc("/api/sign_out", controllers.SignOut).Methods("POST")
-	router.HandleFunc("/api/update", controllers.UpdateProfile).Methods("POST")
-	router.HandleFunc("/admin/get_sessions", controllers.GetSessions).Methods("GET")
+	router.Use(middleware.CorsMiddleware)
+	apiRouter.Use(middleware.ApplyJsonContentType)
 
+	apiRouter.HandleFunc("/", controllers.IndexApiHandler)
+	apiRouter.HandleFunc("/sign_in", controllers.SignIn).Methods("POST")
+	apiRouter.HandleFunc("/sign_out", controllers.SignOut).Methods("POST")
+	apiRouter.HandleFunc("/register", controllers.Register).Methods("POST")
+	apiRouter.HandleFunc("/update", controllers.UpdateProfile).Methods("POST")
+	apiRouter.HandleFunc("/refresh_token", controllers.Refresh).Methods("POST")
+
+	router.HandleFunc("/api/welcome", controllers.Welcome).Methods("GET")
+	apiRouter.HandleFunc("/admin/get_sessions", controllers.GetSessions).Methods("GET")
 	return http.ListenAndServe(":"+params.Port, router)
 }

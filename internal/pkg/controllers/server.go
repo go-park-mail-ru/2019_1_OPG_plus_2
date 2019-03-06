@@ -21,6 +21,7 @@ func MainHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // IndexApiHandler godoc
+// @Title Index test
 // @Summary Site of OPG+2
 // @Description test api handler
 // @Produce  json

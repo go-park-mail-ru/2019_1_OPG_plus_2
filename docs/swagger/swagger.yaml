@@ -19,6 +19,15 @@ definitions:
       status:
         type: integer
     type: object
+  models.UserData:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    type: object
 host: localhost:8001
 info:
   contact:
@@ -42,11 +51,68 @@ paths:
             $ref: '#/definitions/models.IndexMessage'
             type: object
       summary: Site of OPG+2
+  /refresh_token:
+    post:
+      description: Method to register new user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            type: object
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Method to register new user
+      parameters:
+      - description: User profile
+        in: body
+        name: user_data
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserData'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            type: object
   /sign_in:
     post:
       consumes:
       - application/json
-      description: Sign-in controller
+      description: Sign-in method
       parameters:
       - description: User credentials
         in: body
@@ -73,4 +139,80 @@ paths:
           schema:
             $ref: '#/definitions/models.SuccessOrErrorMessage'
             type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            type: object
+  /sign_out:
+    post:
+      description: Sign-out method
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            type: object
+  /update:
+    post:
+      consumes:
+      - application/json
+      description: Method to update user's profile
+      parameters:
+      - description: User profile
+        in: body
+        name: user_data
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserData'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            type: object
+  /welcome:
+    get:
+      description: Method to check sessions consistency
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: Welcome
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
 swagger: "2.0"
