@@ -215,4 +215,8 @@ paths:
           description: Unauthorized
           schema:
             type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
 swagger: "2.0"

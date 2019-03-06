@@ -367,6 +367,7 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 // @produce text/plain
 // @success 200 {string} string "Welcome"
 // @failure 401 {string} string "Unauthorized"
+// @failure 500 {string} string "Internal server error"
 // @router /welcome [get]
 func Welcome(w http.ResponseWriter, r *http.Request) {
 	// We can obtain the session token from the requests cookies, which come with every request
