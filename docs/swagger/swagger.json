@@ -1,0 +1,47 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Game based on filling field with color cells",
+        "title": "Colors service API by OPG+2",
+        "contact": {
+            "name": "@DanikNik @severush @Xatabch",
+            "email": "nikolsky.dan@gmail.com"
+        },
+        "license": {
+            "name": "Apache 2.0"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:8001",
+    "basePath": "/api",
+    "paths": {
+        "/": {
+            "get": {
+                "description": "test api handler",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Site of OPG+2",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.IndexMessage"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "models.IndexMessage": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

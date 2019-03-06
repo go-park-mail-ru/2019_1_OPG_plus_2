@@ -8,6 +8,7 @@ import (
 // @title Colors service API by OPG+2
 // @version 1.0
 // @description Game based on filling field with color cells
+// @license.name Apache 2.0
 
 // @contact.name @DanikNik @severush @Xatabch
 // @contact.email nikolsky.dan@gmail.com

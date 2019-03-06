@@ -1,0 +1,31 @@
+basePath: /api
+definitions:
+  models.IndexMessage:
+    properties:
+      message:
+        type: string
+    type: object
+host: localhost:8001
+info:
+  contact:
+    email: nikolsky.dan@gmail.com
+    name: '@DanikNik @severush @Xatabch'
+  description: Game based on filling field with color cells
+  license:
+    name: Apache 2.0
+  title: Colors service API by OPG+2
+  version: "1.0"
+paths:
+  /:
+    get:
+      description: test api handler
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IndexMessage'
+            type: object
+      summary: Site of OPG+2
+swagger: "2.0"
