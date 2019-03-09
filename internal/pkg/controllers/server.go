@@ -35,7 +35,6 @@ func IndexApiHandler(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	message, _ := json.Marshal(models.NewIndexMessage("Site of OPG+2"))
-	w.Header().Add("Content-Type", "application/json")
 	_, err := fmt.Fprintf(w, string(message))
 	if err != nil {
 		panic(err)

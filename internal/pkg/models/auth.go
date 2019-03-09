@@ -16,8 +16,3 @@ type UserData struct {
 	Password string `json:"password, string"`
 	EMail    string `json:"email, string, omitempty"`
 }
-
-type SuccessOrErrorMessage struct {
-	Status  int    `json:"status, int"`
-	Message string `json:"message, string"`
-}
