@@ -38,8 +38,8 @@ func StartApp(params Params) error {
 
 	apiRouter.HandleFunc("/create_profile", controllers.CreateProfile).Methods("POST")
 	apiRouter.HandleFunc("/get_profile/{id}", controllers.GetProfile).Methods("GET")
-	apiRouter.HandleFunc("/update_profile/", controllers.UpdateProfile).Methods("PUT")
-	apiRouter.HandleFunc("/delete_profile/", controllers.DeleteProfile).Methods("DELETE")
+	apiRouter.HandleFunc("/update_profile", controllers.UpdateProfile).Methods("PUT")
+	apiRouter.HandleFunc("/delete_profile", controllers.DeleteProfile).Methods("DELETE")
 
 	apiRouter.HandleFunc("/scoreboard/{page}", controllers.ScoreBoardByPage).Methods("GET")
 	apiRouter.HandleFunc("/admin/get_profiles", controllers.GetProfiles).Methods("GET")
