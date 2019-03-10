@@ -35,7 +35,7 @@ func init() {
 //TODO: CreateProfile вызывает controllers/auth.go 66:72 строки, они создают пользователя, я из jwt беру данные (id) и создаю профиль
 //TODO: в ScoreBoard пагинация по limit offset
 
-// принимает {email, nickname, password}
+// принимает {email, username, password}
 // отдает {status, text}
 func CreateProfile(w http.ResponseWriter, r *http.Request) {
 	var userData models.UserData
@@ -55,7 +55,7 @@ func CreateProfile(w http.ResponseWriter, r *http.Request) {
 
 	var profile models.UserProfile
 	profile.ID = jwtData.Id
-	profile.Username = jwtData.Nickname
+	profile.Username = jwtData.Username
 	profile.Email = jwtData.Email
 	_ = userStorage.Set(jwtData.Id, &profile)
 	models.SendMessage(w, http.StatusOK, "Profile successfully created")
@@ -93,17 +93,17 @@ func UpdateProfile(w http.ResponseWriter, r *http.Request) {
 	// UpdateUsername
 	// whatever else...
 
-	var newProfile models.UserUpdateInfo
+	var newProfile models.UserData
 	err := json.NewDecoder(r.Body).Decode(&newProfile)
 	if err != nil {
 		models.SendMessage(w, http.StatusBadRequest, "JSON parsing error")
 		return
 	}
 
-	//id := strconv.Itoa(jwtData(r).Id)
-	//user, _ := userStorage.Get(id)
-	//user.Username = newProfile.Username
-	//user.Email = newProfile.Email
+	id := jwtData(r).Id
+	user, _ := userStorage.Get(id)
+	user.Username = newProfile.Username
+	user.Email = newProfile.Email
 
 	//auth.UpdateUser(newProfile)
 
@@ -143,7 +143,7 @@ func UploadAvatar(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(id)
 	user, _ := userStorage.Get(id)
 
-	err = ioutil.WriteFile(`/home/daniknik/colors_static/`+strconv.FormatInt(int64(id), 10)+`.png`, data.Bytes(), 0666)
+	err = ioutil.WriteFile(`~/colors_static/`+strconv.FormatInt(int64(id), 10)+`.png`, data.Bytes(), 0666)
 	if err != nil {
 		panic(err)
 	}
