@@ -12,12 +12,6 @@ type UserProfile struct {
 	Lose        int `json:"lose, number"`
 }
 
-type UserUpdateInfo struct {
-	Username string `json:"username, number" example:"user_test"`
-	Email    string `json:"email, number" example:"user_test@test.com"`
-	Password string `json:"password, number"example:"verysecretpasswordwhichnooneknows"`
-}
-
 type UserProfileStorage struct {
 	Data map[int]*UserProfile
 }
