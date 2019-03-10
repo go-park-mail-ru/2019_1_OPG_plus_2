@@ -24,17 +24,9 @@ func StartApp(params Params) error {
 	router.PathPrefix("/docs").Handler(httpSwagger.WrapHandler)
 
 	router.Use(middleware.CorsMiddleware)
-	//router.Use(middleware.ValueOfMiddleware)
 	apiRouter.Use(middleware.ApplyJsonContentType)
 
 	apiRouter.HandleFunc("/", controllers.IndexApiHandler)
-	//apiRouter.HandleFunc("/sign_in", controllers.SignIn).Methods("POST")
-	//apiRouter.HandleFunc("/sign_out", controllers.SignOut).Methods("POST")
-	//apiRouter.HandleFunc("/register", controllers.Register).Methods("POST")
-	//apiRouter.HandleFunc("/refresh_token", controllers.Refresh).Methods("POST")
-	//
-	//router.HandleFunc("/api/welcome", controllers.Welcome).Methods("GET")
-	//apiRouter.HandleFunc("/admin/get_sessions", controllers.GetSessions).Methods("GET")
 
 	apiRouter.HandleFunc("/create_profile", controllers.CreateProfile).Methods("POST")
 	apiRouter.HandleFunc("/get_profile/{id}", controllers.GetProfile).Methods("GET")
