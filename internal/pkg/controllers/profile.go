@@ -35,6 +35,8 @@ func init() {
 //TODO: CreateProfile вызывает controllers/auth.go 66:72 строки, они создают пользователя, я из jwt беру данные (id) и создаю профиль
 //TODO: в ScoreBoard пагинация по limit offset
 
+// принимает {email, nickname, password}
+// отдает {status, text}
 func CreateProfile(w http.ResponseWriter, r *http.Request) {
 	var userData models.UserData
 	err := json.NewDecoder(r.Body).Decode(&userData)
@@ -59,6 +61,7 @@ func CreateProfile(w http.ResponseWriter, r *http.Request) {
 	models.SendMessage(w, http.StatusOK, "Profile successfully created")
 }
 
+// отдает {id, username, email, avatar_url, score, games_played, win, lose}
 func GetProfile(w http.ResponseWriter, r *http.Request) {
 	pathVariables := mux.Vars(r)
 
@@ -83,6 +86,8 @@ func GetProfile(w http.ResponseWriter, r *http.Request) {
 	_, _ = fmt.Fprintln(w, string(msg))
 }
 
+// принимает {username, email, password}
+// отдает {status, text}
 func UpdateProfile(w http.ResponseWriter, r *http.Request) {
 	// UpdateEmail
 	// UpdateUsername
@@ -105,6 +110,7 @@ func UpdateProfile(w http.ResponseWriter, r *http.Request) {
 	models.SendMessage(w, http.StatusOK, "Profile successfully updated")
 }
 
+// отдает {status, text}
 func DeleteProfile(w http.ResponseWriter, r *http.Request) {
 	id := jwtData(r).Id
 
@@ -116,6 +122,8 @@ func DeleteProfile(w http.ResponseWriter, r *http.Request) {
 	models.SendMessage(w, http.StatusOK, "Profile "+string(id)+" deleted successfully")
 }
 
+// принимает multipart/form-data
+// отдает {status, text}
 func UploadAvatar(w http.ResponseWriter, r *http.Request) {
 	_ = r.ParseMultipartForm(int64(5 * MB))
 	file, _, err := r.FormFile("avatar")
