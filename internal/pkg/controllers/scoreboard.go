@@ -23,6 +23,15 @@ var scoreboard = []models.ScoreboardRecord{
 
 var pageSize = 10
 
+// ScoreBoardByPage godoc
+// @title Get scoreboard page
+// @summary Produces scoreboard page with {limit} and {offset}
+// @description This method provides client with scoreboard limited with {limit} entries per page and offset of {offset} from the first position
+// @produce json
+// @param limit query int false "Entries per page"
+// @param offset query int false "Entries from the first position"
+// @success 200 {array} models.ScoreboardRecord
+// @router /profiles/score [get]
 func ScoreBoardByPage(w http.ResponseWriter, r *http.Request) {
 	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
 	if limit <= 0 {

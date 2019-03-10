@@ -1,7 +1,7 @@
 package models
 
 type ScoreboardRecord struct {
-	Position int    `json:"position, number"`
-	Username string `json:"username, string"`
-	Score    int    `json:"score, number"`
+	Position int    `json:"position, number" example:"1"`
+	Username string `json:"username, string" example:"XxX__NaGiBaToR__XxX"`
+	Score    int    `json:"score, number" example:"314159"`
 }

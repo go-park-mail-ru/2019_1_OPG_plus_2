@@ -1,5 +1,17 @@
 basePath: /api
 definitions:
+  models.ScoreboardRecord:
+    properties:
+      position:
+        example: 1
+        type: integer
+      score:
+        example: 314159
+        type: integer
+      username:
+        example: XxX__NaGiBaToR__XxX
+        type: string
+    type: object
   models.SuccessOrErrorMessage:
     properties:
       message:
@@ -168,6 +180,29 @@ paths:
             $ref: '#/definitions/models.SuccessOrErrorMessage'
             type: object
       summary: Produces user profile info
+  /profiles/score:
+    get:
+      description: This method provides client with scoreboard limited with {limit}
+        entries per page and offset of {offset} from the first position
+      parameters:
+      - description: Entries per page
+        in: query
+        name: limit
+        type: integer
+      - description: Entries from the first position
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.ScoreboardRecord'
+            type: array
+      summary: Produces scoreboard page with {limit} and {offset}
   /upload_avatar:
     post:
       consumes:
