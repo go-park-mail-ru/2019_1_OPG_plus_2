@@ -4,12 +4,14 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/auth"
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"
 	"github.com/gorilla/mux"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 var MB = 1 << 20
@@ -17,40 +19,43 @@ var MB = 1 << 20
 var userStorage = models.NewUserProfileStorage()
 
 func init() {
-	_ = userStorage.Set("1", &models.UserProfile{
+	_ = userStorage.Set(1, &models.UserProfile{
 		ID:        1,
 		Score:     228,
 		AvatarUrl: "<user1_avatar_url>",
 	})
 
-	_ = userStorage.Set("2", &models.UserProfile{
+	_ = userStorage.Set(2, &models.UserProfile{
 		ID:        2,
 		Score:     1337,
 		AvatarUrl: "<user2_avatar_url>",
 	})
 }
 
-//TODO: профайл поменять в соответствии с фоткой: оставить id(number), score, avatar, статы остальное лежит в jwt
 //TODO: CreateProfile вызывает controllers/auth.go 66:72 строки, они создают пользователя, я из jwt беру данные (id) и создаю профиль
 //TODO: в ScoreBoard пагинация по limit offset
 
-type ProfileData struct {
-	Username string `json:"username, string"`
-	Email    string `json:"email, string"`
-	models.UserProfile
-}
-
 func CreateProfile(w http.ResponseWriter, r *http.Request) {
-	var profile models.UserProfile
-	err := json.NewDecoder(r.Body).Decode(&profile)
+	var userData models.UserData
+	err := json.NewDecoder(r.Body).Decode(&userData)
 	if err != nil {
 		models.SendMessage(w, http.StatusBadRequest, "JSON parsing error")
 		return
 	}
 
-	id := jwtData(r).Id
-	profile.ID = id
-	_ = userStorage.Set(string(id), &profile)
+	jwtData, err := auth.CreateUser(userData)
+	if err != nil {
+		models.SendMessage(w, http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	http.SetCookie(w, auth.CreateAuthCookie(jwtData, 30*24*time.Hour))
+
+	var profile models.UserProfile
+	profile.ID = jwtData.Id
+	profile.Username = jwtData.Nickname
+	profile.Email = jwtData.Email
+	_ = userStorage.Set(jwtData.Id, &profile)
 	models.SendMessage(w, http.StatusOK, "Profile successfully created")
 }
 
@@ -67,7 +72,8 @@ func GetProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	profile, err := userStorage.Get(id)
+	intId, _ := strconv.ParseInt(id, 10, 64)
+	profile, err := userStorage.Get(int(intId))
 	if err != nil {
 		models.SendMessage(w, http.StatusNotFound, "User not found")
 		return
@@ -100,7 +106,7 @@ func UpdateProfile(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteProfile(w http.ResponseWriter, r *http.Request) {
-	id := strconv.Itoa(jwtData(r).Id)
+	id := jwtData(r).Id
 
 	err := userStorage.Delete(id)
 	if err != nil {
@@ -125,16 +131,16 @@ func UploadAvatar(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	id := strconv.Itoa(jwtData(r).Id)
+	id := jwtData(r).Id
 	fmt.Println(id)
 	user, _ := userStorage.Get(id)
 
-	err = ioutil.WriteFile(`/home/daniknik/colors_static/`+id+`.png`, data.Bytes(), 0666)
+	err = ioutil.WriteFile(`/home/daniknik/colors_static/`+strconv.FormatInt(int64(id), 10)+`.png`, data.Bytes(), 0666)
 	if err != nil {
 		panic(err)
 	}
 
-	user.AvatarUrl = "/img/" + id + `.png`
+	user.AvatarUrl = "/img/" + strconv.FormatInt(int64(id), 10) + `.png`
 
 	models.SendMessage(w, http.StatusOK, user.AvatarUrl)
 }

@@ -28,7 +28,7 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.SetCookie(w, auth.CreateAuthCookie(jwtData, 30 * 24 * time.Hour))
+	http.SetCookie(w, auth.CreateAuthCookie(jwtData, 30*24*time.Hour))
 	models.SendMessage(w, http.StatusOK, "signed in")
 }
 
@@ -69,7 +69,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.SetCookie(w, auth.CreateAuthCookie(jwtData, 30 * 24 * time.Hour))
+	http.SetCookie(w, auth.CreateAuthCookie(jwtData, 30*24*time.Hour))
 	models.SendMessage(w, http.StatusOK, "signed up")
 }
 

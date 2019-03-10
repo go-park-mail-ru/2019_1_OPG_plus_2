@@ -19,23 +19,23 @@ type UserUpdateInfo struct {
 }
 
 type UserProfileStorage struct {
-	Data map[string]*UserProfile
+	Data map[int]*UserProfile
 }
 
-func (storage *UserProfileStorage) Get(key string) (object *UserProfile, err error) {
+func (storage *UserProfileStorage) Get(key int) (object *UserProfile, err error) {
 	return storage.Data[key], nil
 }
 
-func (storage *UserProfileStorage) Set(key string, object *UserProfile) (err error) {
+func (storage *UserProfileStorage) Set(key int, object *UserProfile) (err error) {
 	storage.Data[key] = object
 	return nil
 }
 
-func (storage *UserProfileStorage) Delete(key string) (err error) {
+func (storage *UserProfileStorage) Delete(key int) (err error) {
 	delete(storage.Data, key)
 	return nil
 }
 
 func NewUserProfileStorage() *UserProfileStorage {
-	return &UserProfileStorage{Data: make(map[string]*UserProfile)}
+	return &UserProfileStorage{Data: make(map[int]*UserProfile)}
 }
