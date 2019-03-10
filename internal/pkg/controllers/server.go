@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"
 	"net/http"
@@ -20,24 +19,6 @@ func MainHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// IndexApiHandler godoc
-// @Title Index test
-// @Summary Site of OPG+2
-// @Description test api handler
-// @Produce  json
-// @Success 200 {object} models.IndexMessage
-// @Router / [get]
 func IndexApiHandler(w http.ResponseWriter, r *http.Request) {
-	defer func() {
-		if err := recover(); err != nil {
-			fmt.Println(err)
-		}
-	}()
-
-	message, _ := json.Marshal(models.NewIndexMessage("Site of OPG+2"))
-	w.Header().Add("Content-Type", "application/json")
-	_, err := fmt.Fprintf(w, string(message))
-	if err != nil {
-		panic(err)
-	}
+	models.SendMessage(w, http.StatusOK, "Hello, " + jwtData(r).Nickname + "!")
 }

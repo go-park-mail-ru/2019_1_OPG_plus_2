@@ -20,20 +20,20 @@ func StartApp(params Params) error {
 	router := mux.NewRouter()
 	apiRouter := router.PathPrefix("/api").Subrouter()
 
+	router.Use(middleware.CorsMiddleware)
+
 	router.HandleFunc("/", controllers.MainHandler)
 	router.PathPrefix("/docs").Handler(httpSwagger.WrapHandler)
 
-	router.Use(middleware.CorsMiddleware)
+	apiRouter.Use(middleware.AuthMiddleware)
 	apiRouter.Use(middleware.ApplyJsonContentType)
 
 	apiRouter.HandleFunc("/", controllers.IndexApiHandler)
-	apiRouter.HandleFunc("/sign_in", controllers.SignIn).Methods("POST")
-	apiRouter.HandleFunc("/sign_out", controllers.SignOut).Methods("POST")
-	apiRouter.HandleFunc("/register", controllers.Register).Methods("POST")
-	apiRouter.HandleFunc("/update", controllers.UpdateProfile).Methods("POST")
-	apiRouter.HandleFunc("/refresh_token", controllers.Refresh).Methods("POST")
 
-	router.HandleFunc("/api/welcome", controllers.Welcome).Methods("GET")
-	apiRouter.HandleFunc("/admin/get_sessions", controllers.GetSessions).Methods("GET")
+	apiRouter.HandleFunc("/user", controllers.SignUp).Methods("POST")
+	apiRouter.HandleFunc("/session", controllers.IsAuth).Methods("GET")
+	apiRouter.HandleFunc("/session", controllers.SignIn).Methods("POST")
+	apiRouter.HandleFunc("/session", controllers.SignOut).Methods("DELETE")
+
 	return http.ListenAndServe(":"+params.Port, router)
 }
