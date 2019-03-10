@@ -1,22 +1,22 @@
 package controllers
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/auth"
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"
+	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/util/fileStorage"
 	"github.com/gorilla/mux"
-	"io"
-	"io/ioutil"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 )
 
 var MB = 1 << 20
 
 var userStorage = models.NewUserProfileStorage()
+var fileVault = fileStorage.NewLocalFileStorage("/home/daniknik/colors_static")
 
 func init() {
 	_ = userStorage.Set(1, &models.UserProfile{
@@ -31,8 +31,6 @@ func init() {
 		AvatarUrl: "<user2_avatar_url>",
 	})
 }
-
-//TODO: в ScoreBoard пагинация по limit offset
 
 // CreateProfile godoc
 // @title Create profile
@@ -166,32 +164,30 @@ func DeleteProfile(w http.ResponseWriter, r *http.Request) {
 // @produce json
 // @success 200 {object} models.SuccessOrErrorMessage
 // @failure 400 {object} models.SuccessOrErrorMessage
+// @failure 500 {object} models.SuccessOrErrorMessage
 // @router /upload_avatar [post]
 func UploadAvatar(w http.ResponseWriter, r *http.Request) {
 	_ = r.ParseMultipartForm(int64(5 * MB))
-	file, _, err := r.FormFile("avatar")
+	file, header, err := r.FormFile("avatar")
 	if err != nil {
 		models.SendMessage(w, http.StatusBadRequest, "Error reading file")
 		return
 	}
 	defer file.Close()
 
-	data := bytes.NewBuffer(nil)
-	_, err = io.Copy(data, file)
-	if err != nil {
-		panic(err)
-	}
-
 	id := jwtData(r).Id
 	fmt.Println(id)
 	user, _ := userStorage.Get(id)
 
-	err = ioutil.WriteFile(`~/colors_static/`+strconv.FormatInt(int64(id), 10)+`.png`, data.Bytes(), 0666)
+	ext := strings.Split(header.Filename, ".")[1]
+
+	err = fileVault.UploadFile(file, strconv.Itoa(id), ext)
 	if err != nil {
-		panic(err)
+		models.SendMessage(w, http.StatusInternalServerError, "Error while saving file, try again later")
+		return
 	}
 
-	user.AvatarUrl = "/static/" + strconv.FormatInt(int64(id), 10) + `.png`
+	user.AvatarUrl = "/static/" + strconv.Itoa(id) + "." + ext
 
 	models.SendMessage(w, http.StatusOK, user.AvatarUrl)
 }

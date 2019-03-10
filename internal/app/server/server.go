@@ -49,7 +49,7 @@ func StartApp(params Params) error {
 		"/static",
 		http.FileServer(http.Dir("/home/daniknik/colors_static/")),
 	)
-	router.PathPrefix("/img").Handler(staticHandler)
+	router.PathPrefix("/static").Handler(staticHandler)
 
 	return http.ListenAndServe(":"+params.Port, router)
 }
