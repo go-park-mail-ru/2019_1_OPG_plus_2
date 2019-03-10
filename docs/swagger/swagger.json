@@ -15,75 +15,20 @@
     "host": "localhost:8001",
     "basePath": "/api",
     "paths": {
-        "/": {
-            "get": {
-                "description": "test api handler",
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Site of OPG+2",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.IndexMessage"
-                        }
-                    }
-                }
-            }
-        },
-        "/refresh_token": {
-            "post": {
-                "description": "Method to register new user",
-                "produces": [
-                    "application/json"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.SuccessOrErrorMessage"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.SuccessOrErrorMessage"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.SuccessOrErrorMessage"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.SuccessOrErrorMessage"
-                        }
-                    }
-                }
-            }
-        },
-        "/register": {
-            "post": {
-                "description": "Method to register new user",
+        "/profile": {
+            "put": {
+                "description": "This method updates info in profile and auth-db record of user, who is making a query",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
+                "summary": "Updates client's profile",
                 "parameters": [
                     {
-                        "description": "User profile",
-                        "name": "user_data",
+                        "description": "User new profile data",
+                        "name": "profile_data",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -115,105 +60,20 @@
                         }
                     }
                 }
-            }
-        },
-        "/sign_in": {
+            },
             "post": {
-                "description": "Sign-in method",
+                "description": "This method creates records about new user in auth-bd and profile-db and then sends cookie to user in order to identify",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
+                "summary": "Registers user",
                 "parameters": [
                     {
-                        "description": "User credentials",
-                        "name": "credentials",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.Credentials"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.SuccessOrErrorMessage"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.SuccessOrErrorMessage"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.SuccessOrErrorMessage"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.SuccessOrErrorMessage"
-                        }
-                    }
-                }
-            }
-        },
-        "/sign_out": {
-            "post": {
-                "description": "Sign-out method",
-                "produces": [
-                    "application/json"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.SuccessOrErrorMessage"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.SuccessOrErrorMessage"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.SuccessOrErrorMessage"
-                        }
-                    }
-                }
-            }
-        },
-        "/update": {
-            "post": {
-                "description": "Method to update user's profile",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "parameters": [
-                    {
-                        "description": "User profile",
-                        "name": "user_data",
+                        "description": "User profile data",
+                        "name": "profile_data",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -243,6 +103,22 @@
                             "type": "object",
                             "$ref": "#/definitions/models.SuccessOrErrorMessage"
                         }
+                    }
+                }
+            },
+            "delete": {
+                "description": "This method deletes all information about user, making a query, including profile, game stats and authorization info",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Deletes profile and user of client",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.SuccessOrErrorMessage"
+                        }
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -254,29 +130,74 @@
                 }
             }
         },
-        "/welcome": {
+        "/profile/{id}": {
             "get": {
-                "description": "Method to check sessions consistency",
+                "description": "This method provides client with profile data, matching required ID",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
-                    "text/plain"
+                    "application/json"
+                ],
+                "summary": "Produces user profile info",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Profile ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Welcome",
+                        "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "type": "object",
+                            "$ref": "#/definitions/models.UserProfile"
                         }
                     },
-                    "401": {
-                        "description": "Unauthorized",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
-                            "type": "string"
+                            "type": "object",
+                            "$ref": "#/definitions/models.SuccessOrErrorMessage"
                         }
                     },
-                    "500": {
-                        "description": "Internal server error",
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
-                            "type": "string"
+                            "type": "object",
+                            "$ref": "#/definitions/models.SuccessOrErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/upload_avatar": {
+            "post": {
+                "description": "This method saves avatar image in server storage and sets it as clients user avatar",
+                "consumes": [
+                    "image/png",
+                    "image/jpeg"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Saves new avatar image of client's user",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.SuccessOrErrorMessage"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.SuccessOrErrorMessage"
                         }
                     }
                 }
@@ -284,25 +205,6 @@
         }
     },
     "definitions": {
-        "models.Credentials": {
-            "type": "object",
-            "properties": {
-                "password": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.IndexMessage": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                }
-            }
-        },
         "models.SuccessOrErrorMessage": {
             "type": "object",
             "properties": {
@@ -325,6 +227,35 @@
                 },
                 "username": {
                     "type": "string"
+                }
+            }
+        },
+        "models.UserProfile": {
+            "type": "object",
+            "properties": {
+                "avatar_url": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "games_played": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "lose": {
+                    "type": "integer"
+                },
+                "score": {
+                    "type": "integer"
+                },
+                "username": {
+                    "type": "string"
+                },
+                "win": {
+                    "type": "integer"
                 }
             }
         }

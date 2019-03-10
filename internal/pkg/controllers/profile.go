@@ -32,11 +32,19 @@ func init() {
 	})
 }
 
-//TODO: CreateProfile вызывает controllers/auth.go 66:72 строки, они создают пользователя, я из jwt беру данные (id) и создаю профиль
 //TODO: в ScoreBoard пагинация по limit offset
 
-// принимает {email, username, password}
-// отдает {status, text}
+// CreateProfile godoc
+// @title Create profile
+// @summary Registers user
+// @description This method creates records about new user in auth-bd and profile-db and then sends cookie to user in order to identify
+// @accept json
+// @produce json
+// @param profile_data body models.UserData true "User profile data"
+// @success 200 {object} models.SuccessOrErrorMessage
+// @failure 400 {object} models.SuccessOrErrorMessage
+// @failure 401 {object} models.SuccessOrErrorMessage
+// @router /profile [post]
 func CreateProfile(w http.ResponseWriter, r *http.Request) {
 	var userData models.UserData
 	err := json.NewDecoder(r.Body).Decode(&userData)
@@ -61,7 +69,17 @@ func CreateProfile(w http.ResponseWriter, r *http.Request) {
 	models.SendMessage(w, http.StatusOK, "Profile successfully created")
 }
 
-// отдает {id, username, email, avatar_url, score, games_played, win, lose}
+// GetProfile godoc
+// @title Get profile
+// @summary Produces user profile info
+// @description This method provides client with profile data, matching required ID
+// @accept json
+// @produce json
+// @param id path int true "Profile ID"
+// @success 200 {object} models.UserProfile
+// @failure 400 {object} models.SuccessOrErrorMessage
+// @failure 404 {object} models.SuccessOrErrorMessage
+// @router /profile/{id} [get]
 func GetProfile(w http.ResponseWriter, r *http.Request) {
 	pathVariables := mux.Vars(r)
 
@@ -86,8 +104,17 @@ func GetProfile(w http.ResponseWriter, r *http.Request) {
 	_, _ = fmt.Fprintln(w, string(msg))
 }
 
-// принимает {username, email, password}
-// отдает {status, text}
+// UpdateProfile godoc
+// @title Update profile
+// @summary Updates client's profile
+// @description This method updates info in profile and auth-db record of user, who is making a query
+// @accept json
+// @produce json
+// @param profile_data body models.UserData true "User new profile data"
+// @success 200 {object} models.SuccessOrErrorMessage
+// @failure 400 {object} models.SuccessOrErrorMessage
+// @failure 401 {object} models.SuccessOrErrorMessage
+// @router /profile [put]
 func UpdateProfile(w http.ResponseWriter, r *http.Request) {
 	// UpdateEmail
 	// UpdateUsername
@@ -110,7 +137,14 @@ func UpdateProfile(w http.ResponseWriter, r *http.Request) {
 	models.SendMessage(w, http.StatusOK, "Profile successfully updated")
 }
 
-// отдает {status, text}
+// DeleteProfile godoc
+// @title Delete profile
+// @summary Deletes profile and user of client
+// @description This method deletes all information about user, making a query, including profile, game stats and authorization info
+// @produce json
+// @success 200 {object} models.SuccessOrErrorMessage
+// @failure 500 {object} models.SuccessOrErrorMessage
+// @router /profile [delete]
 func DeleteProfile(w http.ResponseWriter, r *http.Request) {
 	id := jwtData(r).Id
 
@@ -122,8 +156,18 @@ func DeleteProfile(w http.ResponseWriter, r *http.Request) {
 	models.SendMessage(w, http.StatusOK, "Profile "+string(id)+" deleted successfully")
 }
 
-// принимает multipart/form-data
-// отдает {status, text}
+// TODO: implement FileStorage interface to inline file operations
+
+// UploadAvatar godoc
+// @title Upload new avatar
+// @summary Saves new avatar image of client's user
+// @description This method saves avatar image in server storage and sets it as clients user avatar
+// @accept png
+// @accept jpeg
+// @produce json
+// @success 200 {object} models.SuccessOrErrorMessage
+// @failure 400 {object} models.SuccessOrErrorMessage
+// @router /upload_avatar [post]
 func UploadAvatar(w http.ResponseWriter, r *http.Request) {
 	_ = r.ParseMultipartForm(int64(5 * MB))
 	file, _, err := r.FormFile("avatar")
@@ -148,7 +192,7 @@ func UploadAvatar(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	user.AvatarUrl = "/img/" + strconv.FormatInt(int64(id), 10) + `.png`
+	user.AvatarUrl = "/static/" + strconv.FormatInt(int64(id), 10) + `.png`
 
 	models.SendMessage(w, http.StatusOK, user.AvatarUrl)
 }

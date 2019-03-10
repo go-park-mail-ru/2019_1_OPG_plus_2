@@ -1,17 +1,5 @@
 basePath: /api
 definitions:
-  models.Credentials:
-    properties:
-      password:
-        type: string
-      username:
-        type: string
-    type: object
-  models.IndexMessage:
-    properties:
-      message:
-        type: string
-    type: object
   models.SuccessOrErrorMessage:
     properties:
       message:
@@ -28,6 +16,25 @@ definitions:
       username:
         type: string
     type: object
+  models.UserProfile:
+    properties:
+      avatar_url:
+        type: string
+      email:
+        type: string
+      games_played:
+        type: integer
+      id:
+        type: integer
+      lose:
+        type: integer
+      score:
+        type: integer
+      username:
+        type: string
+      win:
+        type: integer
+    type: object
 host: localhost:8001
 info:
   contact:
@@ -39,36 +46,15 @@ info:
   title: Colors service API by OPG+2
   version: "1.0"
 paths:
-  /:
-    get:
-      description: test api handler
+  /profile:
+    delete:
+      description: This method deletes all information about user, making a query,
+        including profile, game stats and authorization info
       produces:
       - application/json
       responses:
         "200":
           description: OK
-          schema:
-            $ref: '#/definitions/models.IndexMessage'
-            type: object
-      summary: Site of OPG+2
-  /refresh_token:
-    post:
-      description: Method to register new user
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.SuccessOrErrorMessage'
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.SuccessOrErrorMessage'
-            type: object
-        "401":
-          description: Unauthorized
           schema:
             $ref: '#/definitions/models.SuccessOrErrorMessage'
             type: object
@@ -77,15 +63,16 @@ paths:
           schema:
             $ref: '#/definitions/models.SuccessOrErrorMessage'
             type: object
-  /register:
+      summary: Deletes profile and user of client
     post:
       consumes:
       - application/json
-      description: Method to register new user
+      description: This method creates records about new user in auth-bd and profile-db
+        and then sends cookie to user in order to identify
       parameters:
-      - description: User profile
+      - description: User profile data
         in: body
-        name: user_data
+        name: profile_data
         required: true
         schema:
           $ref: '#/definitions/models.UserData'
@@ -108,72 +95,16 @@ paths:
           schema:
             $ref: '#/definitions/models.SuccessOrErrorMessage'
             type: object
-  /sign_in:
-    post:
+      summary: Registers user
+    put:
       consumes:
       - application/json
-      description: Sign-in method
+      description: This method updates info in profile and auth-db record of user,
+        who is making a query
       parameters:
-      - description: User credentials
+      - description: User new profile data
         in: body
-        name: credentials
-        required: true
-        schema:
-          $ref: '#/definitions/models.Credentials'
-          type: object
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.SuccessOrErrorMessage'
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.SuccessOrErrorMessage'
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/models.SuccessOrErrorMessage'
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.SuccessOrErrorMessage'
-            type: object
-  /sign_out:
-    post:
-      description: Sign-out method
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.SuccessOrErrorMessage'
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.SuccessOrErrorMessage'
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/models.SuccessOrErrorMessage'
-            type: object
-  /update:
-    post:
-      consumes:
-      - application/json
-      description: Method to update user's profile
-      parameters:
-      - description: User profile
-        in: body
-        name: user_data
+        name: profile_data
         required: true
         schema:
           $ref: '#/definitions/models.UserData'
@@ -196,27 +127,57 @@ paths:
           schema:
             $ref: '#/definitions/models.SuccessOrErrorMessage'
             type: object
-        "500":
-          description: Internal Server Error
+      summary: Updates client's profile
+  /profile/{id}:
+    get:
+      consumes:
+      - application/json
+      description: This method provides client with profile data, matching required
+        ID
+      parameters:
+      - description: Profile ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.UserProfile'
+            type: object
+        "400":
+          description: Bad Request
           schema:
             $ref: '#/definitions/models.SuccessOrErrorMessage'
             type: object
-  /welcome:
-    get:
-      description: Method to check sessions consistency
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            type: object
+      summary: Produces user profile info
+  /upload_avatar:
+    post:
+      consumes:
+      - image/png
+      - image/jpeg
+      description: This method saves avatar image in server storage and sets it as
+        clients user avatar
       produces:
-      - text/plain
+      - application/json
       responses:
         "200":
-          description: Welcome
+          description: OK
           schema:
-            type: string
-        "401":
-          description: Unauthorized
+            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            type: object
+        "400":
+          description: Bad Request
           schema:
-            type: string
-        "500":
-          description: Internal server error
-          schema:
-            type: string
+            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            type: object
+      summary: Saves new avatar image of client's user
 swagger: "2.0"
