@@ -18,18 +18,26 @@ var userStorage = models.NewUserProfileStorage()
 
 func init() {
 	_ = userStorage.Set("1", &models.UserProfile{
-		Username:  "user1",
-		Email:     "user1@example.com",
+		ID:        1,
 		Score:     228,
 		AvatarUrl: "<user1_avatar_url>",
 	})
 
 	_ = userStorage.Set("2", &models.UserProfile{
-		Username:  "user2",
-		Email:     "user2@example.com",
+		ID:        2,
 		Score:     1337,
 		AvatarUrl: "<user2_avatar_url>",
 	})
+}
+
+//TODO: профайл поменять в соответствии с фоткой: оставить id(number), score, avatar, статы остальное лежит в jwt
+//TODO: CreateProfile вызывает controllers/auth.go 66:72 строки, они создают пользователя, я из jwt беру данные (id) и создаю профиль
+//TODO: в ScoreBoard пагинация по limit offset
+
+type ProfileData struct {
+	Username string `json:"username, string"`
+	Email    string `json:"email, string"`
+	models.UserProfile
 }
 
 func CreateProfile(w http.ResponseWriter, r *http.Request) {
@@ -39,7 +47,10 @@ func CreateProfile(w http.ResponseWriter, r *http.Request) {
 		models.SendMessage(w, http.StatusBadRequest, "JSON parsing error")
 		return
 	}
-	_ = userStorage.Set(strconv.FormatInt(int64(len(userStorage.Data)+1), 10), &profile)
+
+	id := jwtData(r).Id
+	profile.ID = id
+	_ = userStorage.Set(string(id), &profile)
 	models.SendMessage(w, http.StatusOK, "Profile successfully created")
 }
 
@@ -69,7 +80,6 @@ func GetProfile(w http.ResponseWriter, r *http.Request) {
 func UpdateProfile(w http.ResponseWriter, r *http.Request) {
 	// UpdateEmail
 	// UpdateUsername
-	// UpdateAvatar
 	// whatever else...
 
 	var newProfile models.UserUpdateInfo
@@ -79,10 +89,12 @@ func UpdateProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id := strconv.Itoa(jwtData(r).Id)
-	user, _ := userStorage.Get(id)
-	user.Username = newProfile.Username
-	user.Email = newProfile.Email
+	//id := strconv.Itoa(jwtData(r).Id)
+	//user, _ := userStorage.Get(id)
+	//user.Username = newProfile.Username
+	//user.Email = newProfile.Email
+
+	//auth.UpdateUser(newProfile)
 
 	models.SendMessage(w, http.StatusOK, "Profile successfully updated")
 }
@@ -114,14 +126,15 @@ func UploadAvatar(w http.ResponseWriter, r *http.Request) {
 	}
 
 	id := strconv.Itoa(jwtData(r).Id)
+	fmt.Println(id)
 	user, _ := userStorage.Get(id)
 
-	err = ioutil.WriteFile(`/home/daniknik/colors_static/`+user.Username+`.png`, data.Bytes(), 0666)
+	err = ioutil.WriteFile(`/home/daniknik/colors_static/`+id+`.png`, data.Bytes(), 0666)
 	if err != nil {
 		panic(err)
 	}
 
-	user.AvatarUrl = "/img/" + user.Username + `.png`
+	user.AvatarUrl = "/img/" + id + `.png`
 
 	models.SendMessage(w, http.StatusOK, user.AvatarUrl)
 }
@@ -129,5 +142,5 @@ func UploadAvatar(w http.ResponseWriter, r *http.Request) {
 //сервисный метод чтобы понимать что творится в хранилище юзеров
 func GetProfiles(w http.ResponseWriter, r *http.Request) {
 	message, _ := json.Marshal(userStorage.Data)
-	models.SendMessage(w, http.StatusOK, string(message))
+	_, _ = fmt.Fprintln(w, string(message))
 }
