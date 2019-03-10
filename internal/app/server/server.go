@@ -30,10 +30,26 @@ func StartApp(params Params) error {
 
 	apiRouter.HandleFunc("/", controllers.IndexApiHandler)
 
-	apiRouter.HandleFunc("/user", controllers.SignUp).Methods("POST")
 	apiRouter.HandleFunc("/session", controllers.IsAuth).Methods("GET")
 	apiRouter.HandleFunc("/session", controllers.SignIn).Methods("POST")
 	apiRouter.HandleFunc("/session", controllers.SignOut).Methods("DELETE")
+
+	// apiRouter.HandleFunc("/profile", controllers.GetProfile).Methods("GET")
+	apiRouter.HandleFunc("/profile/{id}", controllers.GetProfile).Methods("GET")
+	apiRouter.HandleFunc("/profile", controllers.CreateProfile).Methods("POST")
+	apiRouter.HandleFunc("/profile", controllers.UpdateProfile).Methods("PUT")
+	apiRouter.HandleFunc("/profile", controllers.DeleteProfile).Methods("DELETE")
+	
+	apiRouter.HandleFunc("/upload_avatar", controllers.UploadAvatar).Methods("POST")
+
+	apiRouter.HandleFunc("/profiles", controllers.GetProfiles).Methods("GET")
+	apiRouter.HandleFunc("/profiles/score?page={page}", controllers.ScoreBoardByPage).Methods("GET")
+
+	staticHandler := http.StripPrefix(
+		"/img",
+		http.FileServer(http.Dir("/home/daniknik/colors_static/")),
+	)
+	router.PathPrefix("/img").Handler(staticHandler)
 
 	return http.ListenAndServe(":"+params.Port, router)
 }

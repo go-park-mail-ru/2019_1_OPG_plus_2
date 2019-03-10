@@ -5,42 +5,6 @@ import (
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"
 )
 
-type Cache interface {
-	Get(sessionToken string) (*models.UserSessionRecord, error)
-	Set(sessionToken string, dummy *models.UserSessionRecord) error
-	Delete(sessionToken string) error
-}
-
-//
-
-type CookieCacheDummy struct {
-	Data map[string]*models.UserSessionRecord
-}
-
-func NewCookieCacheDummy() *CookieCacheDummy {
-	return &CookieCacheDummy{Data: make(map[string]*models.UserSessionRecord)}
-}
-
-func (cache *CookieCacheDummy) Set(sessionToken string, dummy *models.UserSessionRecord) error {
-	cache.Data[sessionToken] = dummy
-	return nil
-}
-
-func (cache *CookieCacheDummy) Get(sessionToken string) (*models.UserSessionRecord, error) {
-	result := cache.Data[sessionToken]
-	//if result == nil {
-	//	return nil, fmt.Errorf("NO COOKIE IN CACHE")
-	//}
-	return result, nil
-}
-
-func (cache *CookieCacheDummy) Delete(sessionToken string) error {
-	delete(cache.Data, sessionToken)
-	return nil
-}
-
-//
-
 type UserStorage struct {
 	Data map[string]*models.UserData
 }

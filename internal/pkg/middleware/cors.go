@@ -4,13 +4,6 @@ import (
 	"net/http"
 )
 
-func ApplyMiddleware(handler http.Handler, middleware ...func(http.Handler) http.Handler) http.Handler {
-	for _, mware := range middleware {
-		handler = mware(handler)
-	}
-	return handler
-}
-
 type Middleware func(next http.Handler) http.Handler
 
 type CorsData struct {
