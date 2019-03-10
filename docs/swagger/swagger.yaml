@@ -3,34 +3,43 @@ definitions:
   models.SuccessOrErrorMessage:
     properties:
       message:
+        example: Query processed successfully
         type: string
       status:
+        example: 200
         type: integer
     type: object
   models.UserData:
     properties:
       email:
+        example: user_test@test.com
         type: string
       password:
+        example: verysecretpasswordwhichnooneknows
         type: string
       username:
+        example: user_test
         type: string
     type: object
   models.UserProfile:
     properties:
       avatar_url:
+        example: <some avatar url>
         type: string
       email:
+        example: user_test@test.com
         type: string
       games_played:
         type: integer
       id:
+        example: 1
         type: integer
       lose:
         type: integer
       score:
         type: integer
       username:
+        example: user_test
         type: string
       win:
         type: integer

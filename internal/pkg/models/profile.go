@@ -1,10 +1,10 @@
 package models
 
 type UserProfile struct {
-	ID        int    `json:"id, string"`
-	Username  string `json:"username, string"`
-	Email     string `json:"email, string"`
-	AvatarUrl string `json:"avatar_url, string"`
+	ID        int    `json:"id, string" example:"1"`
+	Username  string `json:"username, string" example:"user_test"`
+	Email     string `json:"email, string" example:"user_test@test.com"`
+	AvatarUrl string `json:"avatar_url, string" example:"<some avatar url>"`
 
 	Score       int `json:"score, number"`
 	GamesPlayed int `json:"games_played, number"`
@@ -13,9 +13,9 @@ type UserProfile struct {
 }
 
 type UserUpdateInfo struct {
-	Username string `json:"username, number"`
-	Email    string `json:"email, number"`
-	Password string `json:"password, number"` //поле под вопросом, скорее всего надо будет скармливать системе аутентификации
+	Username string `json:"username, number" example:"user_test"`
+	Email    string `json:"email, number" example:"user_test@test.com"`
+	Password string `json:"password, number"example:"verysecretpasswordwhichnooneknows"`
 }
 
 type UserProfileStorage struct {

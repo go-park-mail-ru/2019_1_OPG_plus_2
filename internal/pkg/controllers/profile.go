@@ -82,7 +82,6 @@ func CreateProfile(w http.ResponseWriter, r *http.Request) {
 // @router /profile/{id} [get]
 func GetProfile(w http.ResponseWriter, r *http.Request) {
 	pathVariables := mux.Vars(r)
-
 	if pathVariables == nil {
 		models.SendMessage(w, http.StatusBadRequest, "Bad query")
 		return

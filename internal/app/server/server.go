@@ -43,7 +43,7 @@ func StartApp(params Params) error {
 	apiRouter.HandleFunc("/upload_avatar", controllers.UploadAvatar).Methods("POST")
 
 	apiRouter.HandleFunc("/profiles", controllers.GetProfiles).Methods("GET")
-	apiRouter.HandleFunc("/profiles/score?page={page}", controllers.ScoreBoardByPage).Methods("GET")
+	apiRouter.HandleFunc("/profiles/score", controllers.ScoreBoardByPage).Methods("GET")
 
 	staticHandler := http.StripPrefix(
 		"/static",

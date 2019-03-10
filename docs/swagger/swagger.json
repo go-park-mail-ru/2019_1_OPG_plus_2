@@ -209,10 +209,12 @@
             "type": "object",
             "properties": {
                 "message": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Query processed successfully"
                 },
                 "status": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 200
                 }
             }
         },
@@ -220,13 +222,16 @@
             "type": "object",
             "properties": {
                 "email": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "user_test@test.com"
                 },
                 "password": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "verysecretpasswordwhichnooneknows"
                 },
                 "username": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "user_test"
                 }
             }
         },
@@ -234,16 +239,19 @@
             "type": "object",
             "properties": {
                 "avatar_url": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "\u003csome avatar url\u003e"
                 },
                 "email": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "user_test@test.com"
                 },
                 "games_played": {
                     "type": "integer"
                 },
                 "id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "lose": {
                     "type": "integer"
@@ -252,7 +260,8 @@
                     "type": "integer"
                 },
                 "username": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "user_test"
                 },
                 "win": {
                     "type": "integer"

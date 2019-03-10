@@ -11,9 +11,9 @@ type SignInData struct {
 }
 
 type UserData struct {
-	Email    string `json:"email"`
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Email    string `json:"email" example:"user_test@test.com"`
+	Username string `json:"username" example:"user_test"`
+	Password string `json:"password" example:"verysecretpasswordwhichnooneknows"`
 }
 
 type DbUserData struct {
