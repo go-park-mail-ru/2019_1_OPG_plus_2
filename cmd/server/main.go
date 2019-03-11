@@ -13,10 +13,6 @@ import (
 // @contact.name @DanikNik
 // @contact.email nikolsky.dan@gmail.com
 
-// @contact.name @severush
-
-// @contact.name @Xatabch
-
 // @host localhost:8001
 // @BasePath /api
 
