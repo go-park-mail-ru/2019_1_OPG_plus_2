@@ -39,17 +39,17 @@ func StartApp(params Params) error {
 	apiRouter.HandleFunc("/profile", controllers.CreateProfile).Methods("POST")
 	apiRouter.HandleFunc("/profile", controllers.UpdateProfile).Methods("PUT")
 	apiRouter.HandleFunc("/profile", controllers.DeleteProfile).Methods("DELETE")
-	
+
 	apiRouter.HandleFunc("/upload_avatar", controllers.UploadAvatar).Methods("POST")
 
 	apiRouter.HandleFunc("/profiles", controllers.GetProfiles).Methods("GET")
-	apiRouter.HandleFunc("/profiles/score?page={page}", controllers.ScoreBoardByPage).Methods("GET")
+	apiRouter.HandleFunc("/profiles/score", controllers.ScoreBoardByPage).Methods("GET")
 
 	staticHandler := http.StripPrefix(
-		"/img",
+		"/static",
 		http.FileServer(http.Dir("/home/daniknik/colors_static/")),
 	)
-	router.PathPrefix("/img").Handler(staticHandler)
+	router.PathPrefix("/static").Handler(staticHandler)
 
 	return http.ListenAndServe(":"+params.Port, router)
 }

@@ -1,32 +1,69 @@
 basePath: /api
 definitions:
-  models.Credentials:
+  models.ScoreboardRecord:
     properties:
-      password:
-        type: string
+      position:
+        example: 1
+        type: integer
+      score:
+        example: 314159
+        type: integer
       username:
+        example: XxX__NaGiBaToR__XxX
         type: string
     type: object
-  models.IndexMessage:
+  models.SignInData:
     properties:
-      message:
+      login:
+        example: test@mail.ru
+        type: string
+      password:
+        example: Qwerty123
         type: string
     type: object
   models.SuccessOrErrorMessage:
     properties:
       message:
+        example: Query processed successfully
         type: string
       status:
+        example: 200
         type: integer
     type: object
   models.UserData:
     properties:
       email:
+        example: user_test@test.com
         type: string
       password:
+        example: verysecretpasswordwhichnooneknows
         type: string
       username:
+        example: user_test
         type: string
+    type: object
+  models.UserProfile:
+    properties:
+      avatar_url:
+        example: <some avatar url>
+        type: string
+      email:
+        example: user_test@test.com
+        type: string
+      games_played:
+        type: integer
+      id:
+        example: 1
+        type: integer
+      lose:
+        type: integer
+      score:
+        type: integer
+      username:
+        example: user_test
+        type: string
+      win:
+        type: integer
     type: object
 host: localhost:8001
 info:
@@ -39,36 +76,15 @@ info:
   title: Colors service API by OPG+2
   version: "1.0"
 paths:
-  /:
-    get:
-      description: test api handler
+  /profile:
+    delete:
+      description: This method deletes all information about user, making a query,
+        including profile, game stats and authorization info
       produces:
       - application/json
       responses:
         "200":
           description: OK
-          schema:
-            $ref: '#/definitions/models.IndexMessage'
-            type: object
-      summary: Site of OPG+2
-  /refresh_token:
-    post:
-      description: Method to register new user
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.SuccessOrErrorMessage'
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.SuccessOrErrorMessage'
-            type: object
-        "401":
-          description: Unauthorized
           schema:
             $ref: '#/definitions/models.SuccessOrErrorMessage'
             type: object
@@ -77,15 +93,18 @@ paths:
           schema:
             $ref: '#/definitions/models.SuccessOrErrorMessage'
             type: object
-  /register:
+      summary: Deletes profile and user of client
+      tags:
+      - profile
     post:
       consumes:
       - application/json
-      description: Method to register new user
+      description: This method creates records about new user in auth-bd and profile-db
+        and then sends cookie to user in order to identify
       parameters:
-      - description: User profile
+      - description: User profile data
         in: body
-        name: user_data
+        name: profile_data
         required: true
         schema:
           $ref: '#/definitions/models.UserData'
@@ -108,18 +127,111 @@ paths:
           schema:
             $ref: '#/definitions/models.SuccessOrErrorMessage'
             type: object
-  /sign_in:
-    post:
+      summary: Registers user
+      tags:
+      - profile
+    put:
       consumes:
       - application/json
-      description: Sign-in method
+      description: This method updates info in profile and auth-db record of user,
+        who is making a query
       parameters:
-      - description: User credentials
+      - description: User new profile data
+        in: body
+        name: profile_data
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserData'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            type: object
+      summary: Updates client's profile
+      tags:
+      - profile
+  /profile/{id}:
+    get:
+      consumes:
+      - application/json
+      description: This method provides client with profile data, matching required
+        ID
+      parameters:
+      - description: Profile ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.UserProfile'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            type: object
+      summary: Produces user profile info
+      tags:
+      - profile
+  /profiles/score:
+    get:
+      description: This method provides client with scoreboard limited with {limit}
+        entries per page and offset of {offset} from the first position
+      parameters:
+      - description: Entries per page
+        in: query
+        name: limit
+        type: integer
+      - description: Entries from the first position
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.ScoreboardRecord'
+            type: array
+      summary: Produces scoreboard page with {limit} and {offset}
+      tags:
+      - scoreboard
+  /session:
+    delete:
+      description: This method logs user out and deletes cookie
+      parameters:
+      - description: Credentials
         in: body
         name: credentials
         required: true
         schema:
-          $ref: '#/definitions/models.Credentials'
+          $ref: '#/definitions/models.SignInData'
           type: object
       produces:
       - application/json
@@ -129,24 +241,16 @@ paths:
           schema:
             $ref: '#/definitions/models.SuccessOrErrorMessage'
             type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.SuccessOrErrorMessage'
-            type: object
         "401":
           description: Unauthorized
           schema:
             $ref: '#/definitions/models.SuccessOrErrorMessage'
             type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.SuccessOrErrorMessage'
-            type: object
-  /sign_out:
-    post:
-      description: Sign-out method
+      summary: Logs user out
+      tags:
+      - auth
+    get:
+      description: This method checks whether user is signed in or signed out
       produces:
       - application/json
       responses:
@@ -155,28 +259,25 @@ paths:
           schema:
             $ref: '#/definitions/models.SuccessOrErrorMessage'
             type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.SuccessOrErrorMessage'
-            type: object
         "401":
           description: Unauthorized
           schema:
             $ref: '#/definitions/models.SuccessOrErrorMessage'
             type: object
-  /update:
+      summary: Checks user session
+      tags:
+      - auth
     post:
       consumes:
       - application/json
-      description: Method to update user's profile
+      description: This method logs user in and sets cookie
       parameters:
-      - description: User profile
+      - description: Credentials
         in: body
-        name: user_data
+        name: credentials
         required: true
         schema:
-          $ref: '#/definitions/models.UserData'
+          $ref: '#/definitions/models.SignInData'
           type: object
       produces:
       - application/json
@@ -201,22 +302,35 @@ paths:
           schema:
             $ref: '#/definitions/models.SuccessOrErrorMessage'
             type: object
-  /welcome:
-    get:
-      description: Method to check sessions consistency
+      summary: Grants client access
+      tags:
+      - auth
+  /upload_avatar:
+    post:
+      consumes:
+      - image/png
+      - image/jpeg
+      description: This method saves avatar image in server storage and sets it as
+        clients user avatar
       produces:
-      - text/plain
+      - application/json
       responses:
         "200":
-          description: Welcome
+          description: OK
           schema:
-            type: string
-        "401":
-          description: Unauthorized
+            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            type: object
+        "400":
+          description: Bad Request
           schema:
-            type: string
+            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            type: object
         "500":
-          description: Internal server error
+          description: Internal Server Error
           schema:
-            type: string
+            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            type: object
+      summary: Saves new avatar image of client's user
+      tags:
+      - profile
 swagger: "2.0"

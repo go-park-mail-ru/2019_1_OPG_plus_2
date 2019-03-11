@@ -1,9 +1,12 @@
 package models
 
+import "fmt"
+
 type UserProfile struct {
-	Username  string `json:"username, string"`
-	Email     string `json:"email, string"`
-	AvatarUrl string `json:"avatar_url, string"`
+	ID        int    `json:"id, string" example:"1"`
+	Username  string `json:"username, string" example:"user_test"`
+	Email     string `json:"email, string" example:"user_test@test.com"`
+	AvatarUrl string `json:"avatar_url, string" example:"<some avatar url>"`
 
 	Score       int `json:"score, number"`
 	GamesPlayed int `json:"games_played, number"`
@@ -11,30 +14,27 @@ type UserProfile struct {
 	Lose        int `json:"lose, number"`
 }
 
-type UserUpdateInfo struct {
-	Username string `json:"username, number"`
-	Email    string `json:"email, number"`
-	Password string `json:"password, number"` //поле под вопросом, скорее всего надо будет скармливать системе аутентификации
-}
-
 type UserProfileStorage struct {
-	Data map[string]*UserProfile
+	Data map[int]*UserProfile
 }
 
-func (storage *UserProfileStorage) Get(key string) (object *UserProfile, err error) {
+func (storage *UserProfileStorage) Get(key int) (object *UserProfile, err error) {
 	return storage.Data[key], nil
 }
 
-func (storage *UserProfileStorage) Set(key string, object *UserProfile) (err error) {
+func (storage *UserProfileStorage) Set(key int, object *UserProfile) (err error) {
 	storage.Data[key] = object
 	return nil
 }
 
-func (storage *UserProfileStorage) Delete(key string) (err error) {
+func (storage *UserProfileStorage) Delete(key int) (err error) {
+	if storage.Data[key] == nil {
+		return fmt.Errorf("NO USER IN DB")
+	}
 	delete(storage.Data, key)
 	return nil
 }
 
 func NewUserProfileStorage() *UserProfileStorage {
-	return &UserProfileStorage{Data: make(map[string]*UserProfile)}
+	return &UserProfileStorage{Data: make(map[int]*UserProfile)}
 }
