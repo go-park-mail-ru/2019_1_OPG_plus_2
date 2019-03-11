@@ -1,5 +1,7 @@
 package models
 
+import "fmt"
+
 type UserProfile struct {
 	ID        int    `json:"id, string" example:"1"`
 	Username  string `json:"username, string" example:"user_test"`
@@ -26,6 +28,9 @@ func (storage *UserProfileStorage) Set(key int, object *UserProfile) (err error)
 }
 
 func (storage *UserProfileStorage) Delete(key int) (err error) {
+	if storage.Data[key] == nil {
+		return fmt.Errorf("NO USER IN DB")
+	}
 	delete(storage.Data, key)
 	return nil
 }

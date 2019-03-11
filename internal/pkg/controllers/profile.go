@@ -23,12 +23,16 @@ func init() {
 		ID:        1,
 		Score:     228,
 		AvatarUrl: "<user1_avatar_url>",
+		Username:  "test",
+		Email:     "test@mail.ru",
 	})
 
 	_ = userStorage.Set(2, &models.UserProfile{
 		ID:        2,
 		Score:     1337,
 		AvatarUrl: "<user2_avatar_url>",
+		Username:  "user",
+		Email:     "user@mail.ru",
 	})
 }
 
@@ -144,10 +148,12 @@ func UpdateProfile(w http.ResponseWriter, r *http.Request) {
 // @router /profile [delete]
 func DeleteProfile(w http.ResponseWriter, r *http.Request) {
 	id := jwtData(r).Id
+	fmt.Println(id)
 
 	err := userStorage.Delete(id)
 	if err != nil {
-		models.SendMessage(w, http.StatusInternalServerError, "Error while deleting profile")
+		models.SendMessage(w, http.StatusInternalServerError, "Error while deleting profile: "+err.Error())
+		return
 	}
 
 	models.SendMessage(w, http.StatusOK, "Profile "+string(id)+" deleted successfully")
