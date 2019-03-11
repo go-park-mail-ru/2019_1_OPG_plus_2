@@ -40,6 +40,7 @@ func init() {
 // @title Create profile
 // @summary Registers user
 // @description This method creates records about new user in auth-bd and profile-db and then sends cookie to user in order to identify
+// @tags profile
 // @accept json
 // @produce json
 // @param profile_data body models.UserData true "User profile data"
@@ -75,6 +76,7 @@ func CreateProfile(w http.ResponseWriter, r *http.Request) {
 // @title Get profile
 // @summary Produces user profile info
 // @description This method provides client with profile data, matching required ID
+// @tags profile
 // @accept json
 // @produce json
 // @param id path int true "Profile ID"
@@ -109,6 +111,7 @@ func GetProfile(w http.ResponseWriter, r *http.Request) {
 // @title Update profile
 // @summary Updates client's profile
 // @description This method updates info in profile and auth-db record of user, who is making a query
+// @tags profile
 // @accept json
 // @produce json
 // @param profile_data body models.UserData true "User new profile data"
@@ -142,6 +145,7 @@ func UpdateProfile(w http.ResponseWriter, r *http.Request) {
 // @title Delete profile
 // @summary Deletes profile and user of client
 // @description This method deletes all information about user, making a query, including profile, game stats and authorization info
+// @tags profile
 // @produce json
 // @success 200 {object} models.SuccessOrErrorMessage
 // @failure 500 {object} models.SuccessOrErrorMessage
@@ -165,6 +169,7 @@ func DeleteProfile(w http.ResponseWriter, r *http.Request) {
 // @title Upload new avatar
 // @summary Saves new avatar image of client's user
 // @description This method saves avatar image in server storage and sets it as clients user avatar
+// @tags profile
 // @accept png
 // @accept jpeg
 // @produce json

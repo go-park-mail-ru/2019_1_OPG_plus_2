@@ -12,6 +12,15 @@ definitions:
         example: XxX__NaGiBaToR__XxX
         type: string
     type: object
+  models.SignInData:
+    properties:
+      login:
+        example: test@mail.ru
+        type: string
+      password:
+        example: Qwerty123
+        type: string
+    type: object
   models.SuccessOrErrorMessage:
     properties:
       message:
@@ -85,6 +94,8 @@ paths:
             $ref: '#/definitions/models.SuccessOrErrorMessage'
             type: object
       summary: Deletes profile and user of client
+      tags:
+      - profile
     post:
       consumes:
       - application/json
@@ -117,6 +128,8 @@ paths:
             $ref: '#/definitions/models.SuccessOrErrorMessage'
             type: object
       summary: Registers user
+      tags:
+      - profile
     put:
       consumes:
       - application/json
@@ -149,6 +162,8 @@ paths:
             $ref: '#/definitions/models.SuccessOrErrorMessage'
             type: object
       summary: Updates client's profile
+      tags:
+      - profile
   /profile/{id}:
     get:
       consumes:
@@ -180,6 +195,8 @@ paths:
             $ref: '#/definitions/models.SuccessOrErrorMessage'
             type: object
       summary: Produces user profile info
+      tags:
+      - profile
   /profiles/score:
     get:
       description: This method provides client with scoreboard limited with {limit}
@@ -203,6 +220,91 @@ paths:
               $ref: '#/definitions/models.ScoreboardRecord'
             type: array
       summary: Produces scoreboard page with {limit} and {offset}
+      tags:
+      - scoreboard
+  /session:
+    delete:
+      description: This method logs user out and deletes cookie
+      parameters:
+      - description: Credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/models.SignInData'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            type: object
+      summary: Logs user out
+      tags:
+      - auth
+    get:
+      description: This method checks whether user is signed in or signed out
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            type: object
+      summary: Checks user session
+      tags:
+      - auth
+    post:
+      consumes:
+      - application/json
+      description: This method logs user in and sets cookie
+      parameters:
+      - description: Credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/models.SignInData'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            type: object
+      summary: Grants client access
+      tags:
+      - auth
   /upload_avatar:
     post:
       consumes:
@@ -223,5 +325,12 @@ paths:
           schema:
             $ref: '#/definitions/models.SuccessOrErrorMessage'
             type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            type: object
       summary: Saves new avatar image of client's user
+      tags:
+      - profile
 swagger: "2.0"

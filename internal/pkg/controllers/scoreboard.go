@@ -27,6 +27,7 @@ var pageSize = 10
 // @title Get scoreboard page
 // @summary Produces scoreboard page with {limit} and {offset}
 // @description This method provides client with scoreboard limited with {limit} entries per page and offset of {offset} from the first position
+// @tags scoreboard
 // @produce json
 // @param limit query int false "Entries per page"
 // @param offset query int false "Entries from the first position"
