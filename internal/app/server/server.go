@@ -4,6 +4,7 @@ import (
 	"fmt"
 	_ "github.com/go-park-mail-ru/2019_1_OPG_plus_2/docs"
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/controllers"
+	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/db"
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/middleware"
 	"github.com/gorilla/mux"
 	"github.com/swaggo/http-swagger"
@@ -16,6 +17,8 @@ type Params struct {
 
 func StartApp(params Params) error {
 	fmt.Println("Server starting at " + params.Port)
+
+	db.Start()
 
 	router := mux.NewRouter()
 	apiRouter := router.PathPrefix("/api").Subrouter()

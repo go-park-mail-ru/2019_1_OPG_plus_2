@@ -17,7 +17,7 @@ type UserData struct {
 }
 
 type DbUserData struct {
-	Id       int    `json:"id"`
+	Id       int64    `json:"id"`
 	Email    string `json:"email"`
 	Username string `json:"username"`
 	PassHash string `json:"pass_hash"`
@@ -25,7 +25,7 @@ type DbUserData struct {
 
 type JwtData struct {
 	jwt.StandardClaims
-	Id       int    `json:"id"`
+	Id       int64    `json:"id"`
 	Email    string `json:"email"`
 	Username string `json:"username"`
 }

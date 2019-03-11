@@ -97,7 +97,7 @@ func GetProfile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	intId, _ := strconv.ParseInt(id, 10, 64)
-	profile, err := userStorage.Get(int(intId))
+	profile, err := userStorage.Get(intId)
 	if err != nil {
 		models.SendMessage(w, http.StatusNotFound, "User not found")
 		return
@@ -192,13 +192,13 @@ func UploadAvatar(w http.ResponseWriter, r *http.Request) {
 
 	ext := strings.Split(header.Filename, ".")[1]
 
-	err = fileVault.UploadFile(file, strconv.Itoa(id), ext)
+	err = fileVault.UploadFile(file, strconv.Itoa(int(id)), ext)
 	if err != nil {
 		models.SendMessage(w, http.StatusInternalServerError, "Error while saving file, try again later")
 		return
 	}
 
-	user.AvatarUrl = "/static/" + strconv.Itoa(id) + "." + ext
+	user.AvatarUrl = "/static/" + strconv.Itoa(int(id)) + "." + ext
 
 	models.SendMessage(w, http.StatusOK, user.AvatarUrl)
 }
