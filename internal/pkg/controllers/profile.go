@@ -203,7 +203,7 @@ func UploadAvatar(w http.ResponseWriter, r *http.Request) {
 	models.SendMessage(w, http.StatusOK, user.AvatarUrl)
 }
 
-//сервисный метод чтобы понимать что творится в хранилище юзеров
+//	сервисный метод чтобы понимать что творится в хранилище юзеров
 func GetProfiles(w http.ResponseWriter, r *http.Request) {
 	message, _ := json.Marshal(userStorage.Data)
 	_, _ = fmt.Fprintln(w, string(message))

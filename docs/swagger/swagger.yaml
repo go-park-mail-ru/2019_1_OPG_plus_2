@@ -69,12 +69,12 @@ host: localhost:8001
 info:
   contact:
     email: nikolsky.dan@gmail.com
-    name: '@Xatabch'
+    name: '@DanikNik'
   description: Game based on filling field with color cells
   license:
     name: Apache 2.0
-  title: Colors service API by OPG+2
-  version: "1.0"
+  title: Colors API by OPG+2
+  version: 444.6.4.2.999
 paths:
   /profile:
     delete:
