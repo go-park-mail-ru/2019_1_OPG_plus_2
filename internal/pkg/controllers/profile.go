@@ -8,6 +8,7 @@ import (
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/util/fileStorage"
 	"github.com/gorilla/mux"
 	"net/http"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -16,7 +17,8 @@ import (
 var MB = 1 << 20
 
 var userStorage = models.NewUserProfileStorage()
-var fileVault = fileStorage.NewLocalFileStorage("/home/daniknik/colors_static")
+var StaticPath, _ = filepath.Abs("./colors_static")
+var fileVault = fileStorage.NewLocalFileStorage(StaticPath)
 
 func init() {
 	_ = userStorage.Set(1, &models.UserProfile{
@@ -79,7 +81,7 @@ func CreateProfile(w http.ResponseWriter, r *http.Request) {
 // @tags profile
 // @accept json
 // @produce json
-// @param id path int true "Profile ID"
+// @param id STATIC_PATH int true "Profile ID"
 // @success 200 {object} models.UserProfile
 // @failure 400 {object} models.SuccessOrErrorMessage
 // @failure 404 {object} models.SuccessOrErrorMessage
@@ -194,7 +196,7 @@ func UploadAvatar(w http.ResponseWriter, r *http.Request) {
 
 	err = fileVault.UploadFile(file, strconv.Itoa(id), ext)
 	if err != nil {
-		models.SendMessage(w, http.StatusInternalServerError, "Error while saving file, try again later")
+		models.SendMessage(w, http.StatusInternalServerError, "Error while saving file, try again later: "+err.Error())
 		return
 	}
 

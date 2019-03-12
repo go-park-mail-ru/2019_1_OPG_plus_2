@@ -47,7 +47,7 @@ func StartApp(params Params) error {
 
 	staticHandler := http.StripPrefix(
 		"/static",
-		http.FileServer(http.Dir("/home/daniknik/colors_static/")),
+		http.FileServer(http.Dir(controllers.StaticPath)),
 	)
 	router.PathPrefix("/static").Handler(staticHandler)
 
