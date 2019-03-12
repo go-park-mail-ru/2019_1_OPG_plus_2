@@ -18,7 +18,9 @@ type Params struct {
 func StartApp(params Params) error {
 	fmt.Println("Server starting at " + params.Port)
 
-	db.Start()
+	if err := db.Open(); err != nil {
+	    fmt.Println(err.Error())
+    }
 
 	router := mux.NewRouter()
 	apiRouter := router.PathPrefix("/api").Subrouter()
@@ -37,7 +39,7 @@ func StartApp(params Params) error {
 	apiRouter.HandleFunc("/session", controllers.SignIn).Methods("POST")
 	apiRouter.HandleFunc("/session", controllers.SignOut).Methods("DELETE")
 
-	// apiRouter.HandleFunc("/profile", controllers.GetProfile).Methods("GET")
+	apiRouter.HandleFunc("/profile", controllers.GetProfile).Methods("GET")
 	apiRouter.HandleFunc("/profile/{id}", controllers.GetProfile).Methods("GET")
 	apiRouter.HandleFunc("/profile", controllers.CreateProfile).Methods("POST")
 	apiRouter.HandleFunc("/profile", controllers.UpdateProfile).Methods("PUT")
@@ -45,7 +47,6 @@ func StartApp(params Params) error {
 
 	apiRouter.HandleFunc("/upload_avatar", controllers.UploadAvatar).Methods("POST")
 
-	apiRouter.HandleFunc("/profiles", controllers.GetProfiles).Methods("GET")
 	apiRouter.HandleFunc("/profiles/score", controllers.ScoreBoardByPage).Methods("GET")
 
 	staticHandler := http.StripPrefix(
@@ -55,4 +56,11 @@ func StartApp(params Params) error {
 	router.PathPrefix("/static").Handler(staticHandler)
 
 	return http.ListenAndServe(":"+params.Port, router)
+}
+
+func StopApp() {
+	fmt.Println("Stopping server...")
+	if err := db.Close(); err != nil {
+        fmt.Println(err.Error())
+    }
 }

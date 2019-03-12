@@ -1,41 +1,32 @@
 package db
 
 import (
-    "database/sql"
     "fmt"
-    "github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"
     _ "github.com/go-sql-driver/mysql"
 )
 
-var authDb *sql.DB
+type UserData struct {
+    Id       int64  `json:"id"`
+    Email    string `json:"email"`
+    Username string `json:"username"`
+    PassHash string `json:"pass_hash"`
+}
 
-func AuthInit() (err error) {
-    if authDb != nil {
-        return fmt.Errorf("db already initialized")
+func AuthCreate(data UserData) (id int64, err error) {
+    id, err = isExists(authDbName, authUsersTable, "email = ? OR username = ?", data.Email, data.Username)
+    if err != nil {
+        return
     }
-    authDb, err = sql.Open("mysql", authUsername + ":" + authPassword + "@/" +authDbName)
-    return
-}
+    if id != 0 {
+        return id, fmt.Errorf("user already exists")
+    }
 
-func AuthClose() error {
-    return authDb.Close()
-}
-
-func AuthQuery(query string, args ...interface{}) (*sql.Rows, error) {
-    return authDb.Query(query, args...)
-}
-
-func AuthExec(query string, args ...interface{}) (sql.Result, error) {
-    return authDb.Exec(query, args...)
-}
-
-func AuthCreate(data models.DbUserData) (int64, error) {
-    return insert(authDb, authDbName, authUsersTable,"username, email, pass_hash", "?, ?, ?",
+    return insert(authDbName, authUsersTable,"username, email, pass_hash", "?, ?, ?",
         data.Username, data.Email, data.PassHash)
 }
 
-func AuthFindById(id int64) (data models.DbUserData, err error) {
-    row, err := findRowBy(authDb, authDbName, authUsersTable, "id, username, email, pass_hash", "id = ?", id)
+func AuthFindById(id int64) (data UserData, err error) {
+    row, err := findRowBy(authDbName, authUsersTable, "id, username, email, pass_hash", "id = ?", id)
     if err != nil {
         return
     }
@@ -43,8 +34,8 @@ func AuthFindById(id int64) (data models.DbUserData, err error) {
     return
 }
 
-func AuthFindByEmailAndPassHash(email string, passHash string) (data models.DbUserData, err error) {
-    row, err := findRowBy(authDb, authDbName, authUsersTable, "id, username, email, pass_hash", "email = ? AND pass_hash = ?", email, passHash)
+func AuthFindByEmailAndPassHash(email string, passHash string) (data UserData, err error) {
+    row, err := findRowBy(authDbName, authUsersTable, "id, username, email, pass_hash", "email = ? AND pass_hash = ?", email, passHash)
     if err != nil {
         return
     }
@@ -52,8 +43,8 @@ func AuthFindByEmailAndPassHash(email string, passHash string) (data models.DbUs
     return
 }
 
-func AuthFindByNicknameAndPassHash(username string, passHash string) (data models.DbUserData, err error) {
-    row, err := findRowBy(authDb, authDbName, authUsersTable, "id, username, email, pass_hash", "username = ? AND pass_hash = ?", username, passHash)
+func AuthFindByNicknameAndPassHash(username string, passHash string) (data UserData, err error) {
+    row, err := findRowBy(authDbName, authUsersTable, "id, username, email, pass_hash", "username = ? AND pass_hash = ?", username, passHash)
     if err != nil {
         return
     }
@@ -61,18 +52,36 @@ func AuthFindByNicknameAndPassHash(username string, passHash string) (data model
     return
 }
 
-func AuthUpdateData(data models.DbUserData) error {
-    _, err := updateBy(authDb, authDbName, authUsersTable,"username = ?, email = ?", "id = ?",
+func AuthUpdateData(data UserData) error {
+    count, err := updateBy(authDbName, authUsersTable,"username = ?, email = ?", "id = ?",
         data.Username, data.Email, data.Id)
-    return err
+    if err != nil {
+        return err
+    }
+    if count == 0 {
+        return fmt.Errorf("user not found")
+    }
+    return nil
 }
 
 func AuthUpdatePassword(id int64, passHash string) error {
-    _, err := updateBy(authDb, authDbName, authUsersTable,"pass_hash = ?", "id = ?", passHash, id)
-    return err
+    count, err := updateBy(authDbName, authUsersTable,"pass_hash = ?", "id = ?", passHash, id)
+    if err != nil {
+        return err
+    }
+    if count == 0 {
+        return fmt.Errorf("user not found")
+    }
+    return nil
 }
 
 func AuthRemove(id int64, passHash string) error {
-    _, err := removeBy(authDb, authDbName, authUsersTable,"id = ? AND pass_hash = ?", id, passHash)
-    return err
+    count, err := removeBy(authDbName, authUsersTable,"id = ? AND pass_hash = ?", id, passHash)
+    if err != nil {
+        return err
+    }
+    if count == 0 {
+        return fmt.Errorf("user not found")
+    }
+    return nil
 }

@@ -30,12 +30,12 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 	signInData := models.SignInData{}
 	err := json.NewDecoder(r.Body).Decode(&signInData)
 	if err != nil {
-		models.SendMessage(w, http.StatusInternalServerError, "can't parse request body")
+		models.SendMessage(w, http.StatusInternalServerError, "incorrect JSON")
 		return
 	}
 	defer r.Body.Close()
 
-	jwtData, err := auth.CheckLoginPass(signInData)
+	jwtData, err := auth.SignIn(signInData)
 	if err != nil {
 		models.SendMessage(w, http.StatusUnauthorized, err.Error())
 		return
@@ -78,15 +78,15 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userData := models.UserData{}
+	userData := models.SingUpData{}
 	err := json.NewDecoder(r.Body).Decode(&userData)
 	if err != nil {
-		models.SendMessage(w, http.StatusInternalServerError, "can't parse request body")
+		models.SendMessage(w, http.StatusInternalServerError, "incorrect JSON")
 		return
 	}
 	defer r.Body.Close()
 
-	jwtData, err := auth.CreateUser(userData)
+	jwtData, err := auth.SignUp(userData)
 	if err != nil {
 		models.SendMessage(w, http.StatusUnauthorized, err.Error())
 		return

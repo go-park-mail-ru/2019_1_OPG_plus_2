@@ -5,13 +5,44 @@ import (
     "fmt"
 )
 
-func Start() {
-    if err := AuthInit(); err != nil {
-        return
+var dbObj *sql.DB
+
+func Open() (err error) {
+    if dbObj != nil {
+        return fmt.Errorf("db already initialized")
     }
+    dbObj, err = sql.Open("mysql", username+":"+password+"@/")
+    return
 }
 
-func insert(dbObj *sql.DB, dbName string, tableName string, cols string, values string, args ...interface{}) (int64, error) {
+func Close() error {
+    return dbObj.Close()
+}
+
+func Query(query string, args ...interface{}) (*sql.Rows, error) {
+    return dbObj.Query(query, args...)
+}
+
+func Exec(query string, args ...interface{}) (sql.Result, error) {
+    return dbObj.Exec(query, args...)
+}
+
+func isExists(dbName string, tableName string, where string, args ...interface{}) (id int64, err error) {
+    row, err := findRowBy(dbName, tableName, "id", where, args...)
+    if err != nil {
+        return
+    }
+    err = row.Scan(&id)
+    if err != nil {
+        if err == sql.ErrNoRows {
+            return 0, nil
+        }
+        return
+    }
+    return id, nil
+}
+
+func insert(dbName string, tableName string, cols string, values string, args ...interface{}) (int64, error) {
     if dbObj == nil {
         return 0, fmt.Errorf("db wasn't initialized")
     }
@@ -24,7 +55,7 @@ func insert(dbObj *sql.DB, dbName string, tableName string, cols string, values 
     return result.LastInsertId()
 }
 
-func findRowBy(dbObj *sql.DB, dbName string, tableName string, cols string, where string, args ...interface{}) (*sql.Row, error) {
+func findRowBy(dbName string, tableName string, cols string, where string, args ...interface{}) (*sql.Row, error) {
     if dbObj == nil {
         return nil, fmt.Errorf("db wasn't initialized")
     }
@@ -35,7 +66,7 @@ func findRowBy(dbObj *sql.DB, dbName string, tableName string, cols string, wher
     return dbObj.QueryRow("SELECT "+cols+" FROM "+dbName+"."+tableName+" WHERE "+where, args...), nil
 }
 
-func findRowsBy(dbObj *sql.DB, dbName string, tableName string, cols string, where string, args ...interface{}) (*sql.Rows, error) {
+func findRowsBy(dbName string, tableName string, cols string, where string, args ...interface{}) (*sql.Rows, error) {
     if dbObj == nil {
         return nil, fmt.Errorf("db wasn't initialized")
     }
@@ -46,7 +77,29 @@ func findRowsBy(dbObj *sql.DB, dbName string, tableName string, cols string, whe
     return dbObj.Query("SELECT "+cols+" FROM "+dbName+"."+tableName+" WHERE "+where, args...)
 }
 
-func updateBy(dbObj *sql.DB, dbName string, tableName string, set string, where string, args ...interface{}) (int64, error) {
+func joinRowBy(dbName string, tableName string, cols string, where string, args ...interface{}) (*sql.Row, error) {
+    if dbObj == nil {
+        return nil, fmt.Errorf("db wasn't initialized")
+    }
+
+    if where == "" {
+        where = "1"
+    }
+    return dbObj.QueryRow("SELECT "+cols+" FROM "+dbName+"."+tableName+" WHERE "+where, args...), nil
+}
+
+func joinRowsBy(dbName string, tableName string, cols string, where string, args ...interface{}) (*sql.Rows, error) {
+    if dbObj == nil {
+        return nil, fmt.Errorf("db wasn't initialized")
+    }
+
+    if where == "" {
+        where = "1"
+    }
+    return dbObj.Query("SELECT "+cols+" FROM "+dbName+"."+tableName+" WHERE "+where, args...)
+}
+
+func updateBy(dbName string, tableName string, set string, where string, args ...interface{}) (int64, error) {
     if dbObj == nil {
         return 0, fmt.Errorf("db wasn't initialized")
     }
@@ -62,7 +115,7 @@ func updateBy(dbObj *sql.DB, dbName string, tableName string, set string, where 
     return result.RowsAffected()
 }
 
-func removeBy(dbObj *sql.DB, dbName string, tableName string, where string, args ...interface{}) (int64, error) {
+func removeBy(dbName string, tableName string, where string, args ...interface{}) (int64, error) {
     if dbObj == nil {
         return 0, fmt.Errorf("db wasn't initialized")
     }
