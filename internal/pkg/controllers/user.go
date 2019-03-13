@@ -122,6 +122,7 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
         models.SendMessage(w, http.StatusInternalServerError, "incorrect JSON")
         return
     }
+    defer r.Body.Close()
 
     jwtData, err := user.UpdateUser(jwtData(r).Id, updateData)
     if err != nil {
@@ -154,6 +155,7 @@ func RemoveUser(w http.ResponseWriter, r *http.Request) {
         models.SendMessage(w, http.StatusInternalServerError, "incorrect JSON")
         return
     }
+    defer r.Body.Close()
 
     err = user.RemoveUser(jwtData(r).Id, removeData)
     if err != nil {

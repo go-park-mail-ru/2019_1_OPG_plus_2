@@ -23,6 +23,7 @@ func GetScoreboard(limit, offset int64) (usersData []models.ScoreboardUserData, 
         return
     }
 
+    defer rows.Close()
     for rows.Next() {
         userData := models.ScoreboardUserData{}
         err = rows.Scan(&userData.Id, &userData.Username, &userData.Score)

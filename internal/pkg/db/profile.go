@@ -49,12 +49,9 @@ func ProfileUpdateData(data ProfileData) error {
 }
 
 func ProfileUpdateAvatar(id int64, avatar string) error {
-    count, err := updateBy(coreDbName, coreUsersTable,"avatar = ?", "id = ?", avatar, id)
+    _, err := updateBy(coreDbName, coreUsersTable,"avatar = ?", "id = ?", avatar, id)
     if err != nil {
         return err
-    }
-    if count == 0 {
-        return fmt.Errorf("user not found")
     }
     return nil
 }
