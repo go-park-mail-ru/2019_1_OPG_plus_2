@@ -2,7 +2,6 @@ package db
 
 import (
     "fmt"
-    _ "github.com/go-sql-driver/mysql"
 )
 
 type AuthData struct {

@@ -3,6 +3,7 @@ package db
 import (
     "database/sql"
     "fmt"
+    _ "github.com/go-sql-driver/mysql"
 )
 
 var dbObj *sql.DB
@@ -11,7 +12,7 @@ func Open() (err error) {
     if dbObj != nil {
         return fmt.Errorf("db already initialized")
     }
-    dbObj, err = sql.Open("mysql", username+":"+password+"@/")
+    dbObj, err = sql.Open("mysql", username+":"+password+"@" + host + "/")
     return
 }
 

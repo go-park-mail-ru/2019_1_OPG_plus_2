@@ -1,5 +1,6 @@
 package db
 
+const host = ""
 const username = "colors"
 const password = "StrongPassword1!"
 
