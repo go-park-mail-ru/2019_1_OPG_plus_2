@@ -19,8 +19,8 @@ func CorsMiddleware(next http.Handler) http.Handler {
 		val, ok := req.Header["Origin"]
 		if ok {
 			res.Header().Set("Access-Control-Allow-Origin", val[0])
+			res.Header().Set("Access-Control-Allow-Credentials", "true")
 		}
-		res.Header().Set("Access-Control-Allow-Credentials", "true")
 		next.ServeHTTP(res, req)
 	})
 }
