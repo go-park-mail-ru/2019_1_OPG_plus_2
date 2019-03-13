@@ -84,7 +84,7 @@ func SignOut(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	jwtCookie.Expires = time.Unix(0, 0)
+	jwtCookie.Expires = time.Unix(-1, 0)
 	http.SetCookie(w, jwtCookie)
 	models.SendMessage(w, http.StatusOK, "signed out")
 }

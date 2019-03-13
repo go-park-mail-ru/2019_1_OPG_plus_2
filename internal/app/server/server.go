@@ -35,19 +35,19 @@ func StartApp(params Params) error {
 
 	apiRouter.HandleFunc("/", controllers.IndexApiHandler)
 
-	apiRouter.HandleFunc("/session", controllers.IsAuth).Methods("GET")
-	apiRouter.HandleFunc("/session", controllers.SignIn).Methods("POST")
-	apiRouter.HandleFunc("/session", controllers.SignOut).Methods("DELETE")
-	apiRouter.HandleFunc("/password", controllers.UpdatePassword).Methods("PUT")
+	apiRouter.HandleFunc("/session", controllers.IsAuth).Methods("GET", "OPTIONS")
+	apiRouter.HandleFunc("/session", controllers.SignIn).Methods("POST", "OPTIONS")
+	apiRouter.HandleFunc("/session", controllers.SignOut).Methods("DELETE", "OPTIONS")
+	apiRouter.HandleFunc("/password", controllers.UpdatePassword).Methods("PUT", "OPTIONS")
 
-	apiRouter.HandleFunc("/user", controllers.GetUser).Methods("GET")
-	apiRouter.HandleFunc("/user/{id:[0-9]+}", controllers.GetUser).Methods("GET")
-	apiRouter.HandleFunc("/user", controllers.CreateUser).Methods("POST")
-	apiRouter.HandleFunc("/user", controllers.UpdateUser).Methods("PUT")
-	apiRouter.HandleFunc("/user", controllers.RemoveUser).Methods("DELETE")
-	apiRouter.HandleFunc("/avatar", controllers.UploadAvatar).Methods("POST")
+	apiRouter.HandleFunc("/user", controllers.GetUser).Methods("GET", "OPTIONS")
+	apiRouter.HandleFunc("/user/{id:[0-9]+}", controllers.GetUser).Methods("GET", "OPTIONS")
+	apiRouter.HandleFunc("/user", controllers.CreateUser).Methods("POST", "OPTIONS")
+	apiRouter.HandleFunc("/user", controllers.UpdateUser).Methods("PUT", "OPTIONS")
+	apiRouter.HandleFunc("/user", controllers.RemoveUser).Methods("DELETE", "OPTIONS")
+	apiRouter.HandleFunc("/avatar", controllers.UploadAvatar).Methods("POST", "OPTIONS")
 
-	apiRouter.HandleFunc("/users", controllers.GetScoreboard).Methods("GET")
+	apiRouter.HandleFunc("/users", controllers.GetScoreboard).Methods("GET", "OPTIONS")
 
 	staticHandler := http.StripPrefix(
 		"/static",
