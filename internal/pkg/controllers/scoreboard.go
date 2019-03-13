@@ -16,7 +16,7 @@ import (
 // @param limit query int false "Entries per page"
 // @param offset query int false "Entries from the first position"
 // @success 200 {array} models.ScoreboardUserData
-// @router /profiles/score [get]
+// @router /users [get]
 func GetScoreboard(w http.ResponseWriter, r *http.Request) {
 	limit, err := strconv.ParseInt(r.URL.Query().Get("limit"), 10, 64)
 	if err != nil || limit < 1 {

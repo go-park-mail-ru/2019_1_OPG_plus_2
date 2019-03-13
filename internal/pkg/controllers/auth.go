@@ -34,7 +34,6 @@ func IsAuth(w http.ResponseWriter, r *http.Request) {
 // @produce json
 // @param credentials body models.SignInData true "Credentials"
 // @success 200 {object} models.AnswerMessage
-// @failure 400 {object} models.AnswerMessage
 // @failure 401 {object} models.AnswerMessage
 // @failure 500 {object} models.AnswerMessage
 // @router /session [post]
@@ -68,9 +67,9 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 // @description This method logs user out and deletes cookie
 // @tags auth
 // @produce json
-// @param credentials body models.SignInData true "Credentials"
 // @success 200 {object} models.AnswerMessage
 // @failure 401 {object} models.AnswerMessage
+// @failure 500 {object} models.AnswerMessage
 // @router /session [delete]
 func SignOut(w http.ResponseWriter, r *http.Request) {
 	if !isAuth(r) {
@@ -89,6 +88,18 @@ func SignOut(w http.ResponseWriter, r *http.Request) {
 	models.SendMessage(w, http.StatusOK, "signed out")
 }
 
+// UpdatePassword godoc
+// @title Update password
+// @summary Updates user password
+// @description This method updates users password, requiring password and confirmation. User data is pulled from jwt-token
+// @tags auth
+// @accepts json
+// @produce json
+// @param update_data body models.UpdatePasswordData true "New password info"
+// @success 200 {object} models.AnswerMessage
+// @failure 401 {object} models.AnswerMessage
+// @failure 500 {object} models.AnswerMessage
+// @router /password [put]
 func UpdatePassword(w http.ResponseWriter, r *http.Request) {
 	if !isAuth(r) {
 		models.SendMessage(w, http.StatusUnauthorized, "not signed in")
