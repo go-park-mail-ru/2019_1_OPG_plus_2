@@ -1,6 +1,8 @@
 package user
 
 import (
+    "database/sql"
+    "fmt"
     "github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/auth"
     "github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/db"
     "github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"
@@ -20,7 +22,11 @@ func CreateUser(signUpData models.SingUpData) (jwtData models.JwtData, err error
 }
 
 func GetUser(id int64) (userData models.UserData, err error) {
-    return db.GetUser(id)
+    userData, err = db.GetUser(id)
+    if err == sql.ErrNoRows {
+        return userData, fmt.Errorf("user not found")
+    }
+    return
 }
 
 func UpdateUser(id int64, userData models.UpdateUserData) (jwtData models.JwtData, err error) {

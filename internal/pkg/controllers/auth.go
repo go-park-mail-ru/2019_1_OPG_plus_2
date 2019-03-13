@@ -40,7 +40,7 @@ func IsAuth(w http.ResponseWriter, r *http.Request) {
 // @router /session [post]
 func SignIn(w http.ResponseWriter, r *http.Request) {
 	if isAuth(r) {
-		models.SendMessage(w, http.StatusBadRequest, "already signed in")
+		models.SendMessage(w, http.StatusOK, "already signed in")
 		return
 	}
 
@@ -74,13 +74,13 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 // @router /session [delete]
 func SignOut(w http.ResponseWriter, r *http.Request) {
 	if !isAuth(r) {
-		models.SendMessage(w, http.StatusUnauthorized, "already signed out")
+		models.SendMessage(w, http.StatusOK, "already signed out")
 		return
 	}
 
 	jwtCookie, errNoCookie := r.Cookie(auth.CookieName)
 	if errNoCookie != nil {
-		models.SendMessage(w, http.StatusUnauthorized, "already signed out")
+		models.SendMessage(w, http.StatusOK, "already signed out")
 		return
 	}
 
@@ -105,7 +105,7 @@ func UpdatePassword(w http.ResponseWriter, r *http.Request) {
 
 	err = auth.UpdatePassword(jwtData(r).Id, updateData)
 	if err != nil {
-		models.SendMessage(w, http.StatusUnauthorized, err.Error())
+		models.SendMessage(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 

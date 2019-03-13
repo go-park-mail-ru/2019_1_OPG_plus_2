@@ -81,7 +81,7 @@ func AuthRemove(id int64, passHash string) error {
         return err
     }
     if count == 0 {
-        return fmt.Errorf("user not found")
+        return fmt.Errorf("incorrect password")
     }
     return nil
 }

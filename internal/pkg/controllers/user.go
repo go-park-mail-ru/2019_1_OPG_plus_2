@@ -14,7 +14,8 @@ import (
     "time"
 )
 
-var MB = 1 << 20
+const pageSize = 10
+const MByte = 1 << 20
 
 var fileVault = fileStorage.NewLocalFileStorage("/home/daniknik/colors_static")
 
@@ -46,7 +47,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
     jwtData, err := user.CreateUser(signUpData)
     if err != nil {
-        models.SendMessage(w, http.StatusUnauthorized, err.Error())
+        models.SendMessage(w, http.StatusInternalServerError, err.Error())
         return
     }
 
@@ -70,20 +71,20 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
     var id int64
     var err error
 
-    pathVariables := mux.Vars(r)
-    if pathVariables == nil {
-        id = jwtData(r).Id
-    } else {
-        pathId, ok := pathVariables["id"]
-        if !ok {
-            models.SendMessage(w, http.StatusBadRequest, "no id in query")
-            return
-        }
+    vars := mux.Vars(r)
+    pathId, ok := vars["id"]
+    if ok {
         id, err = strconv.ParseInt(pathId, 10, 64)
-        if !ok {
+        if err != nil {
             models.SendMessage(w, http.StatusBadRequest, "incorrect id in query")
             return
         }
+    } else {
+        if !isAuth(r) {
+            models.SendMessage(w, http.StatusBadRequest, "no id in query")
+            return
+        }
+        id = jwtData(r).Id
     }
 
     userData, err := user.GetUser(id)
@@ -181,7 +182,7 @@ func UploadAvatar(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    _ = r.ParseMultipartForm(int64(5 * MB))
+    _ = r.ParseMultipartForm(int64(5 * MByte))
     file, header, err := r.FormFile("avatar")
     if err != nil {
         models.SendMessage(w, http.StatusBadRequest, "error reading file")
@@ -205,4 +206,34 @@ func UploadAvatar(w http.ResponseWriter, r *http.Request) {
     }
 
     models.SendMessage(w, http.StatusOK, newAvatar)
+}
+
+// GetScoreboard godoc
+// @title Get scoreboard page
+// @summary Produces scoreboard page with {limit} and {offset}
+// @description This method provides client with scoreboard limited with {limit} entries per page and offset of {offset} from the first position
+// @tags scoreboard
+// @produce json
+// @param limit query int false "Entries per page"
+// @param offset query int false "Entries from the first position"
+// @success 200 {array} models.ScoreboardRecord
+// @router /profiles/score [get]
+func GetScoreboard(w http.ResponseWriter, r *http.Request) {
+    limit, err := strconv.ParseInt(r.URL.Query().Get("limit"), 10, 64)
+    if err != nil || limit < 1 {
+        limit = pageSize
+    }
+
+    page, err := strconv.ParseInt(r.URL.Query().Get("page"), 10, 64)
+    if err != nil || page < 1 {
+        page = 1
+    }
+
+    usersData, err := db.GetScoreboard(limit, (page-1)*limit)
+    if err != nil {
+        models.SendMessage(w, http.StatusInternalServerError, err.Error())
+        return
+    }
+
+    models.SendMessageWithData(w, http.StatusOK, "users found", usersData)
 }

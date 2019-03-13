@@ -41,13 +41,13 @@ func StartApp(params Params) error {
 	apiRouter.HandleFunc("/password", controllers.UpdatePassword).Methods("PUT")
 
 	apiRouter.HandleFunc("/user", controllers.GetUser).Methods("GET")
-	apiRouter.HandleFunc("/user/{id}", controllers.GetUser).Methods("GET")
+	apiRouter.HandleFunc("/user/{id:[0-9]+}", controllers.GetUser).Methods("GET")
 	apiRouter.HandleFunc("/user", controllers.CreateUser).Methods("POST")
 	apiRouter.HandleFunc("/user", controllers.UpdateUser).Methods("PUT")
 	apiRouter.HandleFunc("/user", controllers.RemoveUser).Methods("DELETE")
 	apiRouter.HandleFunc("/avatar", controllers.UploadAvatar).Methods("POST")
 
-	apiRouter.HandleFunc("/users", controllers.GetScoreBoard).Methods("GET")
+	apiRouter.HandleFunc("/users", controllers.GetScoreboard).Methods("GET")
 
 	staticHandler := http.StripPrefix(
 		"/static",

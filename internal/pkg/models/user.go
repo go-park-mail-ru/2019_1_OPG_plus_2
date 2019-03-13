@@ -99,7 +99,7 @@ func (data RemoveUserData) Check() (incorrectFields []string) {
 }
 
 /********************
- *  IN-OUT MODELS   *
+ *    OUT MODELS    *
  ********************/
 
 /* USER DATA */

@@ -5,12 +5,14 @@ import (
 )
 
 func GetUser(id int64) (userData models.UserData, err error) {
-    row, err := QueryRow("SELECT a.id, a.username, a.email, c.score, c.games, c.win, c.lose FROM "+
-        authDbName+"."+authUsersTable+" AS a JOIN "+coreDbName+"."+coreUsersTable+" AS c ON a.id = c.id WHERE id = ?", id)
+    row, err := QueryRow("SELECT a.id, a.username, a.email, c.avatar, c.score, c.games, c.win, c.lose FROM "+
+        authDbName+"."+authUsersTable+" AS a JOIN "+coreDbName+"."+coreUsersTable+" AS c ON a.id = c.id WHERE a.id = ?", id)
     if err != nil {
         return
     }
-    err = row.Scan(&userData.Id, &userData.Username, &userData.Email, &userData.Score, &userData.Games, &userData.Win, &userData.Lose)
+    err = row.Scan(&userData.Id, &userData.Username, &userData.Email, &userData.Avatar, &userData.Score,
+        &userData.Games, &userData.Win, &userData.Lose)
+
     return
 }
 
