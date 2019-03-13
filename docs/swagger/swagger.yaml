@@ -79,7 +79,7 @@ paths:
   /profile:
     delete:
       description: This method deletes all information about user, making a query,
-        including profile, game stats and authorization info
+        including user, game stats and authorization info
       produces:
       - application/json
       responses:
@@ -93,16 +93,16 @@ paths:
           schema:
             $ref: '#/definitions/models.SuccessOrErrorMessage'
             type: object
-      summary: Deletes profile and user of client
+      summary: Deletes user and user of client
       tags:
-      - profile
+      - user
     post:
       consumes:
       - application/json
-      description: This method creates records about new user in auth-bd and profile-db
+      description: This method creates records about new user in auth-bd and user-db
         and then sends cookie to user in order to identify
       parameters:
-      - description: User profile data
+      - description: User user data
         in: body
         name: profile_data
         required: true
@@ -129,14 +129,14 @@ paths:
             type: object
       summary: Registers user
       tags:
-      - profile
+      - user
     put:
       consumes:
       - application/json
-      description: This method updates info in profile and auth-db record of user,
+      description: This method updates info in user and auth-db record of user,
         who is making a query
       parameters:
-      - description: User new profile data
+      - description: User new user data
         in: body
         name: profile_data
         required: true
@@ -161,14 +161,14 @@ paths:
           schema:
             $ref: '#/definitions/models.SuccessOrErrorMessage'
             type: object
-      summary: Updates client's profile
+      summary: Updates client's user
       tags:
-      - profile
+      - user
   /profile/{id}:
     get:
       consumes:
       - application/json
-      description: This method provides client with profile data, matching required
+      description: This method provides client with user data, matching required
         ID
       parameters:
       - description: Profile ID
@@ -194,9 +194,9 @@ paths:
           schema:
             $ref: '#/definitions/models.SuccessOrErrorMessage'
             type: object
-      summary: Produces user profile info
+      summary: Produces user user info
       tags:
-      - profile
+      - user
   /profiles/score:
     get:
       description: This method provides client with scoreboard limited with {limit}
@@ -332,5 +332,5 @@ paths:
             type: object
       summary: Saves new avatar image of client's user
       tags:
-      - profile
+      - user
 swagger: "2.0"

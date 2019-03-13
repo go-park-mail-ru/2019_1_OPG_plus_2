@@ -5,14 +5,14 @@ import (
     _ "github.com/go-sql-driver/mysql"
 )
 
-type UserData struct {
+type AuthData struct {
     Id       int64  `json:"id"`
     Email    string `json:"email"`
     Username string `json:"username"`
     PassHash string `json:"pass_hash"`
 }
 
-func AuthCreate(data UserData) (id int64, err error) {
+func AuthCreate(data AuthData) (id int64, err error) {
     id, err = isExists(authDbName, authUsersTable, "email = ? OR username = ?", data.Email, data.Username)
     if err != nil {
         return
@@ -25,7 +25,7 @@ func AuthCreate(data UserData) (id int64, err error) {
         data.Username, data.Email, data.PassHash)
 }
 
-func AuthFindById(id int64) (data UserData, err error) {
+func AuthFindById(id int64) (data AuthData, err error) {
     row, err := findRowBy(authDbName, authUsersTable, "id, username, email, pass_hash", "id = ?", id)
     if err != nil {
         return
@@ -34,7 +34,7 @@ func AuthFindById(id int64) (data UserData, err error) {
     return
 }
 
-func AuthFindByEmailAndPassHash(email string, passHash string) (data UserData, err error) {
+func AuthFindByEmailAndPassHash(email string, passHash string) (data AuthData, err error) {
     row, err := findRowBy(authDbName, authUsersTable, "id, username, email, pass_hash", "email = ? AND pass_hash = ?", email, passHash)
     if err != nil {
         return
@@ -43,7 +43,7 @@ func AuthFindByEmailAndPassHash(email string, passHash string) (data UserData, e
     return
 }
 
-func AuthFindByNicknameAndPassHash(username string, passHash string) (data UserData, err error) {
+func AuthFindByNicknameAndPassHash(username string, passHash string) (data AuthData, err error) {
     row, err := findRowBy(authDbName, authUsersTable, "id, username, email, pass_hash", "username = ? AND pass_hash = ?", username, passHash)
     if err != nil {
         return
@@ -52,7 +52,7 @@ func AuthFindByNicknameAndPassHash(username string, passHash string) (data UserD
     return
 }
 
-func AuthUpdateData(data UserData) error {
+func AuthUpdateData(data AuthData) error {
     count, err := updateBy(authDbName, authUsersTable,"username = ?, email = ?", "id = ?",
         data.Username, data.Email, data.Id)
     if err != nil {

@@ -19,7 +19,7 @@ import (
 func main() {
 	params := server.Params{Port: os.Getenv("PORT")}
 	if params.Port == "" {
-		params.Port = "8001"
+		params.Port = "8002"
 	}
 
 	err := server.StartApp(params)

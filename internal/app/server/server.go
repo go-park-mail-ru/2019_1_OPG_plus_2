@@ -38,16 +38,16 @@ func StartApp(params Params) error {
 	apiRouter.HandleFunc("/session", controllers.IsAuth).Methods("GET")
 	apiRouter.HandleFunc("/session", controllers.SignIn).Methods("POST")
 	apiRouter.HandleFunc("/session", controllers.SignOut).Methods("DELETE")
+	apiRouter.HandleFunc("/password", controllers.UpdatePassword).Methods("PUT")
 
-	apiRouter.HandleFunc("/profile", controllers.GetProfile).Methods("GET")
-	apiRouter.HandleFunc("/profile/{id}", controllers.GetProfile).Methods("GET")
-	apiRouter.HandleFunc("/profile", controllers.CreateProfile).Methods("POST")
-	apiRouter.HandleFunc("/profile", controllers.UpdateProfile).Methods("PUT")
-	apiRouter.HandleFunc("/profile", controllers.DeleteProfile).Methods("DELETE")
+	apiRouter.HandleFunc("/user", controllers.GetUser).Methods("GET")
+	apiRouter.HandleFunc("/user/{id}", controllers.GetUser).Methods("GET")
+	apiRouter.HandleFunc("/user", controllers.CreateUser).Methods("POST")
+	apiRouter.HandleFunc("/user", controllers.UpdateUser).Methods("PUT")
+	apiRouter.HandleFunc("/user", controllers.RemoveUser).Methods("DELETE")
+	apiRouter.HandleFunc("/avatar", controllers.UploadAvatar).Methods("POST")
 
-	apiRouter.HandleFunc("/upload_avatar", controllers.UploadAvatar).Methods("POST")
-
-	apiRouter.HandleFunc("/profiles/score", controllers.ScoreBoardByPage).Methods("GET")
+	apiRouter.HandleFunc("/users", controllers.GetScoreBoard).Methods("GET")
 
 	staticHandler := http.StripPrefix(
 		"/static",

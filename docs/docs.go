@@ -28,9 +28,9 @@ var doc = `{
     "host": "localhost:8001",
     "basePath": "/api",
     "paths": {
-        "/profile": {
+        "/user": {
             "put": {
-                "description": "This method updates info in profile and auth-db record of user, who is making a query",
+                "description": "This method updates info in user and auth-db record of user, who is making a query",
                 "consumes": [
                     "application/json"
                 ],
@@ -38,12 +38,12 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "profile"
+                    "user"
                 ],
-                "summary": "Updates client's profile",
+                "summary": "Updates client's user",
                 "parameters": [
                     {
-                        "description": "User new profile data",
+                        "description": "User new user data",
                         "name": "profile_data",
                         "in": "body",
                         "required": true,
@@ -78,7 +78,7 @@ var doc = `{
                 }
             },
             "post": {
-                "description": "This method creates records about new user in auth-bd and profile-db and then sends cookie to user in order to identify",
+                "description": "This method creates records about new user in auth-bd and user-db and then sends cookie to user in order to identify",
                 "consumes": [
                     "application/json"
                 ],
@@ -86,12 +86,12 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "profile"
+                    "user"
                 ],
                 "summary": "Registers user",
                 "parameters": [
                     {
-                        "description": "User profile data",
+                        "description": "User user data",
                         "name": "profile_data",
                         "in": "body",
                         "required": true,
@@ -126,14 +126,14 @@ var doc = `{
                 }
             },
             "delete": {
-                "description": "This method deletes all information about user, making a query, including profile, game stats and authorization info",
+                "description": "This method deletes all information about user, making a query, including user, game stats and authorization info",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "profile"
+                    "user"
                 ],
-                "summary": "Deletes profile and user of client",
+                "summary": "Deletes user and user of client",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -152,9 +152,9 @@ var doc = `{
                 }
             }
         },
-        "/profile/{id}": {
+        "/user/{id}": {
             "get": {
-                "description": "This method provides client with profile data, matching required ID",
+                "description": "This method provides client with user data, matching required ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -162,9 +162,9 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "profile"
+                    "user"
                 ],
-                "summary": "Produces user profile info",
+                "summary": "Produces user user info",
                 "parameters": [
                     {
                         "type": "integer",
@@ -368,7 +368,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "profile"
+                    "user"
                 ],
                 "summary": "Saves new avatar image of client's user",
                 "responses": {

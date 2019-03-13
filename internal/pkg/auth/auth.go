@@ -39,7 +39,7 @@ func SignUp(signUpData models.SingUpData) (models.JwtData, error) {
 
     passHash := fmt.Sprintf("%x", sha256.Sum256([]byte(signUpData.Password)))
 
-    id, err := db.AuthCreate(db.UserData{
+    id, err := db.AuthCreate(db.AuthData{
         Email:    signUpData.Email,
         Username: signUpData.Username,
         PassHash: passHash,
@@ -56,10 +56,10 @@ func SignUp(signUpData models.SingUpData) (models.JwtData, error) {
 }
 
 func SignIn(signInData models.SignInData) (data models.JwtData, err error) {
-    var userData db.UserData
+    var userData db.AuthData
     passHash := fmt.Sprintf("%x", sha256.Sum256([]byte(signInData.Password)))
 
-    isEmail := models.CheckUsername(signInData.Login)
+    isEmail := models.CheckEmail(signInData.Login)
     if isEmail {
         userData, err = db.AuthFindByEmailAndPassHash(signInData.Login, passHash)
         if err != nil {
@@ -92,13 +92,23 @@ func SignIn(signInData models.SignInData) (data models.JwtData, err error) {
     }, nil
 }
 
-func UpdateUser(id int64, userData models.UpdateUserData) (models.JwtData, error) {
+func UpdatePassword(id int64, passwordData models.UpdatePasswordData) error {
+    incorrectFields := passwordData.Check()
+    if len(incorrectFields) > 0 {
+        return fmt.Errorf("incorrect: " + strings.Join(incorrectFields, ", "))
+    }
+
+    passHash := fmt.Sprintf("%x", sha256.Sum256([]byte(passwordData.NewPassword)))
+    return db.AuthUpdatePassword(id, passHash)
+}
+
+func UpdateAuth(id int64, userData models.UpdateUserData) (models.JwtData, error) {
     incorrectFields := userData.Check()
     if len(incorrectFields) > 0 {
         return models.JwtData{}, fmt.Errorf("incorrect: " + strings.Join(incorrectFields, ", "))
     }
 
-    err := db.AuthUpdateData(db.UserData{
+    err := db.AuthUpdateData(db.AuthData{
         Id:       id,
         Email:    userData.Email,
         Username: userData.Username,
@@ -114,17 +124,7 @@ func UpdateUser(id int64, userData models.UpdateUserData) (models.JwtData, error
     }, nil
 }
 
-func UpdatePassword(id int64, passwordData models.UpdatePasswordData) error {
-    incorrectFields := passwordData.Check()
-    if len(incorrectFields) > 0 {
-        return fmt.Errorf("incorrect: " + strings.Join(incorrectFields, ", "))
-    }
-
-    passHash := fmt.Sprintf("%x", sha256.Sum256([]byte(passwordData.Password)))
-    return db.AuthUpdatePassword(id, passHash)
-}
-
-func RemoveUser(id int64, removeData models.RemoveUserData) error {
+func RemoveAuth(id int64, removeData models.RemoveUserData) error {
     incorrectFields := removeData.Check()
     if len(incorrectFields) > 0 {
         return fmt.Errorf("incorrect: " + strings.Join(incorrectFields, ", "))

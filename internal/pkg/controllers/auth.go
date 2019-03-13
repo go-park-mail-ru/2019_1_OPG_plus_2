@@ -8,6 +8,23 @@ import (
 	"time"
 )
 
+// IsAuth godoc
+// @title Check session
+// @summary Checks user session
+// @description This method checks whether user is signed in or signed out
+// @tags auth
+// @produce json
+// @success 200 {object} models.AnswerMessage
+// @failure 401 {object} models.AnswerMessage
+// @router /session [get]
+func IsAuth(w http.ResponseWriter, r *http.Request) {
+	if isAuth(r) {
+		models.SendMessage(w, http.StatusOK, "signed in")
+	} else {
+		models.SendMessage(w, http.StatusUnauthorized, "signed out")
+	}
+}
+
 // SignIn godoc
 // @title Sign in
 // @summary Grants client access
@@ -16,10 +33,10 @@ import (
 // @accept json
 // @produce json
 // @param credentials body models.SignInData true "Credentials"
-// @success 200 {object} models.SuccessOrErrorMessage
-// @failure 400 {object} models.SuccessOrErrorMessage
-// @failure 401 {object} models.SuccessOrErrorMessage
-// @failure 500 {object} models.SuccessOrErrorMessage
+// @success 200 {object} models.AnswerMessage
+// @failure 400 {object} models.AnswerMessage
+// @failure 401 {object} models.AnswerMessage
+// @failure 500 {object} models.AnswerMessage
 // @router /session [post]
 func SignIn(w http.ResponseWriter, r *http.Request) {
 	if isAuth(r) {
@@ -52,8 +69,8 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 // @tags auth
 // @produce json
 // @param credentials body models.SignInData true "Credentials"
-// @success 200 {object} models.SuccessOrErrorMessage
-// @failure 401 {object} models.SuccessOrErrorMessage
+// @success 200 {object} models.AnswerMessage
+// @failure 401 {object} models.AnswerMessage
 // @router /session [delete]
 func SignOut(w http.ResponseWriter, r *http.Request) {
 	if !isAuth(r) {
@@ -72,43 +89,25 @@ func SignOut(w http.ResponseWriter, r *http.Request) {
 	models.SendMessage(w, http.StatusOK, "signed out")
 }
 
-func SignUp(w http.ResponseWriter, r *http.Request) {
-	if isAuth(r) {
-		models.SendMessage(w, http.StatusBadRequest, "already signed in")
+func UpdatePassword(w http.ResponseWriter, r *http.Request) {
+	if !isAuth(r) {
+		models.SendMessage(w, http.StatusUnauthorized, "not signed in")
 		return
 	}
 
-	userData := models.SingUpData{}
-	err := json.NewDecoder(r.Body).Decode(&userData)
+	updateData := models.UpdatePasswordData{}
+	err := json.NewDecoder(r.Body).Decode(&updateData)
 	if err != nil {
 		models.SendMessage(w, http.StatusInternalServerError, "incorrect JSON")
 		return
 	}
 	defer r.Body.Close()
 
-	jwtData, err := auth.SignUp(userData)
+	err = auth.UpdatePassword(jwtData(r).Id, updateData)
 	if err != nil {
 		models.SendMessage(w, http.StatusUnauthorized, err.Error())
 		return
 	}
 
-	http.SetCookie(w, auth.CreateAuthCookie(jwtData, 30*24*time.Hour))
-	models.SendMessage(w, http.StatusOK, "signed up")
-}
-
-// IsAuth godoc
-// @title Check session
-// @summary Checks user session
-// @description This method checks whether user is signed in or signed out
-// @tags auth
-// @produce json
-// @success 200 {object} models.SuccessOrErrorMessage
-// @failure 401 {object} models.SuccessOrErrorMessage
-// @router /session [get]
-func IsAuth(w http.ResponseWriter, r *http.Request) {
-	if isAuth(r) {
-		models.SendMessage(w, http.StatusOK, "signed in")
-	} else {
-		models.SendMessage(w, http.StatusUnauthorized, "signed out")
-	}
+	models.SendMessage(w, http.StatusOK, "password updated")
 }

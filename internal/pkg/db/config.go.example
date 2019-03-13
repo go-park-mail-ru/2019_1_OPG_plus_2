@@ -1,11 +1,10 @@
 package db
 
-const authUsername = "colors"
-const authPassword = "your_password"
+const username = "colors"
+const password = "StrongPassword1!"
+
 const authDbName = "colors_auth"
 const authUsersTable = "users"
 
-const coreUsername = "colors"
-const corePassword = "your_password"
 const coreDbName = "colors_core"
 const coreUsersTable = "users"

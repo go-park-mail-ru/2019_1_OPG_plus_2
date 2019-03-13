@@ -1,9 +1,7 @@
 package models
 
 import (
-    "github.com/dgrijalva/jwt-go"
     "regexp"
-    "time"
 )
 
 /********************
@@ -63,7 +61,6 @@ func (data SingUpData) Check() (incorrectFields []string) {
 type UpdateUserData struct {
     Email    string `json:"email" example:"user_test@test.com"`
     Username string `json:"username" example:"user_test"`
-    Avatar   string `json:"avatar, string" example:"<some avatar url>"`
 }
 
 func (data UpdateUserData) Check() (incorrectFields []string) {
@@ -79,10 +76,15 @@ func (data UpdateUserData) Check() (incorrectFields []string) {
 /* UPDATE PASSWORD DATA */
 
 type UpdatePasswordData struct {
-    Password string `json:"password" example:"SecretPass1!"`
+    //OldPassword     string `json:"old_password" example:"SecretPass1!"`
+    NewPassword     string `json:"new_password" example:"SecretPass2!"`
+    PasswordConfirm string `json:"password_confirm" example:"SecretPass2!"`
 }
 
 func (data UpdatePasswordData) Check() (incorrectFields []string) {
+    if data.PasswordConfirm != data.NewPassword {
+        incorrectFields = append(incorrectFields, "password_confirm")
+    }
     return
 }
 
@@ -94,34 +96,6 @@ type RemoveUserData struct {
 
 func (data RemoveUserData) Check() (incorrectFields []string) {
     return
-}
-
-/********************
- *    OUT MODELS    *
- ********************/
-
-/* JWT DATA */
-
-type JwtData struct {
-    jwt.StandardClaims
-    Id       int64  `json:"id"`
-    Email    string `json:"email"`
-    Username string `json:"username"`
-}
-
-func (data *JwtData) Marshal(lifetime time.Duration, secret []byte) (string, error) {
-    data.StandardClaims.ExpiresAt = time.Now().Add(lifetime).Unix()
-    return jwt.NewWithClaims(jwt.SigningMethodHS256, data).SignedString(secret)
-}
-
-func (data *JwtData) UnMarshal(tokenString string, secret []byte) error {
-    token, err := jwt.ParseWithClaims(tokenString, data, func(token *jwt.Token) (interface{}, error) {
-        return secret, nil
-    })
-    if _, ok := token.Claims.(*JwtData); !ok || !token.Valid {
-        return err
-    }
-    return nil
 }
 
 /********************
@@ -139,4 +113,12 @@ type UserData struct {
     Games    int64  `json:"games, number"`
     Win      int64  `json:"win, number"`
     Lose     int64  `json:"lose, number"`
+}
+
+/* SCOREBOARD DATA */
+
+type ScoreboardUserData struct {
+    Id       int64  `json:"id, string" example:"1"`
+    Username string `json:"username, string" example:"XxX__NaGiBaToR__XxX"`
+    Score    int64  `json:"score, number" example:"314159"`
 }

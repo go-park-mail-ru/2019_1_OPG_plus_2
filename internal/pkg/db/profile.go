@@ -19,7 +19,7 @@ func ProfileCreate(data ProfileData) (err error) {
         return
     }
     if id != 0 {
-        return fmt.Errorf("profile already exists")
+        return fmt.Errorf("user already exists")
     }
 
     id, err = insert(coreDbName, coreUsersTable,"id, avatar", "?, ?", data.Id, data.Avatar)
@@ -69,4 +69,3 @@ func ProfileRemove(id int64) error {
     }
     return nil
 }
-
