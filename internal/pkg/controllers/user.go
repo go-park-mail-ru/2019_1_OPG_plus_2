@@ -9,6 +9,7 @@ import (
     "github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/util/fileStorage"
     "github.com/gorilla/mux"
     "net/http"
+    "path/filepath"
     "strconv"
     "strings"
     "time"
@@ -17,7 +18,8 @@ import (
 const pageSize = 10
 const MByte = 1 << 20
 
-var fileVault = fileStorage.NewLocalFileStorage("/home/daniknik/colors_static")
+var StaticPath, _ = filepath.Abs("./static")
+var fileVault = fileStorage.NewLocalFileStorage(StaticPath)
 
 // CreateUser godoc
 // @title Create user
@@ -159,6 +161,7 @@ func RemoveUser(w http.ResponseWriter, r *http.Request) {
         return
     }
 
+    http.SetCookie(w, auth.CreateAuthCookie(jwtData(r), 0))
     models.SendMessage(w, http.StatusOK, "user removed")
 }
 
@@ -185,7 +188,7 @@ func UploadAvatar(w http.ResponseWriter, r *http.Request) {
     _ = r.ParseMultipartForm(int64(5 * MByte))
     file, header, err := r.FormFile("avatar")
     if err != nil {
-        models.SendMessage(w, http.StatusBadRequest, "error reading file")
+        models.SendMessage(w, http.StatusBadRequest, "error reading file: " + err.Error())
         return
     }
     defer file.Close()
@@ -194,7 +197,7 @@ func UploadAvatar(w http.ResponseWriter, r *http.Request) {
     ext := strings.Split(header.Filename, ".")[1]
     err = fileVault.UploadFile(file, strconv.Itoa(int(id)), ext)
     if err != nil {
-        models.SendMessage(w, http.StatusInternalServerError, "impossible save file")
+        models.SendMessage(w, http.StatusInternalServerError, "impossible save file: " + err.Error())
         return
     }
 
