@@ -1,8 +1,17 @@
 basePath: /api
 definitions:
-  models.ScoreboardRecord:
+  models.AnswerMessage:
     properties:
-      position:
+      message:
+        example: Query processed successfully
+        type: string
+      status:
+        example: 200
+        type: integer
+    type: object
+  models.ScoreboardUserData:
+    properties:
+      id:
         example: 1
         type: integer
       score:
@@ -21,36 +30,30 @@ definitions:
         example: Qwerty123
         type: string
     type: object
-  models.SuccessOrErrorMessage:
+  models.SingUpData:
     properties:
-      message:
-        example: Query processed successfully
-        type: string
-      status:
-        example: 200
-        type: integer
-    type: object
-  models.UserData:
-    properties:
-      email:
-        example: user_test@test.com
-        type: string
-      password:
-        example: verysecretpasswordwhichnooneknows
-        type: string
-      username:
-        example: user_test
-        type: string
-    type: object
-  models.UserProfile:
-    properties:
-      avatar_url:
+      avatar:
         example: <some avatar url>
         type: string
       email:
         example: user_test@test.com
         type: string
-      games_played:
+      password:
+        example: SecretPass1!
+        type: string
+      username:
+        example: user_test
+        type: string
+    type: object
+  models.UserData:
+    properties:
+      avatar:
+        example: <some avatar url>
+        type: string
+      email:
+        example: user_test@test.com
+        type: string
+      games:
         type: integer
       id:
         example: 1
@@ -69,132 +72,39 @@ host: localhost:8001
 info:
   contact:
     email: nikolsky.dan@gmail.com
-    name: '@Xatabch'
+    name: '@DanikNik'
   description: Game based on filling field with color cells
   license:
     name: Apache 2.0
   title: Colors service API by OPG+2
   version: "1.0"
 paths:
-  /profile:
-    delete:
-      description: This method deletes all information about user, making a query,
-        including user, game stats and authorization info
+  /avatar:
+    post:
+      consumes:
+      - image/png
+      - image/jpeg
+      description: This method saves avatar image in server storage and sets it as
+        clients user avatar
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            $ref: '#/definitions/models.AnswerMessage'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.AnswerMessage'
             type: object
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            $ref: '#/definitions/models.AnswerMessage'
             type: object
-      summary: Deletes user and user of client
-      tags:
-      - user
-    post:
-      consumes:
-      - application/json
-      description: This method creates records about new user in auth-bd and user-db
-        and then sends cookie to user in order to identify
-      parameters:
-      - description: User user data
-        in: body
-        name: profile_data
-        required: true
-        schema:
-          $ref: '#/definitions/models.UserData'
-          type: object
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.SuccessOrErrorMessage'
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.SuccessOrErrorMessage'
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/models.SuccessOrErrorMessage'
-            type: object
-      summary: Registers user
-      tags:
-      - user
-    put:
-      consumes:
-      - application/json
-      description: This method updates info in user and auth-db record of user,
-        who is making a query
-      parameters:
-      - description: User new user data
-        in: body
-        name: profile_data
-        required: true
-        schema:
-          $ref: '#/definitions/models.UserData'
-          type: object
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.SuccessOrErrorMessage'
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.SuccessOrErrorMessage'
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/models.SuccessOrErrorMessage'
-            type: object
-      summary: Updates client's user
-      tags:
-      - user
-  /profile/{id}:
-    get:
-      consumes:
-      - application/json
-      description: This method provides client with user data, matching required
-        ID
-      parameters:
-      - description: Profile ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.UserProfile'
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.SuccessOrErrorMessage'
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/models.SuccessOrErrorMessage'
-            type: object
-      summary: Produces user user info
+      summary: Saves new avatar image of client's user
       tags:
       - user
   /profiles/score:
@@ -217,7 +127,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.ScoreboardRecord'
+              $ref: '#/definitions/models.ScoreboardUserData'
             type: array
       summary: Produces scoreboard page with {limit} and {offset}
       tags:
@@ -239,12 +149,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            $ref: '#/definitions/models.AnswerMessage'
             type: object
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            $ref: '#/definitions/models.AnswerMessage'
             type: object
       summary: Logs user out
       tags:
@@ -257,12 +167,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            $ref: '#/definitions/models.AnswerMessage'
             type: object
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            $ref: '#/definitions/models.AnswerMessage'
             type: object
       summary: Checks user session
       tags:
@@ -285,52 +195,144 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            $ref: '#/definitions/models.AnswerMessage'
             type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            $ref: '#/definitions/models.AnswerMessage'
             type: object
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            $ref: '#/definitions/models.AnswerMessage'
             type: object
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            $ref: '#/definitions/models.AnswerMessage'
             type: object
       summary: Grants client access
       tags:
       - auth
-  /upload_avatar:
-    post:
-      consumes:
-      - image/png
-      - image/jpeg
-      description: This method saves avatar image in server storage and sets it as
-        clients user avatar
+  /user:
+    delete:
+      description: This method deletes all information about user, making a query,
+        including user, game stats and authorization info
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.SuccessOrErrorMessage'
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            $ref: '#/definitions/models.AnswerMessage'
             type: object
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.SuccessOrErrorMessage'
+            $ref: '#/definitions/models.AnswerMessage'
             type: object
-      summary: Saves new avatar image of client's user
+      summary: Deletes user and user of client
+      tags:
+      - user
+    post:
+      consumes:
+      - application/json
+      description: This method creates records about new user in auth-bd and user-db
+        and then sends cookie to user in order to identify
+      parameters:
+      - description: User data
+        in: body
+        name: profile_data
+        required: true
+        schema:
+          $ref: '#/definitions/models.SingUpData'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.AnswerMessage'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.AnswerMessage'
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.AnswerMessage'
+            type: object
+      summary: Registers user
+      tags:
+      - user
+    put:
+      consumes:
+      - application/json
+      description: This method updates info in user and auth-db record of user, who
+        is making a query
+      parameters:
+      - description: User new user data
+        in: body
+        name: profile_data
+        required: true
+        schema:
+          $ref: '#/definitions/models.SingUpData'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.AnswerMessage'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.AnswerMessage'
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.AnswerMessage'
+            type: object
+      summary: Updates client's user
+      tags:
+      - user
+  /user/{id}:
+    get:
+      consumes:
+      - application/json
+      description: This method provides client with user data, matching required ID
+      parameters:
+      - description: Profile ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.UserData'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.AnswerMessage'
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.AnswerMessage'
+            type: object
+      summary: Produces user user info
       tags:
       - user
 swagger: "2.0"

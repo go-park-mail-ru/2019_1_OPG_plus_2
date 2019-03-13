@@ -4,7 +4,7 @@
         "description": "Game based on filling field with color cells",
         "title": "Colors service API by OPG+2",
         "contact": {
-            "name": "@Xatabch",
+            "name": "@DanikNik",
             "email": "nikolsky.dan@gmail.com"
         },
         "license": {
@@ -15,172 +15,40 @@
     "host": "localhost:8001",
     "basePath": "/api",
     "paths": {
-        "/profile": {
-            "put": {
-                "description": "This method updates info in profile and auth-db record of user, who is making a query",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "profile"
-                ],
-                "summary": "Updates client's profile",
-                "parameters": [
-                    {
-                        "description": "User new profile data",
-                        "name": "profile_data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.UserData"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.SuccessOrErrorMessage"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.SuccessOrErrorMessage"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.SuccessOrErrorMessage"
-                        }
-                    }
-                }
-            },
+        "/avatar": {
             "post": {
-                "description": "This method creates records about new user in auth-bd and profile-db and then sends cookie to user in order to identify",
+                "description": "This method saves avatar image in server storage and sets it as clients user avatar",
                 "consumes": [
-                    "application/json"
+                    "image/png",
+                    "image/jpeg"
                 ],
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "profile"
+                    "user"
                 ],
-                "summary": "Registers user",
-                "parameters": [
-                    {
-                        "description": "User profile data",
-                        "name": "profile_data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.UserData"
-                        }
-                    }
-                ],
+                "summary": "Saves new avatar image of client's user",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.SuccessOrErrorMessage"
+                            "$ref": "#/definitions/models.AnswerMessage"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.SuccessOrErrorMessage"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.SuccessOrErrorMessage"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "This method deletes all information about user, making a query, including profile, game stats and authorization info",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "profile"
-                ],
-                "summary": "Deletes profile and user of client",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.SuccessOrErrorMessage"
+                            "$ref": "#/definitions/models.AnswerMessage"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.SuccessOrErrorMessage"
-                        }
-                    }
-                }
-            }
-        },
-        "/profile/{id}": {
-            "get": {
-                "description": "This method provides client with profile data, matching required ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "profile"
-                ],
-                "summary": "Produces user profile info",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Profile ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.UserProfile"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.SuccessOrErrorMessage"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.SuccessOrErrorMessage"
+                            "$ref": "#/definitions/models.AnswerMessage"
                         }
                     }
                 }
@@ -216,7 +84,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.ScoreboardRecord"
+                                "$ref": "#/definitions/models.ScoreboardUserData"
                             }
                         }
                     }
@@ -238,14 +106,14 @@
                         "description": "OK",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.SuccessOrErrorMessage"
+                            "$ref": "#/definitions/models.AnswerMessage"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.SuccessOrErrorMessage"
+                            "$ref": "#/definitions/models.AnswerMessage"
                         }
                     }
                 }
@@ -279,28 +147,28 @@
                         "description": "OK",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.SuccessOrErrorMessage"
+                            "$ref": "#/definitions/models.AnswerMessage"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.SuccessOrErrorMessage"
+                            "$ref": "#/definitions/models.AnswerMessage"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.SuccessOrErrorMessage"
+                            "$ref": "#/definitions/models.AnswerMessage"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.SuccessOrErrorMessage"
+                            "$ref": "#/definitions/models.AnswerMessage"
                         }
                     }
                 }
@@ -331,53 +199,185 @@
                         "description": "OK",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.SuccessOrErrorMessage"
+                            "$ref": "#/definitions/models.AnswerMessage"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.SuccessOrErrorMessage"
+                            "$ref": "#/definitions/models.AnswerMessage"
                         }
                     }
                 }
             }
         },
-        "/upload_avatar": {
-            "post": {
-                "description": "This method saves avatar image in server storage and sets it as clients user avatar",
+        "/user": {
+            "put": {
+                "description": "This method updates info in user and auth-db record of user, who is making a query",
                 "consumes": [
-                    "image/png",
-                    "image/jpeg"
+                    "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "profile"
+                    "user"
                 ],
-                "summary": "Saves new avatar image of client's user",
+                "summary": "Updates client's user",
+                "parameters": [
+                    {
+                        "description": "User new user data",
+                        "name": "profile_data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.SingUpData"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.SuccessOrErrorMessage"
+                            "$ref": "#/definitions/models.AnswerMessage"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.SuccessOrErrorMessage"
+                            "$ref": "#/definitions/models.AnswerMessage"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.AnswerMessage"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "This method creates records about new user in auth-bd and user-db and then sends cookie to user in order to identify",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Registers user",
+                "parameters": [
+                    {
+                        "description": "User data",
+                        "name": "profile_data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.SingUpData"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.AnswerMessage"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.AnswerMessage"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.AnswerMessage"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "This method deletes all information about user, making a query, including user, game stats and authorization info",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Deletes user and user of client",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.AnswerMessage"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.SuccessOrErrorMessage"
+                            "$ref": "#/definitions/models.AnswerMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/{id}": {
+            "get": {
+                "description": "This method provides client with user data, matching required ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Produces user user info",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Profile ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.UserData"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.AnswerMessage"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.AnswerMessage"
                         }
                     }
                 }
@@ -385,10 +385,23 @@
         }
     },
     "definitions": {
-        "models.ScoreboardRecord": {
+        "models.AnswerMessage": {
             "type": "object",
             "properties": {
-                "position": {
+                "message": {
+                    "type": "string",
+                    "example": "Query processed successfully"
+                },
+                "status": {
+                    "type": "integer",
+                    "example": 200
+                }
+            }
+        },
+        "models.ScoreboardUserData": {
+            "type": "object",
+            "properties": {
+                "id": {
                     "type": "integer",
                     "example": 1
                 },
@@ -415,40 +428,10 @@
                 }
             }
         },
-        "models.SuccessOrErrorMessage": {
+        "models.SingUpData": {
             "type": "object",
             "properties": {
-                "message": {
-                    "type": "string",
-                    "example": "Query processed successfully"
-                },
-                "status": {
-                    "type": "integer",
-                    "example": 200
-                }
-            }
-        },
-        "models.UserData": {
-            "type": "object",
-            "properties": {
-                "email": {
-                    "type": "string",
-                    "example": "user_test@test.com"
-                },
-                "password": {
-                    "type": "string",
-                    "example": "verysecretpasswordwhichnooneknows"
-                },
-                "username": {
-                    "type": "string",
-                    "example": "user_test"
-                }
-            }
-        },
-        "models.UserProfile": {
-            "type": "object",
-            "properties": {
-                "avatar_url": {
+                "avatar": {
                     "type": "string",
                     "example": "\u003csome avatar url\u003e"
                 },
@@ -456,7 +439,28 @@
                     "type": "string",
                     "example": "user_test@test.com"
                 },
-                "games_played": {
+                "password": {
+                    "type": "string",
+                    "example": "SecretPass1!"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "user_test"
+                }
+            }
+        },
+        "models.UserData": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "type": "string",
+                    "example": "\u003csome avatar url\u003e"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "user_test@test.com"
+                },
+                "games": {
                     "type": "integer"
                 },
                 "id": {
