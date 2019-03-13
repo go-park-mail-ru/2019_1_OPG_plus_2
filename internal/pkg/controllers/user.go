@@ -57,7 +57,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 // GetUser godoc
 // @title Get user
-// @summary Produces user user info
+// @summary Produces user profile info
 // @description This method provides client with user data, matching required ID
 // @tags user
 // @accept json
@@ -99,11 +99,11 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 // UpdateUser godoc
 // @title Update user
 // @summary Updates client's user
-// @description This method updates info in user and auth-db record of user, who is making a query
+// @description This method updates info in profile and auth-db record of user, who is making a query
 // @tags user
 // @accept json
 // @produce json
-// @param profile_data body models.SingUpData true "User new user data"
+// @param profile_data body models.SingUpData true "User new profile data"
 // @success 200 {object} models.AnswerMessage
 // @failure 400 {object} models.AnswerMessage
 // @failure 401 {object} models.AnswerMessage
@@ -135,7 +135,7 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 // RemoveUser godoc
 // @title Delete user
 // @summary Deletes user and user of client
-// @description This method deletes all information about user, making a query, including user, game stats and authorization info
+// @description This method deletes all information about user, making a query, including profile, game stats and authorization info
 // @tags user
 // @produce json
 // @success 200 {object} models.AnswerMessage
