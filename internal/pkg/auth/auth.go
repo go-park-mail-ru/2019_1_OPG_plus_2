@@ -22,7 +22,7 @@ func CreateAuthCookie(data models.JwtData, lifetime time.Duration) *http.Cookie 
         Value:    jwtStr,
         Expires:  time.Now().Add(lifetime),
         HttpOnly: true,
-        Domain: "colors.hackallcode.ru",
+        //Domain: "colors.hackallcode.ru",
     }
 }
 
