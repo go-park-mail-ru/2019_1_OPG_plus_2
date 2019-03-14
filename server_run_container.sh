@@ -7,7 +7,9 @@ then
     port=8002
     fi
 
-echo The published port of the container is ${port}
+echo [SERVER] The published port of the container is ${port}
 
-docker build --tag colors:back -f ServerDockerfile --rm
-docker run -d -e PORT=${port} --name colors-back --publish ${port}:8002 colors:back >> docker.log
+docker build --rm -t colors-back -f server.Dockerfile .
+docker run -d --rm --network=opg-net --name colors-back --publish ${port}:8002 colors-back >> docker.log
+
+echo [SERVER] Server is now running at: ${port}
