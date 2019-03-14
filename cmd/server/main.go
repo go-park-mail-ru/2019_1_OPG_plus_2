@@ -13,7 +13,7 @@ import (
 // @contact.name @DanikNik
 // @contact.email nikolsky.dan@gmail.com
 
-// @host localhost:8001
+// @host localhost:8002
 // @BasePath /api
 
 func main() {

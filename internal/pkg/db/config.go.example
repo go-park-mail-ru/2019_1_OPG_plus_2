@@ -2,10 +2,9 @@ package db
 
 import "os"
 
+// Docker DB params
 var host = "localhost"
-//стандартный порт контейнера тестовой базы mariadb если на локалке запущен контейнер а код гошки запущен руками
 var port = "12345"
-
 var username = "root"
 var password = "root"
 
@@ -15,23 +14,19 @@ var authUsersTable = "users"
 var coreDbName = "colors_core"
 var coreUsersTable = "users"
 
-
-// если собирать гошку в контейнер, то она собирается с параметром DOCKERIZED=on, что позволяет
-// переопределить параметры сети для контейнера с гошкой
-
-// контейнер гошки работает в одной виртуальной сети с базой под названием opg-net
-// эту сеть необходимо предварительно создать командой `docker network create opg-net`
-
-// после этого все будет хорошо работать
-
 func init(){
-	if os.Getenv("DOCKERIZED") == "on"{
-		host = "colors-db"
-		port = "3306"
-	} else if os.Getenv("PRODUCTION") == "on"{
-		host = "localhost"
-		port = "3306"
-		username = "USER"
-		password = "PASSWORD"
-	}
+    // При сборке бэка в докере будет переменная окружения DOCKERIZED=on.
+    // Контейнер бэка работает в одной с базой виртуальной сети под названием opg-net.
+    // Эту сеть необходимо предварительно создать командой `docker network create opg-net`.
+    if os.Getenv("DOCKERIZED") == "on"{
+        host = "colors-db"
+        port = "3306"
+    } else
+    // На реальном сервере будет переменная окружения PRODUCTION=on. Меняем параметры на параметры реальной DB.
+    if os.Getenv("PRODUCTION") == "on"{
+        host = "localhost"
+        port = "3306"
+        username = "colors"
+        password = "StrongPassword1!"
+    }
 }

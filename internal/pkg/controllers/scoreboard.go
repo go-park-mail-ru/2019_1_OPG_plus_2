@@ -7,6 +7,8 @@ import (
 	"strconv"
 )
 
+const pageSize = 10
+
 // GetScoreboard godoc
 // @title Get scoreboard page
 // @summary Produces scoreboard page with {limit} and {offset}

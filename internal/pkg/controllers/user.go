@@ -5,19 +5,11 @@ import (
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/auth"
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/user"
-	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/util/fileStorage"
 	"github.com/gorilla/mux"
 	"net/http"
-	"path/filepath"
 	"strconv"
 	"time"
 )
-
-const pageSize = 10
-const MByte = 1 << 20
-
-var StaticPath, _ = filepath.Abs("./static")
-var fileVault = fileStorage.NewLocalFileStorage(StaticPath)
 
 // CreateUser godoc
 // @title Create user

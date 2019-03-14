@@ -49,11 +49,10 @@ func StartApp(params Params) error {
 
 	apiRouter.HandleFunc("/users", controllers.GetScoreboard).Methods("GET", "OPTIONS")
 
-	staticHandler := http.StripPrefix(
+	router.PathPrefix("/static").Handler(http.StripPrefix(
 		"/static",
 		http.FileServer(http.Dir(controllers.StaticPath)),
-	)
-	router.PathPrefix("/static").Handler(staticHandler)
+	))
 
 	return http.ListenAndServe(":"+params.Port, router)
 }
