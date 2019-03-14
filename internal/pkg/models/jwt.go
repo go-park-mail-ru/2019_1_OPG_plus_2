@@ -5,27 +5,11 @@ import (
 	"time"
 )
 
-type SignInData struct {
-	Login    string `json:"login" example:"test@mail.ru"`
-	Password string `json:"password" example:"Qwerty123"`
-}
-
-type UserData struct {
-	Email    string `json:"email" example:"user_test@test.com"`
-	Username string `json:"username" example:"user_test"`
-	Password string `json:"password" example:"verysecretpasswordwhichnooneknows"`
-}
-
-type DbUserData struct {
-	Id       int    `json:"id"`
-	Email    string `json:"email"`
-	Username string `json:"username"`
-	PassHash string `json:"pass_hash"`
-}
+/* JWT DATA */
 
 type JwtData struct {
 	jwt.StandardClaims
-	Id       int    `json:"id"`
+	Id       int64  `json:"id"`
 	Email    string `json:"email"`
 	Username string `json:"username"`
 }

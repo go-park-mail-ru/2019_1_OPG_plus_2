@@ -4,6 +4,7 @@ import (
 	"fmt"
 	_ "github.com/go-park-mail-ru/2019_1_OPG_plus_2/docs"
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/controllers"
+	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/db"
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/middleware"
 	"github.com/gorilla/mux"
 	"github.com/swaggo/http-swagger"
@@ -16,6 +17,10 @@ type Params struct {
 
 func StartApp(params Params) error {
 	fmt.Println("Server starting at " + params.Port)
+
+	if err := db.Open(); err != nil {
+		fmt.Println(err.Error())
+	}
 
 	router := mux.NewRouter()
 	apiRouter := router.PathPrefix("/api").Subrouter()
@@ -30,20 +35,19 @@ func StartApp(params Params) error {
 
 	apiRouter.HandleFunc("/", controllers.IndexApiHandler)
 
-	apiRouter.HandleFunc("/session", controllers.IsAuth).Methods("GET")
-	apiRouter.HandleFunc("/session", controllers.SignIn).Methods("POST")
-	apiRouter.HandleFunc("/session", controllers.SignOut).Methods("DELETE")
+	apiRouter.HandleFunc("/session", controllers.IsAuth).Methods("GET", "OPTIONS")
+	apiRouter.HandleFunc("/session", controllers.SignIn).Methods("POST", "OPTIONS")
+	apiRouter.HandleFunc("/session", controllers.SignOut).Methods("DELETE", "OPTIONS")
+	apiRouter.HandleFunc("/password", controllers.UpdatePassword).Methods("PUT", "OPTIONS")
 
-	// apiRouter.HandleFunc("/profile", controllers.GetProfile).Methods("GET")
-	apiRouter.HandleFunc("/profile/{id}", controllers.GetProfile).Methods("GET")
-	apiRouter.HandleFunc("/profile", controllers.CreateProfile).Methods("POST")
-	apiRouter.HandleFunc("/profile", controllers.UpdateProfile).Methods("PUT")
-	apiRouter.HandleFunc("/profile", controllers.DeleteProfile).Methods("DELETE")
+	apiRouter.HandleFunc("/user", controllers.GetUser).Methods("GET", "OPTIONS")
+	apiRouter.HandleFunc("/user/{id:[0-9]+}", controllers.GetUser).Methods("GET", "OPTIONS")
+	apiRouter.HandleFunc("/user", controllers.CreateUser).Methods("POST", "OPTIONS")
+	apiRouter.HandleFunc("/user", controllers.UpdateUser).Methods("PUT", "OPTIONS")
+	apiRouter.HandleFunc("/user", controllers.RemoveUser).Methods("DELETE", "OPTIONS")
+	apiRouter.HandleFunc("/avatar", controllers.UploadAvatar).Methods("POST", "OPTIONS")
 
-	apiRouter.HandleFunc("/upload_avatar", controllers.UploadAvatar).Methods("POST")
-
-	apiRouter.HandleFunc("/profiles", controllers.GetProfiles).Methods("GET")
-	apiRouter.HandleFunc("/profiles/score", controllers.ScoreBoardByPage).Methods("GET")
+	apiRouter.HandleFunc("/users", controllers.GetScoreboard).Methods("GET", "OPTIONS")
 
 	staticHandler := http.StripPrefix(
 		"/static",
@@ -52,4 +56,11 @@ func StartApp(params Params) error {
 	router.PathPrefix("/static").Handler(staticHandler)
 
 	return http.ListenAndServe(":"+params.Port, router)
+}
+
+func StopApp() {
+	fmt.Println("Stopping server...")
+	if err := db.Close(); err != nil {
+		fmt.Println(err.Error())
+	}
 }

@@ -2,10 +2,12 @@ package auth
 
 import (
 	"crypto/sha256"
+	"database/sql"
 	"fmt"
+	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/db"
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"
 	"net/http"
-	"regexp"
+	"strings"
 	"time"
 )
 
@@ -20,56 +22,68 @@ func CreateAuthCookie(data models.JwtData, lifetime time.Duration) *http.Cookie 
 		Value:    jwtStr,
 		Expires:  time.Now().Add(lifetime),
 		HttpOnly: true,
+		//Domain: "colors.hackallcode.ru",
 	}
 }
 
-func CreateUser(userData models.UserData) (models.JwtData, error) {
-	if matched, _ := regexp.MatchString(`^[\w\-.]+@[\w\-.]+\.[a-z]{2,6}$`, userData.Email); !matched {
-		return models.JwtData{}, fmt.Errorf("incorrect email")
-	}
-	if matched, _ := regexp.MatchString(`^\w+$`, userData.Username); !matched {
-		return models.JwtData{}, fmt.Errorf("incorrect nickname")
-	}
-	passHash := fmt.Sprintf("%x", sha256.Sum256([]byte(userData.Password)))
+func CheckJwt(token string) (models.JwtData, error) {
+	data := models.JwtData{}
+	err := data.UnMarshal(token, secret)
+	return data, err
+}
 
-	id := create(models.DbUserData{
-		Email:    userData.Email,
-		Username: userData.Username,
+func SignUp(signUpData models.SingUpData) (models.JwtData, error) {
+	incorrectFields := signUpData.Check()
+	if len(incorrectFields) > 0 {
+		return models.JwtData{}, fmt.Errorf("incorrect: " + strings.Join(incorrectFields, ", "))
+	}
+
+	passHash := fmt.Sprintf("%x", sha256.Sum256([]byte(signUpData.Password)))
+
+	id, err := db.AuthCreate(db.AuthData{
+		Email:    signUpData.Email,
+		Username: signUpData.Username,
 		PassHash: passHash,
 	})
-	if id == 0 {
-		return models.JwtData{}, fmt.Errorf("user already exists")
+	if err != nil {
+		return models.JwtData{}, err
 	}
 
 	return models.JwtData{
 		Id:       id,
-		Email:    userData.Email,
-		Username: userData.Username,
+		Email:    signUpData.Email,
+		Username: signUpData.Username,
 	}, nil
 }
 
-func CheckLoginPass(signInData models.SignInData) (models.JwtData, error) {
-	var userData *models.DbUserData
+func SignIn(signInData models.SignInData) (data models.JwtData, err error) {
+	var userData db.AuthData
+	passHash := fmt.Sprintf("%x", sha256.Sum256([]byte(signInData.Password)))
 
-	matched, _ := regexp.MatchString(`^[\w\-.]+@[\w\-.]+\.[a-z]{2,6}$`, signInData.Login)
-	if matched {
-		userData = findByEmail(signInData.Login)
-	} else {
-		matched, _ = regexp.MatchString(`^\w+$`, signInData.Login)
-		if matched {
-			userData = findByNickname(signInData.Login)
-		} else {
-			return models.JwtData{}, fmt.Errorf("incorrect login")
+	isEmail := models.CheckEmail(signInData.Login)
+	if isEmail {
+		userData, err = db.AuthFindByEmailAndPassHash(signInData.Login, passHash)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				return data, fmt.Errorf("incorrect login or password")
+			}
+			return
 		}
 	}
 
-	if userData == nil {
-		return models.JwtData{}, fmt.Errorf("incorrect login or password")
+	isUsername := !isEmail && models.CheckUsername(signInData.Login)
+	if isUsername {
+		userData, err = db.AuthFindByNicknameAndPassHash(signInData.Login, passHash)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				return data, fmt.Errorf("incorrect login or password")
+			}
+			return
+		}
 	}
 
-	passHash := fmt.Sprintf("%x", sha256.Sum256([]byte(signInData.Password)))
-	if passHash != userData.PassHash {
-		return models.JwtData{}, fmt.Errorf("incorrect login or password")
+	if !isEmail && !isUsername {
+		return data, fmt.Errorf("incorrect login")
 	}
 
 	return models.JwtData{
@@ -79,8 +93,44 @@ func CheckLoginPass(signInData models.SignInData) (models.JwtData, error) {
 	}, nil
 }
 
-func CheckJwt(token string) (models.JwtData, error) {
-	data := models.JwtData{}
-	err := data.UnMarshal(token, secret)
-	return data, err
+func UpdatePassword(id int64, passwordData models.UpdatePasswordData) error {
+	incorrectFields := passwordData.Check()
+	if len(incorrectFields) > 0 {
+		return fmt.Errorf("incorrect: " + strings.Join(incorrectFields, ", "))
+	}
+
+	passHash := fmt.Sprintf("%x", sha256.Sum256([]byte(passwordData.NewPassword)))
+	return db.AuthUpdatePassword(id, passHash)
+}
+
+func UpdateAuth(id int64, userData models.UpdateUserData) (models.JwtData, error) {
+	incorrectFields := userData.Check()
+	if len(incorrectFields) > 0 {
+		return models.JwtData{}, fmt.Errorf("incorrect: " + strings.Join(incorrectFields, ", "))
+	}
+
+	err := db.AuthUpdateData(db.AuthData{
+		Id:       id,
+		Email:    userData.Email,
+		Username: userData.Username,
+	})
+	if err != nil {
+		return models.JwtData{}, err
+	}
+
+	return models.JwtData{
+		Id:       id,
+		Email:    userData.Email,
+		Username: userData.Username,
+	}, nil
+}
+
+func RemoveAuth(id int64, removeData models.RemoveUserData) error {
+	incorrectFields := removeData.Check()
+	if len(incorrectFields) > 0 {
+		return fmt.Errorf("incorrect: " + strings.Join(incorrectFields, ", "))
+	}
+
+	passHash := fmt.Sprintf("%x", sha256.Sum256([]byte(removeData.Password)))
+	return db.AuthRemove(id, passHash)
 }
