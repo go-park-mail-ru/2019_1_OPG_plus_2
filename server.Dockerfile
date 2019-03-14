@@ -1,6 +1,6 @@
 FROM golang:latest
 ENV GO111MODULE=on
-ENV DOCKERIZED=on
+ENV IN_DOCKER=on
 WORKDIR /app
 
 COPY go.mod .

@@ -8,7 +8,19 @@ import (
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"
 )
 
-func CreateUser(signUpData models.SingUpData) (jwtData models.JwtData, err error) {
+type IUser interface {
+	CreateUser(signUpData models.SingUpData) (jwtData models.JwtData, err error)
+	GetUser(id int64) (userData models.UserData, err error)
+	UpdateUser(id int64, updateData models.UpdateUserData) (jwtData models.JwtData, err error)
+	RemoveUser(id int64, removeData models.RemoveUserData) error
+}
+
+type StorageAdapter struct{}
+
+func NewStorageAdapter() *StorageAdapter {
+	return &StorageAdapter{}
+}
+func (*StorageAdapter) CreateUser(signUpData models.SingUpData) (jwtData models.JwtData, err error) {
 	jwtData, err = auth.SignUp(signUpData)
 	if err != nil {
 		return
@@ -20,26 +32,18 @@ func CreateUser(signUpData models.SingUpData) (jwtData models.JwtData, err error
 	})
 	return
 }
-
-func GetUser(id int64) (userData models.UserData, err error) {
+func (*StorageAdapter) GetUser(id int64) (userData models.UserData, err error) {
 	userData, err = db.GetUser(id)
 	if err == sql.ErrNoRows {
 		return userData, fmt.Errorf("user not found")
 	}
 	return
 }
-
-func UpdateUser(id int64, userData models.UpdateUserData) (jwtData models.JwtData, err error) {
-	jwtData, err = auth.UpdateAuth(id, userData)
-	//if err != nil {
-	//   return
-	//}
-
-	//err = db.ProfileUpdateData(db.ProfileData{})
+func (*StorageAdapter) UpdateUser(id int64, updateData models.UpdateUserData) (jwtData models.JwtData, err error) {
+	jwtData, err = auth.UpdateAuth(id, updateData)
 	return
 }
-
-func RemoveUser(id int64, removeData models.RemoveUserData) error {
+func (*StorageAdapter) RemoveUser(id int64, removeData models.RemoveUserData) error {
 	err := auth.RemoveAuth(id, removeData)
 	if err != nil {
 		return err

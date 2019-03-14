@@ -11,6 +11,16 @@ import (
 	"time"
 )
 
+var storageAdapter = user.NewStorageAdapter()
+
+type UserHandlers struct {
+	adapter user.IUser
+}
+
+func NewUserHandlers(adapter user.IUser) *UserHandlers {
+	return &UserHandlers{adapter: adapter}
+}
+
 // CreateUser godoc
 // @title Create user
 // @summary Registers user
@@ -23,7 +33,7 @@ import (
 // @failure 400 {object} models.AnswerMessage
 // @failure 401 {object} models.AnswerMessage
 // @router /user [post]
-func CreateUser(w http.ResponseWriter, r *http.Request) {
+func (*UserHandlers) CreateUser(w http.ResponseWriter, r *http.Request) {
 	if isAuth(r) {
 		models.SendMessage(w, http.StatusBadRequest, "already signed in")
 		return
@@ -37,7 +47,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	jwtData, err := user.CreateUser(signUpData)
+	jwtData, err := storageAdapter.CreateUser(signUpData)
 	if err != nil {
 		models.SendMessage(w, http.StatusInternalServerError, err.Error())
 		return
@@ -59,7 +69,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 // @failure 400 {object} models.AnswerMessage
 // @failure 404 {object} models.AnswerMessage
 // @router /user/{id} [get]
-func GetUser(w http.ResponseWriter, r *http.Request) {
+func (*UserHandlers) GetUser(w http.ResponseWriter, r *http.Request) {
 	var id int64
 	var err error
 
@@ -79,7 +89,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 		id = jwtData(r).Id
 	}
 
-	userData, err := user.GetUser(id)
+	userData, err := storageAdapter.GetUser(id)
 	if err != nil {
 		models.SendMessage(w, http.StatusInternalServerError, err.Error())
 		return
@@ -100,7 +110,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 // @failure 400 {object} models.AnswerMessage
 // @failure 401 {object} models.AnswerMessage
 // @router /user [put]
-func UpdateUser(w http.ResponseWriter, r *http.Request) {
+func (*UserHandlers) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	if !isAuth(r) {
 		models.SendMessage(w, http.StatusUnauthorized, "not signed in")
 		return
@@ -114,7 +124,7 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	jwtData, err := user.UpdateUser(jwtData(r).Id, updateData)
+	jwtData, err := storageAdapter.UpdateUser(jwtData(r).Id, updateData)
 	if err != nil {
 		models.SendMessage(w, http.StatusInternalServerError, err.Error())
 		return
@@ -133,7 +143,7 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 // @success 200 {object} models.AnswerMessage
 // @failure 500 {object} models.AnswerMessage
 // @router /user [delete]
-func RemoveUser(w http.ResponseWriter, r *http.Request) {
+func (*UserHandlers) RemoveUser(w http.ResponseWriter, r *http.Request) {
 	if !isAuth(r) {
 		models.SendMessage(w, http.StatusUnauthorized, "not signed in")
 		return
@@ -147,7 +157,7 @@ func RemoveUser(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	err = user.RemoveUser(jwtData(r).Id, removeData)
+	err = storageAdapter.RemoveUser(jwtData(r).Id, removeData)
 	if err != nil {
 		models.SendMessage(w, http.StatusInternalServerError, err.Error())
 		return

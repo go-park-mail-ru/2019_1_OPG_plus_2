@@ -12,7 +12,31 @@ import (
 
 var baseUrl = "localhost:8001/api"
 
-func TestCreateUser(t *testing.T) {
+type MockStorageAdapter struct{}
+
+func NewMockStorageAdapter() *MockStorageAdapter {
+	return &MockStorageAdapter{}
+}
+
+func (*MockStorageAdapter) CreateUser(signUpData models.SingUpData) (jwtData models.JwtData, err error) {
+	panic("implement me")
+}
+
+func (*MockStorageAdapter) GetUser(id int64) (userData models.UserData, err error) {
+	panic("implement me")
+}
+
+func (*MockStorageAdapter) UpdateUser(id int64, updateData models.UpdateUserData) (jwtData models.JwtData, err error) {
+	panic("implement me")
+}
+
+func (*MockStorageAdapter) RemoveUser(id int64, removeData models.RemoveUserData) error {
+	panic("implement me")
+}
+
+var mockUserHandlers = NewUserHandlers(NewMockStorageAdapter())
+
+func TestGetUser(t *testing.T) {
 
 	newUser := models.SingUpData{
 		Email:    "new_user@mail.ru",
@@ -33,7 +57,7 @@ func TestCreateUser(t *testing.T) {
 	ctx = context.WithValue(ctx, "isAuth", true)
 	ctx = context.WithValue(ctx, "jwtData", data)
 
-	CreateUser(w, req.WithContext(ctx))
+	mockUserHandlers.GetUser(w, req.WithContext(ctx))
 	if w.Code != http.StatusOK {
 		t.Errorf("Wrong StatusCode: got %d, expected %d", w.Code, http.StatusOK)
 	}
