@@ -19,8 +19,8 @@ func StartApp(params Params) error {
 	fmt.Println("Server starting at " + params.Port)
 
 	if err := db.Open(); err != nil {
-	    fmt.Println(err.Error())
-    }
+		fmt.Println(err.Error())
+	}
 
 	router := mux.NewRouter()
 	apiRouter := router.PathPrefix("/api").Subrouter()
@@ -61,6 +61,6 @@ func StartApp(params Params) error {
 func StopApp() {
 	fmt.Println("Stopping server...")
 	if err := db.Close(); err != nil {
-        fmt.Println(err.Error())
-    }
+		fmt.Println(err.Error())
+	}
 }

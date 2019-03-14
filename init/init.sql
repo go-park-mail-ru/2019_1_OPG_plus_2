@@ -51,3 +51,5 @@ INSERT INTO colors_auth.users (id, username, email, pass_hash) VALUES
 INSERT INTO colors_core.users (id, avatar, score, games, win, lose) VALUES
 (1, 'avatar_1.jpg', 1337, 10, 7, 3),
 (2, 'avatar_2.jpg', 228, 5, 2, 3);
+
+COMMIT;
