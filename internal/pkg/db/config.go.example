@@ -1,11 +1,37 @@
 package db
 
-const host = ""
-const username = "colors"
-const password = "StrongPassword1!"
+import "os"
 
-const authDbName = "colors_auth"
-const authUsersTable = "users"
+var host = "localhost"
+//стандартный порт контейнера тестовой базы mariadb если на локалке запущен контейнер а код гошки запущен руками
+var port = "12345"
 
-const coreDbName = "colors_core"
-const coreUsersTable = "users"
+var username = "root"
+var password = "root"
+
+var authDbName = "colors_auth"
+var authUsersTable = "users"
+
+var coreDbName = "colors_core"
+var coreUsersTable = "users"
+
+
+// если собирать гошку в контейнер, то она собирается с параметром DOCKERIZED=on, что позволяет
+// переопределить параметры сети для контейнера с гошкой
+
+// контейнер гошки работает в одной виртуальной сети с базой под названием opg-net
+// эту сеть необходимо предварительно создать командой `docker network create opg-net`
+
+// после этого все будет хорошо работать
+
+func init(){
+	if os.Getenv("DOCKERIZED") == "on"{
+		host = "colors-db"
+		port = "3306"
+	} else if os.Getenv("PRODUCTION") == "on"{
+		host = "localhost"
+		port = "3306"
+		username = "USER"
+		password = "PASSWORD"
+	}
+}
