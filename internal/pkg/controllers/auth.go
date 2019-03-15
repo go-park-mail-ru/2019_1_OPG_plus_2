@@ -53,12 +53,12 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 
 	jwtData, err := auth.SignIn(signInData)
 	if err != nil {
-		models.SendMessage(w, http.StatusUnauthorized, err.Error())
+		models.SendMessageWithData(w, http.StatusUnauthorized, err.Error(), signInData.Login)
 		return
 	}
 
 	http.SetCookie(w, auth.CreateAuthCookie(jwtData, 30*24*time.Hour))
-	models.SendMessageWithData(w, http.StatusOK, "signed in", jwtData)
+	models.SendMessage(w, http.StatusOK, "signed in")
 }
 
 // SignOut godoc
