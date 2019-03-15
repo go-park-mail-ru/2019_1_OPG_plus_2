@@ -12,8 +12,16 @@ import (
 
 var baseUrl = "localhost:8001/api"
 
+type authData struct {
+	Id       int64
+	Username string
+	Email    string
+	Password string
+}
+
 type MockStorageAdapter struct {
-	Data map[int64]models.UserData
+	ProfileData map[int64]models.UserData
+	AuthData    map[int64]authData
 }
 
 func NewMockStorageAdapter() *MockStorageAdapter {
@@ -49,23 +57,52 @@ func NewMockStorageAdapter() *MockStorageAdapter {
 		Win:      150,
 	}
 
-	return &MockStorageAdapter{Data: data}
+	return &MockStorageAdapter{ProfileData: data}
 }
 
-func (*MockStorageAdapter) CreateUser(signUpData models.SingUpData) (jwtData models.JwtData, err error) {
-	panic("implement me")
+func (storage *MockStorageAdapter) CreateUser(signUpData models.SingUpData) (jwtData models.JwtData, err error) {
+	newUser := models.UserData{
+		Id:       int64(len(storage.ProfileData)),
+		Username: signUpData.Username,
+		Email:    signUpData.Email,
+		Avatar:   signUpData.Avatar,
+	}
+
+	storage.ProfileData[newUser.Id] = newUser
+	storage.AuthData[newUser.Id] = authData{
+		Id:       newUser.Id,
+		Username: newUser.Username,
+		Email:    newUser.Email,
+		Password: signUpData.Password,
+	}
+
+	newJwtData := models.JwtData{
+		Id:       newUser.Id,
+		Email:    newUser.Email,
+		Username: newUser.Username,
+	}
+	return newJwtData, nil
 }
 
 func (storage *MockStorageAdapter) GetUser(id int64) (userData models.UserData, err error) {
-	return storage.Data[id], nil
+	return storage.ProfileData[id], nil
 }
 
-func (*MockStorageAdapter) UpdateUser(id int64, updateData models.UpdateUserData) (jwtData models.JwtData, err error) {
-	panic("implement me")
+func (storage *MockStorageAdapter) UpdateUser(id int64, updateData models.UpdateUserData) (jwtData models.JwtData, err error) {
+	user := storage.ProfileData[id]
+	user.Username = updateData.Username
+	user.Email = updateData.Email
+
+	newJwtData := models.JwtData{
+		Id:       id,
+		Username: user.Username,
+		Email:    user.Email,
+	}
+	return newJwtData, nil
 }
 
 func (*MockStorageAdapter) RemoveUser(id int64, removeData models.RemoveUserData) error {
-	panic("implement me")
+	return nil
 }
 
 var mockedStorageAdapter = NewMockStorageAdapter()
