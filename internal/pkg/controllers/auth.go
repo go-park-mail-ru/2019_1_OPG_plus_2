@@ -53,7 +53,9 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 
 	jwtData, err := auth.SignIn(signInData)
 	if err != nil {
-		models.SendMessageWithData(w, http.StatusUnauthorized, err.Error(), signInData.Login)
+		models.SendSignInAnswer(w, http.StatusUnauthorized, err.Error(), models.SignInAnswer {
+			Login: signInData.Login,
+		})
 		return
 	}
 

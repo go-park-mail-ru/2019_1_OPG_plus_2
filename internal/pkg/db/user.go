@@ -4,7 +4,7 @@ import (
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"
 )
 
-func GetUser(id int64) (userData models.UserData, err error) {
+func GetUser(id int64) (userData models.GetUserAnswer, err error) {
 	row, err := QueryRow("SELECT a.id, a.username, a.email, c.avatar, c.score, c.games, c.win, c.lose FROM "+
 		authDbName+"."+authUsersTable+" AS a JOIN "+coreDbName+"."+coreUsersTable+" AS c ON a.id = c.id WHERE a.id = ?", id)
 	if err != nil {

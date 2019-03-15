@@ -10,7 +10,7 @@ import (
 
 type IUser interface {
 	CreateUser(signUpData models.SingUpData) (jwtData models.JwtData, err error)
-	GetUser(id int64) (userData models.UserData, err error)
+	GetUser(id int64) (userData models.GetUserAnswer, err error)
 	UpdateUser(id int64, updateData models.UpdateUserData) (jwtData models.JwtData, err error)
 	RemoveUser(id int64, removeData models.RemoveUserData) error
 }
@@ -32,7 +32,7 @@ func (*StorageAdapter) CreateUser(signUpData models.SingUpData) (jwtData models.
 	})
 	return
 }
-func (*StorageAdapter) GetUser(id int64) (userData models.UserData, err error) {
+func (*StorageAdapter) GetUser(id int64) (userData models.GetUserAnswer, err error) {
 	userData, err = db.GetUser(id)
 	if err == sql.ErrNoRows {
 		return userData, fmt.Errorf("user not found")

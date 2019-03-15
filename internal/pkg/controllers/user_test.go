@@ -13,12 +13,12 @@ import (
 var baseUrl = "localhost:8001/api"
 
 type MockStorageAdapter struct {
-	Data map[int64]models.UserData
+	Data map[int64]models.GetUserAnswer
 }
 
 func NewMockStorageAdapter() *MockStorageAdapter {
-	data := make(map[int64]models.UserData)
-	data[1] = models.UserData{
+	data := make(map[int64]models.GetUserAnswer)
+	data[1] = models.GetUserAnswer{
 		Id:       1,
 		Email:    "mail1",
 		Username: "username1",
@@ -28,7 +28,7 @@ func NewMockStorageAdapter() *MockStorageAdapter {
 		Lose:     50,
 		Win:      50,
 	}
-	data[2] = models.UserData{
+	data[2] = models.GetUserAnswer{
 		Id:       2,
 		Email:    "mail2",
 		Username: "username2",
@@ -38,7 +38,7 @@ func NewMockStorageAdapter() *MockStorageAdapter {
 		Lose:     100,
 		Win:      100,
 	}
-	data[3] = models.UserData{
+	data[3] = models.GetUserAnswer{
 		Id:       3,
 		Email:    "mail3",
 		Username: "username3",
@@ -56,7 +56,7 @@ func (*MockStorageAdapter) CreateUser(signUpData models.SingUpData) (jwtData mod
 	panic("implement me")
 }
 
-func (storage *MockStorageAdapter) GetUser(id int64) (userData models.UserData, err error) {
+func (storage *MockStorageAdapter) GetUser(id int64) (userData models.GetUserAnswer, err error) {
 	return storage.Data[id], nil
 }
 
@@ -116,7 +116,7 @@ func TestGetUserId(t *testing.T) {
 	err := json.NewDecoder(w.Body).Decode(&gotMessage)
 	profileMap := gotMessage.Data
 	profileJson, err := json.Marshal(profileMap)
-	var profile models.UserData
+	var profile models.GetUserAnswer
 	err = json.Unmarshal([]byte(profileJson), &profile)
 	t.Log(profile)
 	if err != nil {

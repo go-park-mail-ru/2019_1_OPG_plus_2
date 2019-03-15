@@ -36,5 +36,5 @@ func GetScoreboard(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	models.SendMessageWithData(w, http.StatusOK, "users found", usersData)
+	models.SendScoreboardAnswer(w, http.StatusOK, "users found", usersData)
 }
