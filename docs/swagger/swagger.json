@@ -164,7 +164,7 @@
                         "description": "Unauthorized",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.SignInAnswerMessage"
                         }
                     },
                     "500": {
@@ -360,7 +360,7 @@
                         "description": "OK",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.UserData"
+                            "$ref": "#/definitions/models.GetUserAnswerMessage"
                         }
                     },
                     "400": {
@@ -432,6 +432,23 @@
                 }
             }
         },
+        "models.GetUserAnswerMessage": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object",
+                    "$ref": "#/definitions/models.UserData"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Query processed successfully"
+                },
+                "status": {
+                    "type": "integer",
+                    "example": 200
+                }
+            }
+        },
         "models.ScoreboardUserData": {
             "type": "object",
             "properties": {
@@ -446,6 +463,32 @@
                 "username": {
                     "type": "string",
                     "example": "XxX__NaGiBaToR__XxX"
+                }
+            }
+        },
+        "models.SignInAnswer": {
+            "type": "object",
+            "properties": {
+                "login": {
+                    "type": "string",
+                    "example": "test@mail.ru"
+                }
+            }
+        },
+        "models.SignInAnswerMessage": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object",
+                    "$ref": "#/definitions/models.SignInAnswer"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Query processed successfully"
+                },
+                "status": {
+                    "type": "integer",
+                    "example": 200
                 }
             }
         },

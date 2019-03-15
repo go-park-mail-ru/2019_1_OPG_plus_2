@@ -9,6 +9,18 @@ definitions:
         example: 200
         type: integer
     type: object
+  models.GetUserAnswerMessage:
+    properties:
+      data:
+        $ref: '#/definitions/models.UserData'
+        type: object
+      message:
+        example: Query processed successfully
+        type: string
+      status:
+        example: 200
+        type: integer
+    type: object
   models.ScoreboardUserData:
     properties:
       id:
@@ -20,6 +32,24 @@ definitions:
       username:
         example: XxX__NaGiBaToR__XxX
         type: string
+    type: object
+  models.SignInAnswer:
+    properties:
+      login:
+        example: test@mail.ru
+        type: string
+    type: object
+  models.SignInAnswerMessage:
+    properties:
+      data:
+        $ref: '#/definitions/models.SignInAnswer'
+        type: object
+      message:
+        example: Query processed successfully
+        type: string
+      status:
+        example: 200
+        type: integer
     type: object
   models.SignInData:
     properties:
@@ -214,7 +244,7 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.SignInAnswerMessage'
             type: object
         "500":
           description: Internal Server Error
@@ -328,7 +358,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.UserData'
+            $ref: '#/definitions/models.GetUserAnswerMessage'
             type: object
         "400":
           description: Bad Request

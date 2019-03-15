@@ -65,7 +65,7 @@ func (handlers *UserHandlers) CreateUser(w http.ResponseWriter, r *http.Request)
 // @accept json
 // @produce json
 // @param id path int false "Profile ID, if none, returned logged in user"
-// @success 200 {object} models.UserData
+// @success 200 {object} models.GetUserAnswerMessage
 // @failure 400 {object} models.AnswerMessage
 // @failure 404 {object} models.AnswerMessage
 // @router /user/{id} [get]

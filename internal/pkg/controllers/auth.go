@@ -34,7 +34,7 @@ func IsAuth(w http.ResponseWriter, r *http.Request) {
 // @produce json
 // @param credentials body models.SignInData true "Credentials"
 // @success 200 {object} models.AnswerMessage
-// @failure 401 {object} models.AnswerMessage
+// @failure 401 {object} models.SignInAnswerMessage
 // @failure 500 {object} models.AnswerMessage
 // @router /session [post]
 func SignIn(w http.ResponseWriter, r *http.Request) {
@@ -53,7 +53,7 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 
 	jwtData, err := auth.SignIn(signInData)
 	if err != nil {
-		models.SendSignInAnswer(w, http.StatusUnauthorized, err.Error(), models.SignInAnswer {
+		models.SendSignInAnswer(w, http.StatusUnauthorized, err.Error(), models.SignInAnswer{
 			Login: signInData.Login,
 		})
 		return
