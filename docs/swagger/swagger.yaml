@@ -21,6 +21,12 @@ definitions:
         example: 200
         type: integer
     type: object
+  models.RemoveUserData:
+    properties:
+      password:
+        example: SecretPass1!
+        type: string
+    type: object
   models.ScoreboardUserData:
     properties:
       id:
@@ -82,6 +88,15 @@ definitions:
         type: string
       password_confirm:
         example: SecretPass2!
+        type: string
+    type: object
+  models.UpdateUserData:
+    properties:
+      email:
+        example: user_test@test.com
+        type: string
+      username:
+        example: user_test
         type: string
     type: object
   models.UserData:
@@ -258,6 +273,14 @@ paths:
     delete:
       description: This method deletes all information about user, making a query,
         including profile, game stats and authorization info
+      parameters:
+      - description: Info required to remove current user
+        in: body
+        name: remove_data
+        required: true
+        schema:
+          $ref: '#/definitions/models.RemoveUserData'
+          type: object
       produces:
       - application/json
       responses:
@@ -319,7 +342,7 @@ paths:
         name: profile_data
         required: true
         schema:
-          $ref: '#/definitions/models.SingUpData'
+          $ref: '#/definitions/models.UpdateUserData'
           type: object
       produces:
       - application/json
@@ -348,7 +371,7 @@ paths:
       - application/json
       description: This method provides client with user data, matching required ID
       parameters:
-      - description: Profile ID, if none, returned logged in user
+      - description: ProfileData ID, if none, returned logged in user
         in: path
         name: id
         type: integer

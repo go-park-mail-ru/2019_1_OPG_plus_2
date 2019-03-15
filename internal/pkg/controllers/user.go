@@ -105,7 +105,7 @@ func (handlers *UserHandlers) GetUser(w http.ResponseWriter, r *http.Request) {
 // @tags user
 // @accept json
 // @produce json
-// @param profile_data body models.SingUpData true "User new profile data"
+// @param profile_data body models.UpdateUserData true "User new profile data"
 // @success 200 {object} models.AnswerMessage
 // @failure 400 {object} models.AnswerMessage
 // @failure 401 {object} models.AnswerMessage
@@ -140,6 +140,7 @@ func (handlers *UserHandlers) UpdateUser(w http.ResponseWriter, r *http.Request)
 // @description This method deletes all information about user, making a query, including profile, game stats and authorization info
 // @tags user
 // @produce json
+// @param remove_data body models.RemoveUserData true "Info required to remove current user"
 // @success 200 {object} models.AnswerMessage
 // @failure 500 {object} models.AnswerMessage
 // @router /user [delete]

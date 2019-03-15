@@ -231,7 +231,7 @@
                         "required": true,
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.SingUpData"
+                            "$ref": "#/definitions/models.UpdateUserData"
                         }
                     }
                 ],
@@ -316,6 +316,18 @@
                     "user"
                 ],
                 "summary": "Deletes user and user of client",
+                "parameters": [
+                    {
+                        "description": "Info required to remove current user",
+                        "name": "remove_data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.RemoveUserData"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -350,7 +362,7 @@
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Profile ID, if none, returned logged in user",
+                        "description": "ProfileData ID, if none, returned logged in user",
                         "name": "id",
                         "in": "path"
                     }
@@ -449,6 +461,15 @@
                 }
             }
         },
+        "models.RemoveUserData": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string",
+                    "example": "SecretPass1!"
+                }
+            }
+        },
         "models.ScoreboardUserData": {
             "type": "object",
             "properties": {
@@ -536,6 +557,19 @@
                 "password_confirm": {
                     "type": "string",
                     "example": "SecretPass2!"
+                }
+            }
+        },
+        "models.UpdateUserData": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "user_test@test.com"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "user_test"
                 }
             }
         },
