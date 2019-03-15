@@ -2,7 +2,7 @@
     "swagger": "2.0",
     "info": {
         "description": "Game based on filling field with color cells",
-        "title": "Colors API by OPG+2",
+        "title": "Colors service API by OPG+2",
         "contact": {
             "name": "@DanikNik",
             "email": "nikolsky.dan@gmail.com"
@@ -10,9 +10,9 @@
         "license": {
             "name": "Apache 2.0"
         },
-        "version": "444.6.4.2.999"
+        "version": "1.0"
     },
-    "host": "localhost:8001",
+    "host": "localhost:8002",
     "basePath": "/api",
     "paths": {
         "/avatar": {
@@ -350,10 +350,9 @@
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Profile ID",
+                        "description": "Profile ID, if none, returned logged in user",
                         "name": "id",
-                        "in": "path",
-                        "required": true
+                        "in": "path"
                     }
                 ],
                 "responses": {

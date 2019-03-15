@@ -77,7 +77,7 @@ definitions:
       win:
         type: integer
     type: object
-host: localhost:8001
+host: localhost:8002
 info:
   contact:
     email: nikolsky.dan@gmail.com
@@ -85,8 +85,8 @@ info:
   description: Game based on filling field with color cells
   license:
     name: Apache 2.0
-  title: Colors API by OPG+2
-  version: 444.6.4.2.999
+  title: Colors service API by OPG+2
+  version: "1.0"
 paths:
   /avatar:
     post:
@@ -318,10 +318,9 @@ paths:
       - application/json
       description: This method provides client with user data, matching required ID
       parameters:
-      - description: Profile ID
+      - description: Profile ID, if none, returned logged in user
         in: path
         name: id
-        required: true
         type: integer
       produces:
       - application/json
