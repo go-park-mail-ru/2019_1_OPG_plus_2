@@ -147,7 +147,8 @@ func (storage *MockStorageAdapter) RemoveUser(id int64, removeData models.Remove
 var mockedStorageAdapter = NewMockStorageAdapter()
 var mockedUserHandlers = NewUserHandlers(mockedStorageAdapter)
 
-type TestCase struct{}
+type TestCase struct {
+}
 
 func TestGetUserSelf(t *testing.T) {
 	url := baseUrl + "/user"
