@@ -18,7 +18,7 @@ func NewLocalFileStorage(storagePath string) *LocalFileStorage {
 
 func (storage *LocalFileStorage) UploadFile(fileFromRequest multipart.File, fileName string, ext string) error {
 	fileToSave, err := os.OpenFile(
-		filepath.Join(storage.StoragePath, strings.Join([]string{fileName, ext}, ".")),
+		filepath.Join(".",storage.StoragePath, strings.Join([]string{fileName, ext}, ".")),
 		os.O_WRONLY|os.O_CREATE,
 		0666,
 	)
