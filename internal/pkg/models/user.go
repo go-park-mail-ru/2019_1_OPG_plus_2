@@ -145,19 +145,19 @@ type UserData struct {
 	Lose  int64 `json:"lose, number"`
 }
 
-type GetUserAnswerMessage struct {
+type UserDataAnswerMessage struct {
 	AnswerMessage
 	Data UserData `json:"data"`
 }
 
-func (message GetUserAnswerMessage) Send(w http.ResponseWriter) {
+func (message UserDataAnswerMessage) Send(w http.ResponseWriter) {
 	w.WriteHeader(message.Status)
 	msg, _ := json.Marshal(message)
 	_, _ = fmt.Fprintln(w, string(msg))
 }
 
-func SendGetUserAnswer(w http.ResponseWriter, status int, message string, data UserData) {
-	GetUserAnswerMessage{
+func SendUserDataAnswer(w http.ResponseWriter, status int, message string, data UserData) {
+	UserDataAnswerMessage{
 		AnswerMessage: AnswerMessage{
 			Status:  status,
 			Message: message,

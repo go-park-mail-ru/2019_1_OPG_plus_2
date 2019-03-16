@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"
-	"github.com/gorilla/mux"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"testing"
 )
 
@@ -20,13 +20,13 @@ type authData struct {
 	Password string
 }
 
-type MockStorageAdapter struct {
+type mockStorageAdapter struct {
 	ProfileData map[int64]*models.UserData
 	AuthData    map[int64]*authData
 }
 
-func NewMockStorageAdapter() (storage *MockStorageAdapter) {
-	storage = new(MockStorageAdapter)
+func newMockStorageAdapter() (storage *mockStorageAdapter) {
+	storage = new(mockStorageAdapter)
 	storage.ProfileData = make(map[int64]*models.UserData)
 	storage.AuthData = make(map[int64]*authData)
 	storage.ProfileData[1] = &models.UserData{
@@ -80,7 +80,7 @@ func NewMockStorageAdapter() (storage *MockStorageAdapter) {
 	return storage
 }
 
-func (storage *MockStorageAdapter) CreateUser(signUpData models.SingUpData) (jwtData models.JwtData, err error) {
+func (storage *mockStorageAdapter) CreateUser(signUpData models.SingUpData) (jwtData models.JwtData, err error) {
 	newUser := models.UserData{
 		Id:       int64(len(storage.ProfileData)),
 		Username: signUpData.Username,
@@ -110,14 +110,14 @@ func (storage *MockStorageAdapter) CreateUser(signUpData models.SingUpData) (jwt
 	return newJwtData, nil
 }
 
-func (storage *MockStorageAdapter) GetUser(id int64) (userData models.UserData, err error) {
+func (storage *mockStorageAdapter) GetUser(id int64) (userData models.UserData, err error) {
 	if storage.ProfileData[id] == nil {
 		return models.UserData{}, fmt.Errorf("NO USER IN STORAGE")
 	}
 	return *storage.ProfileData[id], nil
 }
 
-func (storage *MockStorageAdapter) UpdateUser(id int64, updateData models.UpdateUserData) (jwtData models.JwtData, err error) {
+func (storage *mockStorageAdapter) UpdateUser(id int64, updateData models.UpdateUserData) (jwtData models.JwtData, err error) {
 	if storage.ProfileData[id] == nil {
 		return models.JwtData{}, fmt.Errorf("NO USER IN STORAGE")
 	}
@@ -134,7 +134,7 @@ func (storage *MockStorageAdapter) UpdateUser(id int64, updateData models.Update
 	return newJwtData, nil
 }
 
-func (storage *MockStorageAdapter) RemoveUser(id int64, removeData models.RemoveUserData) error {
+func (storage *mockStorageAdapter) RemoveUser(id int64, removeData models.RemoveUserData) error {
 	if removeData.Password != storage.AuthData[id].Password {
 		return fmt.Errorf("PASSWORD DOES'T MATCH WITH ONE IN STORAGE")
 	}
@@ -144,60 +144,105 @@ func (storage *MockStorageAdapter) RemoveUser(id int64, removeData models.Remove
 	return nil
 }
 
-var mockedStorageAdapter = NewMockStorageAdapter()
+var mockedStorageAdapter = newMockStorageAdapter()
 var mockedUserHandlers = NewUserHandlers(mockedStorageAdapter)
 
-type TestCase struct{}
-
-func TestGetUserSelf(t *testing.T) {
-	url := baseUrl + "/user"
-	req := httptest.NewRequest("GET", url, nil)
-	w := httptest.NewRecorder()
-	ctx := req.Context()
-
-	data := models.JwtData{
-		Username: "username1",
-		Email:    "mail1",
-		Id:       1,
-	}
-	ctx = context.WithValue(ctx, "isAuth", true)
-	ctx = context.WithValue(ctx, "jwtData", data)
-
-	mockedUserHandlers.GetUser(w, req.WithContext(ctx))
-	if w.Code != http.StatusOK {
-		t.Errorf("Wrong StatusCode: got %d, expected %d\n Body: %v", w.Code, http.StatusOK, w.Body)
-	}
+type testParams struct {
+	isAuth  bool
+	muxVars map[string]string
+	jwt     models.JwtData
+	method  string
+	url     string
 }
 
-func TestGetUserId(t *testing.T) {
-	url := baseUrl + "/user/" + "3"
-	req := httptest.NewRequest("GET", url, nil)
+type testCase struct {
+	handler      http.HandlerFunc
+	params       testParams
+	expStatus    int
+	inputMessage interface{}
+	expMessage   interface{}
+}
+
+var tCase = testCase{
+	handler: mockedUserHandlers.GetUser,
+
+	params: testParams{
+		muxVars: map[string]string{},
+		method:  "GET",
+		isAuth:  true,
+		url:     "/user",
+		jwt: models.JwtData{
+			Id:       1,
+			Username: "username1",
+			Email:    "mail1",
+		},
+	},
+
+	expStatus:    200,
+	inputMessage: nil,
+
+	expMessage: models.UserDataAnswerMessage{
+		Data: models.UserData{
+			Id:       1,
+			Email:    "mail1",
+			Username: "username1",
+			Score:    1000,
+			Avatar:   "avatar1",
+			Games:    100,
+			Lose:     50,
+			Win:      50,
+		},
+		AnswerMessage: models.AnswerMessage{
+			Status:  200,
+			Message: "user found",
+		},
+	},
+}
+
+func TestGetUserController(t *testing.T) {
+
+	testParams := tCase.params
+	url := baseUrl + testParams.url
+	req := httptest.NewRequest(testParams.method, url, nil)
 	w := httptest.NewRecorder()
 	ctx := req.Context()
 
-	data := models.JwtData{
-		Username: "username1",
-		Email:    "mail1",
-		Id:       1,
-	}
-	ctx = context.WithValue(ctx, "isAuth", true)
+	data := testParams.jwt
+	ctx = context.WithValue(ctx, "isAuth", testParams.isAuth)
 	ctx = context.WithValue(ctx, "jwtData", data)
-	req = mux.SetURLVars(req.WithContext(ctx), map[string]string{
-		"id": "3",
-	})
 
-	mockedUserHandlers.GetUser(w, req)
-	if w.Code != http.StatusOK {
-		t.Errorf("Wrong StatusCode: got %d, expected %d\n Body: %v", w.Code, http.StatusOK, w.Body)
+	tCase.handler(w, req.WithContext(ctx))
+
+	if w.Code != tCase.expStatus {
+		t.Errorf("Wrong StatusCode:\n\tGot %d\n\tExpected %d\n", w.Code, tCase.expStatus)
 	}
-	var gotMessage models.AnswerMessageWithData
-	err := json.NewDecoder(w.Body).Decode(&gotMessage)
-	profileMap := gotMessage.Data
-	profileJson, err := json.Marshal(profileMap)
-	var profile models.UserData
-	err = json.Unmarshal([]byte(profileJson), &profile)
-	t.Log(profile)
-	if err != nil {
-		t.Errorf("Json parsing bad: %v", err)
+	var retMessage models.UserDataAnswerMessage
+	_ = json.NewDecoder(w.Body).Decode(&retMessage)
+	if !reflect.DeepEqual(retMessage, tCase.expMessage) {
+		t.Errorf("Wrong body\n%v\n%v", retMessage, tCase.expMessage)
+	}
+
+	if !t.Failed() {
+		t.Logf("\nPASSED TEST:\n"+
+			"\tURL:\t%v\n"+
+			"\tAUTH:\t%v\n"+
+			"\tMETHOD:\t%v\n"+
+			"\tJWT:\t%v\n"+
+			"\tMUXVARS:\t%v\n"+
+			"\tBODY:\t%v\n"+
+			"\n"+
+			"\tEXP_STATUS:\t%v\n"+
+			"\tEXP_BODY:\t%v\n",
+
+			testParams.url,
+			testParams.isAuth,
+			testParams.method,
+			testParams.jwt,
+			testParams.muxVars,
+			tCase.inputMessage,
+
+			tCase.expStatus,
+			tCase.expMessage,
+		)
 	}
 }
