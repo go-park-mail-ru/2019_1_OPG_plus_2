@@ -65,7 +65,7 @@ func (handlers *UserHandlers) CreateUser(w http.ResponseWriter, r *http.Request)
 // @accept json
 // @produce json
 // @param id path int false "ProfileData ID, if none, returned logged in user"
-// @success 200 {object} models.GetUserAnswerMessage
+// @success 200 {object} models.UserDataAnswerMessage
 // @failure 400 {object} models.AnswerMessage
 // @failure 404 {object} models.AnswerMessage
 // @router /user/{id} [get]
@@ -95,7 +95,7 @@ func (handlers *UserHandlers) GetUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	models.SendGetUserAnswer(w, http.StatusOK, "user found", userData)
+	models.SendUserDataAnswer(w, http.StatusOK, "user found", userData)
 }
 
 // UpdateUser godoc
