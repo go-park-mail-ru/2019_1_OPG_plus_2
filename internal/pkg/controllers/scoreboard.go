@@ -16,7 +16,7 @@ const pageSize = 10
 // @tags scoreboard
 // @produce json
 // @param limit query int false "Entries per page"
-// @param offset query int false "Entries from the first position"
+// @param page query int false "Number of page"
 // @success 200 {array} models.ScoreboardUserData
 // @router /users [get]
 func GetScoreboard(w http.ResponseWriter, r *http.Request) {
