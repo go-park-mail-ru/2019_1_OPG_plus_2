@@ -132,7 +132,7 @@ func RemoveAuth(id int64, removeData models.RemoveUserData) (error, []string) {
 	passHash := fmt.Sprintf("%x", sha256.Sum256([]byte(removeData.Password)))
 	err := db.AuthRemove(id, passHash)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if err.Error() == "incorrect password" {
 			return models.FieldsError, append(incorrectFields, "password")
 		}
 		return err, nil

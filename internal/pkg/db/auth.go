@@ -87,6 +87,12 @@ func AuthRemove(id int64, passHash string) error {
 		return models.NotFound
 	}
 
-	_, err = removeBy(authDbName, authUsersTable, "id = ? AND pass_hash = ?", id, passHash)
-	return err
+	count, err := removeBy(authDbName, authUsersTable, "id = ? AND pass_hash = ?", id, passHash)
+	if err != nil {
+		return err
+	}
+	if count == 0 {
+		return fmt.Errorf("incorrect password")
+	}
+	return nil
 }
