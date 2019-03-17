@@ -31,11 +31,13 @@ func NewUserHandlers(adapter user.IUser) *UserHandlers {
 // @param profile_data body models.SingUpData true "User data"
 // @success 200 {object} models.AnswerMessage
 // @failure 400 {object} models.AnswerMessage
-// @failure 401 {object} models.AnswerMessage
+// @failure 401 {object} models.AnswerMessageWithFields
+// @failure 405 {object} models.AnswerMessage
+// @failure 500 {object} models.AnswerMessage
 // @router /user [post]
 func (handlers *UserHandlers) CreateUser(w http.ResponseWriter, r *http.Request) {
 	if isAuth(r) {
-		models.SendMessage(w, http.StatusBadRequest, "already signed in")
+		models.SendMessage(w, http.StatusMethodNotAllowed, "already signed in")
 		return
 	}
 
@@ -47,8 +49,12 @@ func (handlers *UserHandlers) CreateUser(w http.ResponseWriter, r *http.Request)
 	}
 	defer r.Body.Close()
 
-	jwtData, err := handlers.adapter.CreateUser(signUpData)
+	jwtData, err, fields := handlers.adapter.CreateUser(signUpData)
 	if err != nil {
+		if fields != nil {
+			models.SendMessageWithFields(w, http.StatusBadRequest, err.Error(), fields)
+			return
+		}
 		models.SendMessage(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -68,6 +74,7 @@ func (handlers *UserHandlers) CreateUser(w http.ResponseWriter, r *http.Request)
 // @success 200 {object} models.UserDataAnswerMessage
 // @failure 400 {object} models.AnswerMessage
 // @failure 404 {object} models.AnswerMessage
+// @failure 500 {object} models.AnswerMessage
 // @router /user/{id} [get]
 func (handlers *UserHandlers) GetUser(w http.ResponseWriter, r *http.Request) {
 	var id int64
@@ -91,6 +98,10 @@ func (handlers *UserHandlers) GetUser(w http.ResponseWriter, r *http.Request) {
 
 	userData, err := handlers.adapter.GetUser(id)
 	if err != nil {
+		if err == models.NotFound {
+			models.SendMessage(w, http.StatusNotFound, err.Error())
+			return
+		}
 		models.SendMessage(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -109,6 +120,7 @@ func (handlers *UserHandlers) GetUser(w http.ResponseWriter, r *http.Request) {
 // @success 200 {object} models.AnswerMessage
 // @failure 400 {object} models.AnswerMessage
 // @failure 401 {object} models.AnswerMessage
+// @failure 500 {object} models.AnswerMessage
 // @router /user [put]
 func (handlers *UserHandlers) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	if !isAuth(r) {
@@ -124,8 +136,12 @@ func (handlers *UserHandlers) UpdateUser(w http.ResponseWriter, r *http.Request)
 	}
 	defer r.Body.Close()
 
-	jwtData, err := handlers.adapter.UpdateUser(jwtData(r).Id, updateData)
+	jwtData, err, fields := handlers.adapter.UpdateUser(jwtData(r).Id, updateData)
 	if err != nil {
+		if fields != nil {
+			models.SendMessageWithFields(w, http.StatusBadRequest, err.Error(), fields)
+			return
+		}
 		models.SendMessage(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -142,6 +158,8 @@ func (handlers *UserHandlers) UpdateUser(w http.ResponseWriter, r *http.Request)
 // @produce json
 // @param remove_data body models.RemoveUserData true "Info required to remove current user"
 // @success 200 {object} models.AnswerMessage
+// @failure 400 {object} models.AnswerMessage
+// @failure 401 {object} models.AnswerMessage
 // @failure 500 {object} models.AnswerMessage
 // @router /user [delete]
 func (handlers *UserHandlers) RemoveUser(w http.ResponseWriter, r *http.Request) {
@@ -158,8 +176,12 @@ func (handlers *UserHandlers) RemoveUser(w http.ResponseWriter, r *http.Request)
 	}
 	defer r.Body.Close()
 
-	err = handlers.adapter.RemoveUser(jwtData(r).Id, removeData)
+	err, fields := handlers.adapter.RemoveUser(jwtData(r).Id, removeData)
 	if err != nil {
+		if fields != nil {
+			models.SendMessageWithFields(w, http.StatusBadRequest, err.Error(), fields)
+			return
+		}
 		models.SendMessage(w, http.StatusInternalServerError, err.Error())
 		return
 	}

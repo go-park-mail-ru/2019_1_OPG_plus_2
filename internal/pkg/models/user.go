@@ -31,11 +31,11 @@ type SignInData struct {
 }
 
 func (data SignInData) Check() (incorrectFields []string) {
-	if !CheckEmail(data.Login) {
-		return []string{"login"}
+	if !CheckEmail(data.Login) && !CheckUsername(data.Login) {
+		incorrectFields = append(incorrectFields, "login")
 	}
-	if !CheckUsername(data.Login) {
-		return []string{"login"}
+	if data.Password == "" {
+		incorrectFields = append(incorrectFields, "password")
 	}
 	return
 }
@@ -46,7 +46,6 @@ type SingUpData struct {
 	Email    string `json:"email" example:"user_test@test.com"`
 	Username string `json:"username" example:"user_test"`
 	Password string `json:"password" example:"SecretPass1!"`
-	Avatar   string `json:"avatar, string" example:"<some avatar url>"`
 }
 
 func (data SingUpData) Check() (incorrectFields []string) {
@@ -55,6 +54,9 @@ func (data SingUpData) Check() (incorrectFields []string) {
 	}
 	if !CheckUsername(data.Username) {
 		incorrectFields = append(incorrectFields, "username")
+	}
+	if data.Password == "" {
+		incorrectFields = append(incorrectFields, "password")
 	}
 	return
 }
@@ -84,6 +86,9 @@ type UpdatePasswordData struct {
 }
 
 func (data UpdatePasswordData) Check() (incorrectFields []string) {
+	if data.NewPassword == "" {
+		incorrectFields = append(incorrectFields, "new_password")
+	}
 	if data.PasswordConfirm != data.NewPassword {
 		incorrectFields = append(incorrectFields, "password_confirm")
 	}
@@ -96,8 +101,10 @@ type RemoveUserData struct {
 	Password string `json:"password" example:"SecretPass1!"`
 }
 
-//  TODO: валидация приходящих данных на предмет поля password
 func (data RemoveUserData) Check() (incorrectFields []string) {
+	if data.Password == "" {
+		incorrectFields = append(incorrectFields, "password")
+	}
 	return
 }
 
@@ -175,9 +182,14 @@ type ScoreboardUserData struct {
 	Score    int64  `json:"score, number" example:"314159"`
 }
 
+type ScoreboardData struct {
+	Users   []ScoreboardUserData `json:"users"`
+	MaxPage uint64               `json:"max_page" example:"123"`
+}
+
 type ScoreboardAnswerMessage struct {
 	AnswerMessage
-	Data []ScoreboardUserData `json:"data"`
+	Data ScoreboardData `json:"data"`
 }
 
 func (message ScoreboardAnswerMessage) Send(w http.ResponseWriter) {
@@ -186,7 +198,7 @@ func (message ScoreboardAnswerMessage) Send(w http.ResponseWriter) {
 	_, _ = fmt.Fprintln(w, string(msg))
 }
 
-func SendScoreboardAnswer(w http.ResponseWriter, status int, message string, data []ScoreboardUserData) {
+func SendScoreboardAnswer(w http.ResponseWriter, status int, message string, data ScoreboardData) {
 	ScoreboardAnswerMessage{
 		AnswerMessage: AnswerMessage{
 			Status:  status,

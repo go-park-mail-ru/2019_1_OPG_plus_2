@@ -2,6 +2,7 @@ package db
 
 import (
 	"fmt"
+	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"
 )
 
 type ProfileData struct {
@@ -19,7 +20,7 @@ func ProfileCreate(data ProfileData) (err error) {
 		return
 	}
 	if id != 0 {
-		return fmt.Errorf("user already exists")
+		return fmt.Errorf("profile already exists")
 	}
 
 	id, err = insert(coreDbName, coreUsersTable, "id, avatar", "?, ?", data.Id, data.Avatar)
@@ -37,32 +38,41 @@ func ProfileFindById(id int64) (data ProfileData, err error) {
 }
 
 func ProfileUpdateData(data ProfileData) error {
-	count, err := updateBy(coreDbName, coreUsersTable, "score = ?, games = ?, win = ?, lose = ?", "id = ?",
-		data.Score, data.Games, data.Win, data.Lose, data.Id)
+	id, err := isExists(coreDbName, coreUsersTable, "id = ?", data.Id)
 	if err != nil {
 		return err
 	}
-	if count == 0 {
-		return fmt.Errorf("user not found")
+	if id == 0 {
+		return models.NotFound
 	}
-	return nil
+
+	_, err = updateBy(coreDbName, coreUsersTable, "score = ?, games = ?, win = ?, lose = ?", "id = ?",
+		data.Score, data.Games, data.Win, data.Lose, data.Id)
+	return err
 }
 
 func ProfileUpdateAvatar(id int64, avatar string) error {
-	_, err := updateBy(coreDbName, coreUsersTable, "avatar = ?", "id = ?", avatar, id)
+	id, err := isExists(coreDbName, coreUsersTable, "id = ?", id)
 	if err != nil {
 		return err
 	}
-	return nil
+	if id == 0 {
+		return models.NotFound
+	}
+
+	_, err = updateBy(coreDbName, coreUsersTable, "avatar = ?", "id = ?", avatar, id)
+	return err
 }
 
 func ProfileRemove(id int64) error {
-	count, err := removeBy(coreDbName, coreUsersTable, "id = ?", id)
+	id, err := isExists(coreDbName, coreUsersTable, "id = ?", id)
 	if err != nil {
 		return err
 	}
-	if count == 0 {
-		return fmt.Errorf("user not found")
+	if id == 0 {
+		return models.NotFound
 	}
-	return nil
+
+	_, err = removeBy(coreDbName, coreUsersTable, "id = ?", id)
+	return err
 }

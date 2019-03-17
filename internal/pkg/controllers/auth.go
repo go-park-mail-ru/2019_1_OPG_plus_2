@@ -34,12 +34,13 @@ func IsAuth(w http.ResponseWriter, r *http.Request) {
 // @produce json
 // @param credentials body models.SignInData true "Credentials"
 // @success 200 {object} models.AnswerMessage
-// @failure 401 {object} models.SignInAnswerMessage
+// @failure 400 {object} models.AnswerMessageWithFields
+// @failure 405 {object} models.AnswerMessage
 // @failure 500 {object} models.AnswerMessage
 // @router /session [post]
 func SignIn(w http.ResponseWriter, r *http.Request) {
 	if isAuth(r) {
-		models.SendMessage(w, http.StatusOK, "already signed in")
+		models.SendMessage(w, http.StatusMethodNotAllowed, "already signed in")
 		return
 	}
 
@@ -51,11 +52,13 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	jwtData, err := auth.SignIn(signInData)
+	jwtData, err, fields := auth.SignIn(signInData)
 	if err != nil {
-		models.SendSignInAnswer(w, http.StatusUnauthorized, err.Error(), models.SignInAnswer{
-			Login: signInData.Login,
-		})
+		if fields != nil {
+			models.SendMessageWithFields(w, http.StatusBadRequest, err.Error(), fields)
+			return
+		}
+		models.SendMessage(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -70,22 +73,16 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 // @tags auth
 // @produce json
 // @success 200 {object} models.AnswerMessage
-// @failure 401 {object} models.AnswerMessage
-// @failure 500 {object} models.AnswerMessage
+// @failure 405 {object} models.AnswerMessage
 // @router /session [delete]
 func SignOut(w http.ResponseWriter, r *http.Request) {
 	if !isAuth(r) {
-		models.SendMessage(w, http.StatusOK, "already signed out")
+		models.SendMessage(w, http.StatusMethodNotAllowed, "already signed out")
 		return
 	}
 
-	jwtCookie, errNoCookie := r.Cookie(auth.CookieName)
-	if errNoCookie != nil {
-		models.SendMessage(w, http.StatusOK, "already signed out")
-		return
-	}
-
-	jwtCookie.Expires = time.Unix(-1, 0)
+	jwtCookie, _ := r.Cookie(auth.CookieName)
+	jwtCookie.Expires = time.Unix(0, 0)
 	http.SetCookie(w, jwtCookie)
 	models.SendMessage(w, http.StatusOK, "signed out")
 }
@@ -99,6 +96,7 @@ func SignOut(w http.ResponseWriter, r *http.Request) {
 // @produce json
 // @param update_data body models.UpdatePasswordData true "New password info"
 // @success 200 {object} models.AnswerMessage
+// @failure 400 {object} models.AnswerMessageWithFields
 // @failure 401 {object} models.AnswerMessage
 // @failure 500 {object} models.AnswerMessage
 // @router /password [put]
@@ -116,8 +114,12 @@ func UpdatePassword(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	err = auth.UpdatePassword(jwtData(r).Id, updateData)
+	err, fields := auth.UpdatePassword(jwtData(r).Id, updateData)
 	if err != nil {
+		if fields != nil {
+			models.SendMessageWithFields(w, http.StatusBadRequest, err.Error(), fields)
+			return
+		}
 		models.SendMessage(w, http.StatusInternalServerError, err.Error())
 		return
 	}

@@ -29,6 +29,7 @@ func StartApp(params Params) error {
 	apiRouter := router.PathPrefix("/api").Subrouter()
 
 	router.Use(middleware.CorsMiddleware)
+	router.Use(middleware.PanicMiddleware)
 
 	router.HandleFunc("/", controllers.MainHandler)
 	router.PathPrefix("/docs").Handler(httpSwagger.WrapHandler)
