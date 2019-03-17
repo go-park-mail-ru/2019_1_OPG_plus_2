@@ -20,7 +20,8 @@ type CorsData struct {
 var corsData = CorsData{
 	AllowOrigins: []string{
 		"https://colors.hackallcode.ru",
-		"https://api.colors.hackallcode.ru",
+		"http://localhost:8001",
+		"http://127.0.0.1:8001",
 	},
 	AllowMethods: []string{
 		"GET",
