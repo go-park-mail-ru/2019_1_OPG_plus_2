@@ -3,7 +3,6 @@ package controllers
 import (
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/db"
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"
-	"math"
 	"net/http"
 	"strconv"
 )
@@ -38,7 +37,7 @@ func GetScoreboard(w http.ResponseWriter, r *http.Request) {
 	}
 
 	models.SendScoreboardAnswer(w, http.StatusOK, "users found", models.ScoreboardData{
-		Users:   users,
-		MaxPage: uint64(math.Ceil(float64(count) / float64(limit))),
+		Users: users,
+		Count: count,
 	})
 }

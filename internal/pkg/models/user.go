@@ -184,8 +184,8 @@ type ScoreboardUserData struct {
 }
 
 type ScoreboardData struct {
-	Users   []ScoreboardUserData `json:"users"`
-	MaxPage uint64               `json:"max_page" example:"123"`
+	Users []ScoreboardUserData `json:"users"`
+	Count uint64               `json:"count" example:"123"`
 }
 
 type ScoreboardAnswerMessage struct {
