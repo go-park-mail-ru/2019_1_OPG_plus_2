@@ -179,6 +179,10 @@ func testInitial(tCase testCase) (*httptest.ResponseRecorder, *http.Request) {
 
 	req = mux.SetURLVars(req, tCase.params.muxVars)
 
+	if tCase.inputMessage != nil {
+		_, _ = req.Body.Read(tCase.inputMessage)
+	}
+
 	return w, req
 }
 
@@ -446,3 +450,46 @@ func TestGetUserIdNotNumber(t *testing.T) {
 /****************************
  *  UPDATE_USER CONTROLLER  *
  ****************************/
+func TestUpdateUserCorrect(t *testing.T) {
+	tCases := []testCase{
+		{
+			handler: mockedUserHandlers.UpdateUser,
+
+			params: testParams{
+				muxVars: map[string]string{},
+				method:  "PUT",
+				isAuth:  true,
+				url:     "/user",
+				jwt: models.JwtData{
+					Id:       1,
+					Username: "username1",
+					Email:    "mail1",
+				},
+			},
+
+			expStatus:    200,
+			inputMessage: []byte(`{"email": "qwerty","username": "qwerty"}`),
+
+			expMessage: models.AnswerMessage{
+				Status:  200,
+				Message: "user updated",
+			},
+		},
+	}
+
+	for _, tCase := range tCases {
+		w, req := testInitial(tCase)
+		tCase.handler(w, req)
+
+		if w.Code != tCase.expStatus {
+			t.Errorf("Wrong Status:\n\tGot %d\n\tExpected %d\n", w.Code, tCase.expStatus)
+		}
+		var retMessage models.AnswerMessage
+		_ = json.NewDecoder(w.Body).Decode(&retMessage)
+		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
+			t.Errorf("Wrong body\n%v\n%v", retMessage, tCase.expMessage)
+		}
+
+		//testLog(t, tCase)
+	}
+}
