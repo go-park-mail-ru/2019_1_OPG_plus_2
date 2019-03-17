@@ -5,13 +5,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"
+	"github.com/gorilla/mux"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
 	"testing"
 )
 
-var baseUrl = "localhost:8001/api"
+var baseUrl = "localhost:8002/api"
 
 type authData struct {
 	Id       int64
@@ -112,7 +113,7 @@ func (storage *mockStorageAdapter) CreateUser(signUpData models.SingUpData) (jwt
 
 func (storage *mockStorageAdapter) GetUser(id int64) (userData models.UserData, err error) {
 	if storage.ProfileData[id] == nil {
-		return models.UserData{}, fmt.Errorf("NO USER IN STORAGE")
+		return models.UserData{}, fmt.Errorf("user not found")
 	}
 	return *storage.ProfileData[id], nil
 }
@@ -158,49 +159,12 @@ type testParams struct {
 type testCase struct {
 	handler      http.HandlerFunc
 	params       testParams
+	inputMessage json.RawMessage
 	expStatus    int
-	inputMessage interface{}
 	expMessage   interface{}
 }
 
-var tCase = testCase{
-	handler: mockedUserHandlers.GetUser,
-
-	params: testParams{
-		muxVars: map[string]string{},
-		method:  "GET",
-		isAuth:  true,
-		url:     "/user",
-		jwt: models.JwtData{
-			Id:       1,
-			Username: "username1",
-			Email:    "mail1",
-		},
-	},
-
-	expStatus:    200,
-	inputMessage: nil,
-
-	expMessage: models.UserDataAnswerMessage{
-		Data: models.UserData{
-			Id:       1,
-			Email:    "mail1",
-			Username: "username1",
-			Score:    1000,
-			Avatar:   "avatar1",
-			Games:    100,
-			Lose:     50,
-			Win:      50,
-		},
-		AnswerMessage: models.AnswerMessage{
-			Status:  200,
-			Message: "user found",
-		},
-	},
-}
-
-func TestGetUserController(t *testing.T) {
-
+func testInitial(tCase testCase) (*httptest.ResponseRecorder, *http.Request) {
 	testParams := tCase.params
 	url := baseUrl + testParams.url
 	req := httptest.NewRequest(testParams.method, url, nil)
@@ -211,34 +175,31 @@ func TestGetUserController(t *testing.T) {
 	ctx = context.WithValue(ctx, "isAuth", testParams.isAuth)
 	ctx = context.WithValue(ctx, "jwtData", data)
 
-	tCase.handler(w, req.WithContext(ctx))
+	req = req.WithContext(ctx)
 
-	if w.Code != tCase.expStatus {
-		t.Errorf("Wrong StatusCode:\n\tGot %d\n\tExpected %d\n", w.Code, tCase.expStatus)
-	}
-	var retMessage models.UserDataAnswerMessage
-	_ = json.NewDecoder(w.Body).Decode(&retMessage)
-	if !reflect.DeepEqual(retMessage, tCase.expMessage) {
-		t.Errorf("Wrong body\n%v\n%v", retMessage, tCase.expMessage)
-	}
+	req = mux.SetURLVars(req, tCase.params.muxVars)
 
+	return w, req
+}
+
+func testLog(t *testing.T, tCase testCase) {
 	if !t.Failed() {
 		t.Logf("\nPASSED TEST:\n"+
-			"\tURL:\t%v\n"+
-			"\tAUTH:\t%v\n"+
-			"\tMETHOD:\t%v\n"+
-			"\tJWT:\t%v\n"+
+			"\tURL:\t\t%v\n"+
+			"\tAUTH:\t\t%v\n"+
+			"\tMETHOD:\t\t%v\n"+
+			"\tJWT:\t\t%v\n"+
 			"\tMUXVARS:\t%v\n"+
-			"\tBODY:\t%v\n"+
+			"\tBODY:\t\t%v\n"+
 			"\n"+
-			"\tEXP_STATUS:\t%v\n"+
-			"\tEXP_BODY:\t%v\n",
+			"\tEXP_STATUS:\t\t%v\n"+
+			"\tEXP_BODY:\t\t%v\n",
 
-			testParams.url,
-			testParams.isAuth,
-			testParams.method,
-			testParams.jwt,
-			testParams.muxVars,
+			tCase.params.url,
+			tCase.params.isAuth,
+			tCase.params.method,
+			tCase.params.jwt,
+			tCase.params.muxVars,
 			tCase.inputMessage,
 
 			tCase.expStatus,
@@ -246,3 +207,242 @@ func TestGetUserController(t *testing.T) {
 		)
 	}
 }
+
+/*************************
+ *  GET_USER CONTROLLER  *
+ *************************/
+func TestGetUserSelf(t *testing.T) {
+	tCases := []testCase{
+		{
+			handler: mockedUserHandlers.GetUser,
+
+			params: testParams{
+				muxVars: map[string]string{},
+				method:  "GET",
+				isAuth:  true,
+				url:     "/user",
+				jwt: models.JwtData{
+					Id:       1,
+					Username: "username1",
+					Email:    "mail1",
+				},
+			},
+
+			expStatus:    200,
+			inputMessage: nil,
+
+			expMessage: models.UserDataAnswerMessage{
+				Data: models.UserData{
+					Id:       1,
+					Email:    "mail1",
+					Username: "username1",
+					Score:    1000,
+					Avatar:   "avatar1",
+					Games:    100,
+					Lose:     50,
+					Win:      50,
+				},
+				AnswerMessage: models.AnswerMessage{
+					Status:  200,
+					Message: "user found",
+				},
+			},
+		},
+	}
+
+	for _, tCase := range tCases {
+		w, req := testInitial(tCase)
+		tCase.handler(w, req)
+
+		if w.Code != tCase.expStatus {
+			t.Errorf("Wrong Status:\n\tGot %d\n\tExpected %d\n", w.Code, tCase.expStatus)
+		}
+		var retMessage models.UserDataAnswerMessage
+		_ = json.NewDecoder(w.Body).Decode(&retMessage)
+		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
+			t.Errorf("Wrong body\n%v\n%v", retMessage, tCase.expMessage)
+		}
+
+		//testLog(t, tCase)
+	}
+}
+
+func TestGetUserId(t *testing.T) {
+	retData, _ := mockedStorageAdapter.GetUser(3)
+	tCases := []testCase{
+		{
+			handler: mockedUserHandlers.GetUser,
+
+			params: testParams{
+				muxVars: map[string]string{"id": "3"},
+				method:  "GET",
+				isAuth:  true,
+				url:     "/user",
+				jwt: models.JwtData{
+					Id:       1,
+					Username: "username1",
+					Email:    "mail1",
+				},
+			},
+
+			expStatus:    200,
+			inputMessage: nil,
+
+			expMessage: models.UserDataAnswerMessage{
+				Data: retData,
+				AnswerMessage: models.AnswerMessage{
+					Status:  200,
+					Message: "user found",
+				},
+			},
+		},
+	}
+
+	for _, tCase := range tCases {
+		w, req := testInitial(tCase)
+		tCase.handler(w, req)
+
+		if w.Code != tCase.expStatus {
+			t.Errorf("Wrong Status:\n\tGot %d\n\tExpected %d\n", w.Code, tCase.expStatus)
+		}
+		var retMessage models.UserDataAnswerMessage
+		_ = json.NewDecoder(w.Body).Decode(&retMessage)
+		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
+			t.Errorf("Wrong body\n%v\n%v", retMessage, tCase.expMessage)
+		}
+
+		//testLog(t, tCase)
+	}
+}
+
+func TestGetUserIdNotExists(t *testing.T) {
+	tCases := []testCase{
+		{
+			handler: mockedUserHandlers.GetUser,
+
+			params: testParams{
+				muxVars: map[string]string{"id": "1278"},
+				method:  "GET",
+				isAuth:  true,
+				url:     "/user",
+				jwt: models.JwtData{
+					Id:       1,
+					Username: "username1",
+					Email:    "mail1",
+				},
+			},
+
+			expStatus:    500,
+			inputMessage: nil,
+
+			expMessage: models.AnswerMessage{
+				Status:  500,
+				Message: "user not found",
+			},
+		},
+	}
+
+	for _, tCase := range tCases {
+		w, req := testInitial(tCase)
+		tCase.handler(w, req)
+
+		if w.Code != tCase.expStatus {
+			t.Errorf("Wrong Status:\n\tGot %d\n\tExpected %d\n", w.Code, tCase.expStatus)
+		}
+		var retMessage models.AnswerMessage
+		_ = json.NewDecoder(w.Body).Decode(&retMessage)
+		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
+			t.Errorf("Wrong body\n%v\n%v", retMessage, tCase.expMessage)
+		}
+
+		//testLog(t, tCase)
+	}
+}
+
+func TestGetUserNoIdNoAuth(t *testing.T) {
+	tCases := []testCase{
+		{
+			handler: mockedUserHandlers.GetUser,
+
+			params: testParams{
+				muxVars: map[string]string{},
+				method:  "GET",
+				isAuth:  false,
+				url:     "/user",
+				jwt:     models.JwtData{},
+			},
+
+			expStatus:    400,
+			inputMessage: nil,
+
+			expMessage: models.AnswerMessage{
+				Status:  400,
+				Message: "no id in query",
+			},
+		},
+	}
+
+	for _, tCase := range tCases {
+		w, req := testInitial(tCase)
+		tCase.handler(w, req)
+
+		if w.Code != tCase.expStatus {
+			t.Errorf("Wrong Status:\n\tGot %d\n\tExpected %d\n", w.Code, tCase.expStatus)
+		}
+		var retMessage models.AnswerMessage
+		_ = json.NewDecoder(w.Body).Decode(&retMessage)
+		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
+			t.Errorf("Wrong body\n%v\n%v", retMessage, tCase.expMessage)
+		}
+
+		//testLog(t, tCase)
+	}
+}
+
+func TestGetUserIdNotNumber(t *testing.T) {
+	tCases := []testCase{
+		{
+			handler: mockedUserHandlers.GetUser,
+
+			params: testParams{
+				muxVars: map[string]string{"id": "qwerty"},
+				method:  "GET",
+				isAuth:  true,
+				url:     "/user",
+				jwt: models.JwtData{
+					Id:       1,
+					Username: "username1",
+					Email:    "mail1",
+				},
+			},
+
+			expStatus:    400,
+			inputMessage: nil,
+
+			expMessage: models.AnswerMessage{
+				Status:  400,
+				Message: "incorrect id in query",
+			},
+		},
+	}
+
+	for _, tCase := range tCases {
+		w, req := testInitial(tCase)
+		tCase.handler(w, req)
+
+		if w.Code != tCase.expStatus {
+			t.Errorf("Wrong Status:\n\tGot %d\n\tExpected %d\n", w.Code, tCase.expStatus)
+		}
+		var retMessage models.AnswerMessage
+		_ = json.NewDecoder(w.Body).Decode(&retMessage)
+		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
+			t.Errorf("Wrong body\n%v\n%v", retMessage, tCase.expMessage)
+		}
+
+		//testLog(t, tCase)
+	}
+}
+
+/****************************
+ *  UPDATE_USER CONTROLLER  *
+ ****************************/
