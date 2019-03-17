@@ -62,7 +62,7 @@ func CorsMiddleware(next http.Handler) http.Handler {
 		}
 
 		res.Header().Set("Access-Control-Allow-Origin", origin[0])
-		res.Header().Set("Access-Control-Allow-Credentials", "true")
+		res.Header().Set("Access-Control-Allow-Credentials", strconv.FormatBool(corsData.AllowCredentials))
 		next.ServeHTTP(res, req)
 	})
 }
