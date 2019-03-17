@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -9,6 +10,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -119,6 +121,10 @@ func (storage *mockStorageAdapter) GetUser(id int64) (userData models.UserData, 
 }
 
 func (storage *mockStorageAdapter) UpdateUser(id int64, updateData models.UpdateUserData) (jwtData models.JwtData, err error) {
+	incorrectFields := updateData.Check()
+	if len(incorrectFields) > 0 {
+		return models.JwtData{}, fmt.Errorf("incorrect: " + strings.Join(incorrectFields, ", "))
+	}
 	if storage.ProfileData[id] == nil {
 		return models.JwtData{}, fmt.Errorf("NO USER IN STORAGE")
 	}
@@ -167,7 +173,7 @@ type testCase struct {
 func testInitial(tCase testCase) (*httptest.ResponseRecorder, *http.Request) {
 	testParams := tCase.params
 	url := baseUrl + testParams.url
-	req := httptest.NewRequest(testParams.method, url, nil)
+	req := httptest.NewRequest(testParams.method, url, bytes.NewReader(tCase.inputMessage))
 	w := httptest.NewRecorder()
 	ctx := req.Context()
 
@@ -178,10 +184,6 @@ func testInitial(tCase testCase) (*httptest.ResponseRecorder, *http.Request) {
 	req = req.WithContext(ctx)
 
 	req = mux.SetURLVars(req, tCase.params.muxVars)
-
-	if tCase.inputMessage != nil {
-		_, _ = req.Body.Read(tCase.inputMessage)
-	}
 
 	return w, req
 }
@@ -363,7 +365,7 @@ func TestGetUserIdNotExists(t *testing.T) {
 	}
 }
 
-func TestGetUserNoIdNoAuth(t *testing.T) {
+func TestGetUserNoAuth(t *testing.T) {
 	tCases := []testCase{
 		{
 			handler: mockedUserHandlers.GetUser,
@@ -468,11 +470,205 @@ func TestUpdateUserCorrect(t *testing.T) {
 			},
 
 			expStatus:    200,
-			inputMessage: []byte(`{"email": "qwerty","username": "qwerty"}`),
+			inputMessage: []byte(`{"email": "qwerty@mail.com","username": "qwerty"}`),
 
 			expMessage: models.AnswerMessage{
 				Status:  200,
 				Message: "user updated",
+			},
+		},
+	}
+
+	for _, tCase := range tCases {
+		w, req := testInitial(tCase)
+		tCase.handler(w, req)
+
+		if w.Code != tCase.expStatus {
+			t.Errorf("Wrong Status:\n\tGot %d\n\tExpected %d\n", w.Code, tCase.expStatus)
+		}
+		var retMessage models.AnswerMessage
+		_ = json.NewDecoder(w.Body).Decode(&retMessage)
+		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
+			t.Errorf("Wrong body\n%v\n%v", retMessage, tCase.expMessage)
+		}
+
+		newUserData, err := mockedStorageAdapter.GetUser(tCase.params.jwt.Id)
+		if err != nil {
+			t.Errorf("Test failed while getting user from storage: %e", err)
+		}
+
+		expUserData := models.UserData{
+			Id:       1,
+			Username: "qwerty",
+			Email:    "qwerty@mail.com",
+			Avatar:   newUserData.Avatar,
+			Score:    newUserData.Score,
+			Games:    newUserData.Games,
+			Win:      newUserData.Win,
+			Lose:     newUserData.Win,
+		}
+
+		if !reflect.DeepEqual(newUserData, expUserData) {
+			t.Errorf("Data did not actually update")
+		}
+
+		//testLog(t, tCase)
+	}
+}
+
+func TestUpdateUserNoAuth(t *testing.T) {
+	tCases := []testCase{
+		{
+			handler: mockedUserHandlers.UpdateUser,
+
+			params: testParams{
+				muxVars: map[string]string{},
+				method:  "PUT",
+				isAuth:  false,
+				url:     "/user",
+				jwt:     models.JwtData{},
+			},
+
+			expStatus:    401,
+			inputMessage: []byte(`{"email": "qwerty","username": "qwerty"}`),
+
+			expMessage: models.AnswerMessage{
+				Status:  401,
+				Message: "not signed in",
+			},
+		},
+	}
+
+	for _, tCase := range tCases {
+		w, req := testInitial(tCase)
+		tCase.handler(w, req)
+
+		if w.Code != tCase.expStatus {
+			t.Errorf("Wrong Status:\n\tGot %d\n\tExpected %d\n", w.Code, tCase.expStatus)
+		}
+		var retMessage models.AnswerMessage
+		_ = json.NewDecoder(w.Body).Decode(&retMessage)
+		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
+			t.Errorf("Wrong body\n%v\n%v", retMessage, tCase.expMessage)
+		}
+
+		//testLog(t, tCase)
+	}
+}
+
+func TestUpdateUserInvalidField(t *testing.T) {
+	tCases := []testCase{
+		{
+			handler: mockedUserHandlers.UpdateUser,
+
+			params: testParams{
+				muxVars: map[string]string{},
+				method:  "PUT",
+				isAuth:  true,
+				url:     "/user",
+				jwt: models.JwtData{
+					Id:       1,
+					Username: "qwerty",
+					Email:    "qwerty@mail.com",
+				},
+			},
+
+			expStatus:    500,
+			inputMessage: []byte(`{"email": "qwerty@mail.com","user": "qwerty"}`),
+
+			expMessage: models.AnswerMessage{
+				Status:  500,
+				Message: "incorrect: username",
+			},
+		},
+		{
+			handler: mockedUserHandlers.UpdateUser,
+
+			params: testParams{
+				muxVars: map[string]string{},
+				method:  "PUT",
+				isAuth:  true,
+				url:     "/user",
+				jwt: models.JwtData{
+					Id:       1,
+					Username: "qwerty",
+					Email:    "qwerty@mail.com",
+				},
+			},
+
+			expStatus:    500,
+			inputMessage: []byte(`{"e-mail": "qwerty@mail.com","username": "qwerty"}`),
+
+			expMessage: models.AnswerMessage{
+				Status:  500,
+				Message: "incorrect: email",
+			},
+		},
+		{
+			handler: mockedUserHandlers.UpdateUser,
+
+			params: testParams{
+				muxVars: map[string]string{},
+				method:  "PUT",
+				isAuth:  true,
+				url:     "/user",
+				jwt: models.JwtData{
+					Id:       1,
+					Username: "qwerty",
+					Email:    "qwerty@mail.com",
+				},
+			},
+
+			expStatus:    500,
+			inputMessage: []byte(`{"email": "qwerty","user-name": "qwerty"}`),
+
+			expMessage: models.AnswerMessage{
+				Status:  500,
+				Message: "incorrect: email, username",
+			},
+		},
+	}
+
+	for _, tCase := range tCases {
+		w, req := testInitial(tCase)
+		tCase.handler(w, req)
+
+		if w.Code != tCase.expStatus {
+			t.Errorf("Wrong Status:\n\tGot %d\n\tExpected %d\n", w.Code, tCase.expStatus)
+		}
+		var retMessage models.AnswerMessage
+		_ = json.NewDecoder(w.Body).Decode(&retMessage)
+		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
+			t.Errorf("Wrong body\n%v\n%v", retMessage, tCase.expMessage)
+		}
+
+		//testLog(t, tCase)
+	}
+}
+
+func TestUpdateUserInvalidJSON(t *testing.T) {
+	tCases := []testCase{
+		{
+			handler: mockedUserHandlers.UpdateUser,
+
+			params: testParams{
+				muxVars: map[string]string{},
+				method:  "PUT",
+				isAuth:  true,
+				url:     "/user",
+				jwt: models.JwtData{
+					Id:       1,
+					Username: "qwerty",
+					Email:    "qwerty@mail.com",
+				},
+			},
+
+			expStatus:    500,
+			inputMessage: []byte(`{"email": "qwerty@mail.com","user": "qwerty"`), //no closing parentheses in JSON
+
+			expMessage: models.AnswerMessage{
+				Status:  500,
+				Message: "incorrect JSON",
 			},
 		},
 	}
