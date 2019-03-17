@@ -23,7 +23,7 @@ func GetScoreboard(limit, offset int64) (usersData []models.ScoreboardUserData, 
 	}
 	err = row.Scan(&count)
 
-	rows, err := Query("SELECT a.id, a.username, c.score FROM "+authDbName+"."+authUsersTable+" AS a JOIN "+
+	rows, err := Query("SELECT a.id, a.username, c.avatar, c.score FROM "+authDbName+"."+authUsersTable+" AS a JOIN "+
 		coreDbName+"."+coreUsersTable+" AS c ON a.id = c.id ORDER BY c.score DESC LIMIT ? OFFSET ?", limit, offset)
 	if err != nil {
 		return
@@ -32,7 +32,7 @@ func GetScoreboard(limit, offset int64) (usersData []models.ScoreboardUserData, 
 	defer rows.Close()
 	for rows.Next() {
 		userData := models.ScoreboardUserData{}
-		err = rows.Scan(&userData.Id, &userData.Username, &userData.Score)
+		err = rows.Scan(&userData.Id, &userData.Username, &userData.Avatar, &userData.Score)
 		if err != nil {
 			return
 		}

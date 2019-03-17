@@ -179,6 +179,7 @@ func SendUserDataAnswer(w http.ResponseWriter, status int, message string, data 
 type ScoreboardUserData struct {
 	Id       int64  `json:"id, string" example:"1"`
 	Username string `json:"username, string" example:"XxX__NaGiBaToR__XxX"`
+	Avatar   string `json:"avatar, string" example:"<some avatar url>"`
 	Score    int64  `json:"score, number" example:"314159"`
 }
 

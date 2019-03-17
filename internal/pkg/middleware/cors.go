@@ -38,6 +38,23 @@ var corsData = CorsData{
 
 func CorsMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
+		origin, hasOrigin := req.Header["Origin"]
+		if hasOrigin {
+			found := false
+			for _, allowed := range corsData.AllowOrigins {
+				if origin[0] == allowed {
+					found = true
+					break
+				}
+			}
+			if found {
+				res.Header().Set("Access-Control-Allow-Origin", origin[0])
+				res.Header().Set("Access-Control-Allow-Credentials", strconv.FormatBool(corsData.AllowCredentials))
+			} else {
+				fmt.Println("Origin " + origin[0] + " wasn't found!")
+			}
+		}
+
 		if req.Method == "OPTIONS" {
 			res.Header().Set("Access-Control-Allow-Methods", strings.Join(corsData.AllowMethods, ", "))
 			res.Header().Set("Access-Control-Allow-Headers", strings.Join(corsData.AllowHeaders, ", "))
@@ -45,24 +62,6 @@ func CorsMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		origin, ok := req.Header["Origin"]
-		if !ok {
-			return
-		}
-		found := false
-		for _, v := range corsData.AllowOrigins {
-			if origin[0] == v {
-				found = true
-				break
-			}
-		}
-		if !found {
-			fmt.Println("Origin " + origin[0] + " wasn't found!")
-			return
-		}
-
-		res.Header().Set("Access-Control-Allow-Origin", origin[0])
-		res.Header().Set("Access-Control-Allow-Credentials", strconv.FormatBool(corsData.AllowCredentials))
 		next.ServeHTTP(res, req)
 	})
 }
