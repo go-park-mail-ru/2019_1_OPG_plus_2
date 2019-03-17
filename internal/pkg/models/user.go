@@ -96,6 +96,7 @@ type RemoveUserData struct {
 	Password string `json:"password" example:"SecretPass1!"`
 }
 
+//  TODO: валидация приходящих данных на предмет поля password
 func (data RemoveUserData) Check() (incorrectFields []string) {
 	return
 }

@@ -142,8 +142,13 @@ func (storage *mockStorageAdapter) UpdateUser(id int64, updateData models.Update
 }
 
 func (storage *mockStorageAdapter) RemoveUser(id int64, removeData models.RemoveUserData) error {
+	incorrectFields := removeData.Check()
+	if len(incorrectFields) > 0 {
+		return fmt.Errorf("incorrect: " + strings.Join(incorrectFields, ", "))
+	}
+
 	if removeData.Password != storage.AuthData[id].Password {
-		return fmt.Errorf("PASSWORD DOES'T MATCH WITH ONE IN STORAGE")
+		return fmt.Errorf("incorrect password")
 	}
 
 	delete(storage.ProfileData, id)
@@ -687,5 +692,186 @@ func TestUpdateUserInvalidJSON(t *testing.T) {
 		}
 
 		//testLog(t, tCase)
+	}
+}
+
+/****************************
+ *  DELETE_USER CONTROLLER  *
+ ****************************/
+
+func TestRemoveUserCorrect(t *testing.T) {
+	tCases := []testCase{
+		{
+			handler: mockedUserHandlers.RemoveUser,
+
+			params: testParams{
+				muxVars: map[string]string{},
+				method:  "DELETE",
+				isAuth:  true,
+				url:     "/user",
+				jwt: models.JwtData{
+					Id:       1,
+					Username: "qwerty",
+					Email:    "qwerty@mail.com",
+				},
+			},
+
+			expStatus:    200,
+			inputMessage: []byte(`{"password": "pass1"}`),
+
+			expMessage: models.AnswerMessage{
+				Status:  200,
+				Message: "user removed",
+			},
+		},
+	}
+
+	for _, tCase := range tCases {
+		w, req := testInitial(tCase)
+		tCase.handler(w, req)
+
+		if w.Code != tCase.expStatus {
+			t.Errorf("Wrong Status:\n\tGot %d\n\tExpected %d\n", w.Code, tCase.expStatus)
+		}
+		var retMessage models.AnswerMessage
+		_ = json.NewDecoder(w.Body).Decode(&retMessage)
+		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
+			t.Errorf("Wrong body\n%v\n%v", retMessage, tCase.expMessage)
+		}
+
+		_, err := mockedStorageAdapter.GetUser(tCase.params.jwt.Id)
+		if err == nil {
+			t.Errorf("Data did not actually delete")
+		}
+	}
+}
+
+//since this moment i would use another user as a client for testing
+//because in previous test user 1 has been deleted successfully
+
+func TestRemoveUserNoAuth(t *testing.T) {
+	tCases := []testCase{
+		{
+			handler: mockedUserHandlers.RemoveUser,
+
+			params: testParams{
+				muxVars: map[string]string{},
+				method:  "DELETE",
+				isAuth:  false,
+				url:     "/user",
+				jwt:     models.JwtData{},
+			},
+
+			expStatus:    401,
+			inputMessage: []byte(`{"password": "pass2"}`),
+
+			expMessage: models.AnswerMessage{
+				Status:  401,
+				Message: "not signed in",
+			},
+		},
+	}
+
+	for _, tCase := range tCases {
+		w, req := testInitial(tCase)
+		tCase.handler(w, req)
+
+		if w.Code != tCase.expStatus {
+			t.Errorf("Wrong Status:\n\tGot %d\n\tExpected %d\n", w.Code, tCase.expStatus)
+		}
+		var retMessage models.AnswerMessage
+		_ = json.NewDecoder(w.Body).Decode(&retMessage)
+		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
+			t.Errorf("Wrong body\n%v\n%v", retMessage, tCase.expMessage)
+		}
+	}
+}
+
+func TestRemoveUserInvalidJSON(t *testing.T) {
+	tCases := []testCase{
+		{
+			handler: mockedUserHandlers.RemoveUser,
+
+			params: testParams{
+				muxVars: map[string]string{},
+				method:  "DELETE",
+				isAuth:  true,
+				url:     "/user",
+				jwt: models.JwtData{
+					Id:       2,
+					Username: "username2",
+					Email:    "mail2",
+				},
+			},
+
+			expStatus:    500,
+			inputMessage: []byte(`{"password": "pass1"`), // no closing parentheses
+
+			expMessage: models.AnswerMessage{
+				Status:  500,
+				Message: "incorrect JSON",
+			},
+		},
+	}
+
+	for _, tCase := range tCases {
+		w, req := testInitial(tCase)
+		tCase.handler(w, req)
+
+		if w.Code != tCase.expStatus {
+			t.Errorf("Wrong Status:\n\tGot %d\n\tExpected %d\n", w.Code, tCase.expStatus)
+		}
+		var retMessage models.AnswerMessage
+		_ = json.NewDecoder(w.Body).Decode(&retMessage)
+		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
+			t.Errorf("Wrong body\n%v\n%v", retMessage, tCase.expMessage)
+		}
+	}
+}
+
+func TestRemoveUserInvalidData(t *testing.T) {
+	tCases := []testCase{
+		{
+			handler: mockedUserHandlers.RemoveUser,
+
+			params: testParams{
+				muxVars: map[string]string{},
+				method:  "DELETE",
+				isAuth:  true,
+				url:     "/user",
+				jwt: models.JwtData{
+					Id:       2,
+					Username: "username2",
+					Email:    "mail2",
+				},
+			},
+
+			inputMessage: []byte(`{"passw": "pass1"}`),
+
+			expStatus: 500,
+			expMessage: models.AnswerMessage{
+				Status:  500,
+				Message: "incorrect: password",
+			},
+		},
+	}
+
+	for _, tCase := range tCases {
+		w, req := testInitial(tCase)
+		tCase.handler(w, req)
+
+		if w.Code != tCase.expStatus {
+			t.Errorf("Wrong Status:\n\tGot %d\n\tExpected %d\n", w.Code, tCase.expStatus)
+		}
+		var retMessage models.AnswerMessage
+		_ = json.NewDecoder(w.Body).Decode(&retMessage)
+		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
+			t.Errorf("Wrong body\n%v\n%v", retMessage, tCase.expMessage)
+		}
+
+		_, err := mockedStorageAdapter.GetUser(tCase.params.jwt.Id)
+		if err != nil {
+			t.Errorf("Data did actually delete!")
+		}
 	}
 }
