@@ -119,7 +119,7 @@ type SignInAnswer struct {
 }
 
 type SignInAnswerMessage struct {
-	AnswerMessage
+	MessageAnswer
 	Data SignInAnswer `json:"data"`
 }
 
@@ -131,7 +131,7 @@ func (message SignInAnswerMessage) Send(w http.ResponseWriter) {
 
 func SendSignInAnswer(w http.ResponseWriter, status int, message string, data SignInAnswer) {
 	SignInAnswerMessage{
-		AnswerMessage: AnswerMessage{
+		MessageAnswer: MessageAnswer{
 			Status:  status,
 			Message: message,
 		},
@@ -154,7 +154,7 @@ type UserData struct {
 }
 
 type UserDataAnswerMessage struct {
-	AnswerMessage
+	MessageAnswer
 	Data UserData `json:"data"`
 }
 
@@ -166,7 +166,7 @@ func (message UserDataAnswerMessage) Send(w http.ResponseWriter) {
 
 func SendUserDataAnswer(w http.ResponseWriter, status int, message string, data UserData) {
 	UserDataAnswerMessage{
-		AnswerMessage: AnswerMessage{
+		MessageAnswer: MessageAnswer{
 			Status:  status,
 			Message: message,
 		},
@@ -189,7 +189,7 @@ type ScoreboardData struct {
 }
 
 type ScoreboardAnswerMessage struct {
-	AnswerMessage
+	MessageAnswer
 	Data ScoreboardData `json:"data"`
 }
 
@@ -201,7 +201,7 @@ func (message ScoreboardAnswerMessage) Send(w http.ResponseWriter) {
 
 func SendScoreboardAnswer(w http.ResponseWriter, status int, message string, data ScoreboardData) {
 	ScoreboardAnswerMessage{
-		AnswerMessage: AnswerMessage{
+		MessageAnswer: MessageAnswer{
 			Status:  status,
 			Message: message,
 		},

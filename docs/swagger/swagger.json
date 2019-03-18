@@ -1,7 +1,7 @@
 {
     "info": {
-      "contact": {},
-      "license": {}
+        "contact": {},
+        "license": {}
     },
     "paths": {
         "/avatar": {
@@ -23,21 +23,21 @@
                         "description": "OK",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     }
                 }
@@ -70,28 +70,28 @@
                         "description": "OK",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     },
-                  "400": {
-                    "description": "Bad Request",
-                    "schema": {
-                      "type": "object",
-                      "$ref": "#/definitions/models.AnswerMessageWithFields"
-                    }
-                  },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.IncorrectFieldsAnswer"
+                        }
+                    },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     }
                 }
@@ -112,14 +112,14 @@
                         "description": "OK",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     }
                 }
@@ -153,28 +153,28 @@
                         "description": "OK",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     },
-                  "400": {
-                    "description": "Bad Request",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "type": "object",
-                          "$ref": "#/definitions/models.AnswerMessageWithFields"
+                            "$ref": "#/definitions/models.IncorrectFieldsAnswer"
                         }
-                  },
-                  "405": {
-                    "description": "Method Not Allowed",
-                    "schema": {
-                      "type": "object",
-                      "$ref": "#/definitions/models.AnswerMessage"
+                    },
+                    "405": {
+                        "description": "Method Not Allowed",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     }
                 }
@@ -193,14 +193,14 @@
                         "description": "OK",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     },
-                  "405": {
-                    "description": "Method Not Allowed",
+                    "405": {
+                        "description": "Method Not Allowed",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     }
                 }
@@ -236,29 +236,29 @@
                         "description": "OK",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     },
-                  "500": {
-                    "description": "Internal Server Error",
-                    "schema": {
-                      "type": "object",
-                      "$ref": "#/definitions/models.AnswerMessage"
-                    }
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.MessageAnswer"
+                        }
                     }
                 }
             },
@@ -291,35 +291,35 @@
                         "description": "OK",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
-                      "schema": {
-                        "type": "object",
-                        "$ref": "#/definitions/models.AnswerMessageWithFields"
-                      }
-                    },
-                  "405": {
-                    "description": "Method Not Allowed",
-                    "schema": {
-                      "type": "object",
-                      "$ref": "#/definitions/models.AnswerMessage"
-                    }
-                  },
-                  "500": {
-                    "description": "Internal Server Error",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.IncorrectFieldsAnswer"
+                        }
+                    },
+                    "405": {
+                        "description": "Method Not Allowed",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.MessageAnswer"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     }
                 }
@@ -350,28 +350,28 @@
                         "description": "OK",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     },
-                  "400": {
-                    "description": "Bad Request",
-                    "schema": {
-                      "type": "object",
-                      "$ref": "#/definitions/models.AnswerMessage"
-                    }
-                  },
-                  "401": {
-                    "description": "Unauthorized",
-                    "schema": {
-                      "type": "object",
-                      "$ref": "#/definitions/models.AnswerMessage"
-                    }
-                  },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.MessageAnswer"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.MessageAnswer"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     }
                 }
@@ -403,28 +403,28 @@
                         "description": "OK",
                         "schema": {
                             "type": "object",
-                          "$ref": "#/definitions/models.UserDataAnswerMessage"
+                            "$ref": "#/definitions/models.UserDataAnswerMessage"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     },
-                  "500": {
-                    "description": "Internal Server Error",
-                    "schema": {
-                      "type": "object",
-                      "$ref": "#/definitions/models.AnswerMessage"
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     }
                 }
@@ -449,8 +449,8 @@
                     },
                     {
                         "type": "integer",
-                      "description": "Number of page",
-                      "name": "page",
+                        "description": "Number of page",
+                        "name": "page",
                         "in": "query"
                     }
                 ],
@@ -464,21 +464,31 @@
                             }
                         }
                     },
-                  "500": {
-                    "description": "Internal Server Error",
-                    "schema": {
-                      "type": "object",
-                      "$ref": "#/definitions/models.AnswerMessage"
-                    }
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.MessageAnswer"
+                        }
                     }
                 }
             }
         }
     },
     "definitions": {
-        "models.AnswerMessage": {
+        "models.IncorrectFieldsAnswer": {
             "type": "object",
             "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "[email",
+                        " username]"
+                    ]
+                },
                 "message": {
                     "type": "string",
                     "example": "Query processed successfully"
@@ -489,22 +499,12 @@
                 }
             }
         },
-      "models.AnswerMessageWithFields": {
+        "models.MessageAnswer": {
             "type": "object",
             "properties": {
-                "data": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  },
-                  "example": [
-                    "[email",
-                    " username]"
-                  ]
-                },
                 "message": {
                     "type": "string",
-                    "example": "Query processed successfully"
+                    "example": "ok"
                 },
                 "status": {
                     "type": "integer",
@@ -524,10 +524,10 @@
         "models.ScoreboardUserData": {
             "type": "object",
             "properties": {
-              "avatar": {
-                "type": "string",
-                "example": "\u003csome avatar url\u003e"
-              },
+                "avatar": {
+                    "type": "string",
+                    "example": "\u003csome avatar url\u003e"
+                },
                 "id": {
                     "type": "integer",
                     "example": 1
@@ -631,22 +631,22 @@
                 }
             }
         },
-      "models.UserDataAnswerMessage": {
-        "type": "object",
-        "properties": {
-          "data": {
+        "models.UserDataAnswerMessage": {
             "type": "object",
-            "$ref": "#/definitions/models.UserData"
-          },
-          "message": {
-            "type": "string",
-            "example": "Query processed successfully"
-          },
-          "status": {
-            "type": "integer",
-            "example": 200
-          }
-        }
+            "properties": {
+                "data": {
+                    "type": "object",
+                    "$ref": "#/definitions/models.UserData"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "ok"
+                },
+                "status": {
+                    "type": "integer",
+                    "example": 200
+                }
+            }
         }
     }
 }

@@ -29,22 +29,22 @@ func NewUserHandlers(adapter user.IUser) *UserHandlers {
 // @accept json
 // @produce json
 // @param profile_data body models.SingUpData true "User data"
-// @success 200 {object} models.AnswerMessage
-// @failure 400 {object} models.AnswerMessage
-// @failure 401 {object} models.AnswerMessageWithFields
-// @failure 405 {object} models.AnswerMessage
-// @failure 500 {object} models.AnswerMessage
+// @success 200 {object} models.MessageAnswer
+// @failure 400 {object} models.MessageAnswer
+// @failure 401 {object} models.IncorrectFieldsAnswer
+// @failure 405 {object} models.MessageAnswer
+// @failure 500 {object} models.MessageAnswer
 // @router /user [post]
 func (handlers *UserHandlers) CreateUser(w http.ResponseWriter, r *http.Request) {
 	if isAuth(r) {
-		models.SendMessage(w, http.StatusMethodNotAllowed, "already signed in")
+		models.Send(w, http.StatusMethodNotAllowed, models.AlreadySignedInAnswer)
 		return
 	}
 
 	signUpData := models.SingUpData{}
 	err := json.NewDecoder(r.Body).Decode(&signUpData)
 	if err != nil {
-		models.SendMessage(w, http.StatusInternalServerError, "incorrect JSON")
+		models.Send(w, http.StatusInternalServerError, models.IncorrectJsonAnswer)
 		return
 	}
 	defer r.Body.Close()
@@ -52,15 +52,15 @@ func (handlers *UserHandlers) CreateUser(w http.ResponseWriter, r *http.Request)
 	jwtData, err, fields := handlers.adapter.CreateUser(signUpData)
 	if err != nil {
 		if fields != nil {
-			models.SendMessageWithFields(w, http.StatusBadRequest, err.Error(), fields)
+			models.Send(w, http.StatusBadRequest, models.NewIncorrectFieldsAnswer(fields))
 			return
 		}
-		models.SendMessage(w, http.StatusInternalServerError, err.Error())
+		models.Send(w, http.StatusInternalServerError, models.MessageAnswer{Status: 500, Message: err.Error()})
 		return
 	}
 
 	http.SetCookie(w, auth.CreateAuthCookie(jwtData, 30*24*time.Hour))
-	models.SendMessage(w, http.StatusOK, "signed up")
+	models.Send(w, http.StatusOK, models.SignedUpAnswer)
 }
 
 // GetUser godoc
@@ -72,9 +72,9 @@ func (handlers *UserHandlers) CreateUser(w http.ResponseWriter, r *http.Request)
 // @produce json
 // @param id path int false "ProfileData ID, if none, returned logged in user"
 // @success 200 {object} models.UserDataAnswerMessage
-// @failure 400 {object} models.AnswerMessage
-// @failure 404 {object} models.AnswerMessage
-// @failure 500 {object} models.AnswerMessage
+// @failure 400 {object} models.MessageAnswer
+// @failure 404 {object} models.MessageAnswer
+// @failure 500 {object} models.MessageAnswer
 // @router /user/{id} [get]
 func (handlers *UserHandlers) GetUser(w http.ResponseWriter, r *http.Request) {
 	var id int64
@@ -85,12 +85,12 @@ func (handlers *UserHandlers) GetUser(w http.ResponseWriter, r *http.Request) {
 	if ok {
 		id, err = strconv.ParseInt(pathId, 10, 64)
 		if err != nil {
-			models.SendMessage(w, http.StatusBadRequest, "incorrect id in query")
+			models.Send(w, http.StatusBadRequest, models.NewIncorrectFieldsAnswer([]string{"id"}))
 			return
 		}
 	} else {
 		if !isAuth(r) {
-			models.SendMessage(w, http.StatusBadRequest, "no id in query")
+			models.Send(w, http.StatusBadRequest, models.NewIncorrectFieldsAnswer([]string{"id"}))
 			return
 		}
 		id = jwtData(r).Id
@@ -99,10 +99,10 @@ func (handlers *UserHandlers) GetUser(w http.ResponseWriter, r *http.Request) {
 	userData, err := handlers.adapter.GetUser(id)
 	if err != nil {
 		if err == models.NotFound {
-			models.SendMessage(w, http.StatusNotFound, err.Error())
+			models.Send(w, http.StatusNotFound, models.UserNotFoundAnswer)
 			return
 		}
-		models.SendMessage(w, http.StatusInternalServerError, err.Error())
+		models.Send(w, http.StatusInternalServerError, models.MessageAnswer{Status: 500, Message: err.Error()})
 		return
 	}
 
@@ -117,21 +117,21 @@ func (handlers *UserHandlers) GetUser(w http.ResponseWriter, r *http.Request) {
 // @accept json
 // @produce json
 // @param profile_data body models.UpdateUserData true "User new profile data"
-// @success 200 {object} models.AnswerMessage
-// @failure 400 {object} models.AnswerMessage
-// @failure 401 {object} models.AnswerMessage
-// @failure 500 {object} models.AnswerMessage
+// @success 200 {object} models.MessageAnswer
+// @failure 400 {object} models.MessageAnswer
+// @failure 401 {object} models.MessageAnswer
+// @failure 500 {object} models.MessageAnswer
 // @router /user [put]
 func (handlers *UserHandlers) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	if !isAuth(r) {
-		models.SendMessage(w, http.StatusUnauthorized, "not signed in")
+		models.Send(w, http.StatusUnauthorized, models.NotSignedInAnswer)
 		return
 	}
 
 	var updateData models.UpdateUserData
 	err := json.NewDecoder(r.Body).Decode(&updateData)
 	if err != nil {
-		models.SendMessage(w, http.StatusInternalServerError, "incorrect JSON")
+		models.Send(w, http.StatusInternalServerError, models.IncorrectJsonAnswer)
 		return
 	}
 	defer r.Body.Close()
@@ -139,15 +139,15 @@ func (handlers *UserHandlers) UpdateUser(w http.ResponseWriter, r *http.Request)
 	jwtData, err, fields := handlers.adapter.UpdateUser(jwtData(r).Id, updateData)
 	if err != nil {
 		if fields != nil {
-			models.SendMessageWithFields(w, http.StatusBadRequest, err.Error(), fields)
+			models.Send(w, http.StatusBadRequest, models.NewIncorrectFieldsAnswer(fields))
 			return
 		}
-		models.SendMessage(w, http.StatusInternalServerError, err.Error())
+		models.Send(w, http.StatusInternalServerError, models.MessageAnswer{Status: 500, Message: err.Error()})
 		return
 	}
 
 	http.SetCookie(w, auth.CreateAuthCookie(jwtData, 30*24*time.Hour))
-	models.SendMessage(w, http.StatusOK, "user updated")
+	models.Send(w, http.StatusOK, models.UserUpdatedAnswer)
 }
 
 // RemoveUser godoc
@@ -157,21 +157,21 @@ func (handlers *UserHandlers) UpdateUser(w http.ResponseWriter, r *http.Request)
 // @tags user
 // @produce json
 // @param remove_data body models.RemoveUserData true "Info required to remove current user"
-// @success 200 {object} models.AnswerMessage
-// @failure 400 {object} models.AnswerMessage
-// @failure 401 {object} models.AnswerMessage
-// @failure 500 {object} models.AnswerMessage
+// @success 200 {object} models.MessageAnswer
+// @failure 400 {object} models.MessageAnswer
+// @failure 401 {object} models.MessageAnswer
+// @failure 500 {object} models.MessageAnswer
 // @router /user [delete]
 func (handlers *UserHandlers) RemoveUser(w http.ResponseWriter, r *http.Request) {
 	if !isAuth(r) {
-		models.SendMessage(w, http.StatusUnauthorized, "not signed in")
+		models.Send(w, http.StatusUnauthorized, models.NotSignedInAnswer)
 		return
 	}
 
 	var removeData models.RemoveUserData
 	err := json.NewDecoder(r.Body).Decode(&removeData)
 	if err != nil {
-		models.SendMessage(w, http.StatusInternalServerError, "incorrect JSON")
+		models.Send(w, http.StatusInternalServerError, models.IncorrectJsonAnswer)
 		return
 	}
 	defer r.Body.Close()
@@ -179,13 +179,13 @@ func (handlers *UserHandlers) RemoveUser(w http.ResponseWriter, r *http.Request)
 	err, fields := handlers.adapter.RemoveUser(jwtData(r).Id, removeData)
 	if err != nil {
 		if fields != nil {
-			models.SendMessageWithFields(w, http.StatusBadRequest, err.Error(), fields)
+			models.Send(w, http.StatusBadRequest, models.NewIncorrectFieldsAnswer(fields))
 			return
 		}
-		models.SendMessage(w, http.StatusInternalServerError, err.Error())
+		models.Send(w, http.StatusInternalServerError, models.MessageAnswer{Status: 500, Message: err.Error()})
 		return
 	}
 
 	http.SetCookie(w, auth.CreateAuthCookie(jwtData(r), 0))
-	models.SendMessage(w, http.StatusOK, "user removed")
+	models.Send(w, http.StatusOK, models.UserRemovedAnswer)
 }

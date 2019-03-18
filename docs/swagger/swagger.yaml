@@ -1,6 +1,13 @@
 definitions:
-  models.AnswerMessage:
+  models.IncorrectFieldsAnswer:
     properties:
+      data:
+        example:
+        - '[email'
+        - ' username]'
+        items:
+          type: string
+        type: array
       message:
         example: Query processed successfully
         type: string
@@ -8,17 +15,10 @@ definitions:
         example: 200
         type: integer
     type: object
-  models.AnswerMessageWithFields:
+  models.MessageAnswer:
     properties:
-      data:
-        example:
-          - '[email'
-          - ' username]'
-        items:
-          type: string
-        type: array
       message:
-        example: Query processed successfully
+        example: ok
         type: string
       status:
         example: 200
@@ -113,7 +113,7 @@ definitions:
         $ref: '#/definitions/models.UserData'
         type: object
       message:
-        example: Query processed successfully
+        example: ok
         type: string
       status:
         example: 200
@@ -136,17 +136,17 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
       summary: Saves new avatar image of client's user
       tags:
@@ -169,22 +169,22 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.AnswerMessageWithFields'
+            $ref: '#/definitions/models.IncorrectFieldsAnswer'
             type: object
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
       summary: Updates user password
       tags:
@@ -198,12 +198,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
         "405":
           description: Method Not Allowed
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
       summary: Logs user out
       tags:
@@ -216,12 +216,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
       summary: Checks user session
       tags:
@@ -244,22 +244,22 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.AnswerMessageWithFields'
+            $ref: '#/definitions/models.IncorrectFieldsAnswer'
             type: object
         "405":
           description: Method Not Allowed
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
       summary: Grants client access
       tags:
@@ -282,22 +282,22 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
       summary: Deletes user and user of client
       tags:
@@ -321,27 +321,27 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/models.AnswerMessageWithFields'
+            $ref: '#/definitions/models.IncorrectFieldsAnswer'
             type: object
         "405":
           description: Method Not Allowed
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
       summary: Registers user
       tags:
@@ -365,22 +365,22 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
       summary: Updates client's user
       tags:
@@ -406,17 +406,17 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
       summary: Produces user profile info
       tags:
@@ -446,7 +446,7 @@ paths:
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
       summary: Produces scoreboard page with {limit} and {offset}
       tags:
