@@ -1,4 +1,3 @@
-basePath: /api
 definitions:
   models.AnswerMessage:
     properties:
@@ -9,11 +8,15 @@ definitions:
         example: 200
         type: integer
     type: object
-  models.GetUserAnswerMessage:
+  models.AnswerMessageWithFields:
     properties:
       data:
-        $ref: '#/definitions/models.UserData'
-        type: object
+        example:
+          - '[email'
+          - ' username]'
+        items:
+          type: string
+        type: array
       message:
         example: Query processed successfully
         type: string
@@ -29,6 +32,9 @@ definitions:
     type: object
   models.ScoreboardUserData:
     properties:
+      avatar:
+        example: <some avatar url>
+        type: string
       id:
         example: 1
         type: integer
@@ -38,24 +44,6 @@ definitions:
       username:
         example: XxX__NaGiBaToR__XxX
         type: string
-    type: object
-  models.SignInAnswer:
-    properties:
-      login:
-        example: test@mail.ru
-        type: string
-    type: object
-  models.SignInAnswerMessage:
-    properties:
-      data:
-        $ref: '#/definitions/models.SignInAnswer'
-        type: object
-      message:
-        example: Query processed successfully
-        type: string
-      status:
-        example: 200
-        type: integer
     type: object
   models.SignInData:
     properties:
@@ -68,9 +56,6 @@ definitions:
     type: object
   models.SingUpData:
     properties:
-      avatar:
-        example: <some avatar url>
-        type: string
       email:
         example: user_test@test.com
         type: string
@@ -122,16 +107,21 @@ definitions:
       win:
         type: integer
     type: object
-host: localhost:8002
+  models.UserDataAnswerMessage:
+    properties:
+      data:
+        $ref: '#/definitions/models.UserData'
+        type: object
+      message:
+        example: Query processed successfully
+        type: string
+      status:
+        example: 200
+        type: integer
+    type: object
 info:
-  contact:
-    email: nikolsky.dan@gmail.com
-    name: '@DanikNik'
-  description: Game based on filling field with color cells
-  license:
-    name: Apache 2.0
-  title: Colors service API by OPG+2
-  version: "1.0"
+  contact: {}
+  license: {}
 paths:
   /avatar:
     post:
@@ -181,6 +171,11 @@ paths:
           schema:
             $ref: '#/definitions/models.AnswerMessage'
             type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.AnswerMessageWithFields'
+            type: object
         "401":
           description: Unauthorized
           schema:
@@ -205,13 +200,8 @@ paths:
           schema:
             $ref: '#/definitions/models.AnswerMessage'
             type: object
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/models.AnswerMessage'
-            type: object
-        "500":
-          description: Internal Server Error
+        "405":
+          description: Method Not Allowed
           schema:
             $ref: '#/definitions/models.AnswerMessage'
             type: object
@@ -256,10 +246,15 @@ paths:
           schema:
             $ref: '#/definitions/models.AnswerMessage'
             type: object
-        "401":
-          description: Unauthorized
+        "400":
+          description: Bad Request
           schema:
-            $ref: '#/definitions/models.SignInAnswerMessage'
+            $ref: '#/definitions/models.AnswerMessageWithFields'
+            type: object
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/models.AnswerMessage'
             type: object
         "500":
           description: Internal Server Error
@@ -286,6 +281,16 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/models.AnswerMessage'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.AnswerMessage'
+            type: object
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/models.AnswerMessage'
             type: object
@@ -326,6 +331,16 @@ paths:
         "401":
           description: Unauthorized
           schema:
+            $ref: '#/definitions/models.AnswerMessageWithFields'
+            type: object
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/models.AnswerMessage'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
             $ref: '#/definitions/models.AnswerMessage'
             type: object
       summary: Registers user
@@ -362,6 +377,11 @@ paths:
           schema:
             $ref: '#/definitions/models.AnswerMessage'
             type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.AnswerMessage'
+            type: object
       summary: Updates client's user
       tags:
       - user
@@ -381,7 +401,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.GetUserAnswerMessage'
+            $ref: '#/definitions/models.UserDataAnswerMessage'
             type: object
         "400":
           description: Bad Request
@@ -390,6 +410,11 @@ paths:
             type: object
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/models.AnswerMessage'
+            type: object
+        "500":
+          description: Internal Server Error
           schema:
             $ref: '#/definitions/models.AnswerMessage'
             type: object
@@ -405,9 +430,9 @@ paths:
         in: query
         name: limit
         type: integer
-      - description: Entries from the first position
+      - description: Number of page
         in: query
-        name: offset
+        name: page
         type: integer
       produces:
       - application/json
@@ -418,7 +443,11 @@ paths:
             items:
               $ref: '#/definitions/models.ScoreboardUserData'
             type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.AnswerMessage'
+            type: object
       summary: Produces scoreboard page with {limit} and {offset}
       tags:
       - scoreboard
-swagger: "2.0"

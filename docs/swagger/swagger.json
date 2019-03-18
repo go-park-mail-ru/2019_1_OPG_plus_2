@@ -1,19 +1,8 @@
 {
-    "swagger": "2.0",
     "info": {
-        "description": "Game based on filling field with color cells",
-        "title": "Colors service API by OPG+2",
-        "contact": {
-            "name": "@DanikNik",
-            "email": "nikolsky.dan@gmail.com"
-        },
-        "license": {
-            "name": "Apache 2.0"
-        },
-        "version": "1.0"
+      "contact": {},
+      "license": {}
     },
-    "host": "localhost:8002",
-    "basePath": "/api",
     "paths": {
         "/avatar": {
             "post": {
@@ -84,6 +73,13 @@
                             "$ref": "#/definitions/models.AnswerMessage"
                         }
                     },
+                  "400": {
+                    "description": "Bad Request",
+                    "schema": {
+                      "type": "object",
+                      "$ref": "#/definitions/models.AnswerMessageWithFields"
+                    }
+                  },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
@@ -160,11 +156,18 @@
                             "$ref": "#/definitions/models.AnswerMessage"
                         }
                     },
-                    "401": {
-                        "description": "Unauthorized",
+                  "400": {
+                    "description": "Bad Request",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.SignInAnswerMessage"
+                          "$ref": "#/definitions/models.AnswerMessageWithFields"
+                        }
+                  },
+                  "405": {
+                    "description": "Method Not Allowed",
+                    "schema": {
+                      "type": "object",
+                      "$ref": "#/definitions/models.AnswerMessage"
                         }
                     },
                     "500": {
@@ -193,15 +196,8 @@
                             "$ref": "#/definitions/models.AnswerMessage"
                         }
                     },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
+                  "405": {
+                    "description": "Method Not Allowed",
                         "schema": {
                             "type": "object",
                             "$ref": "#/definitions/models.AnswerMessage"
@@ -256,6 +252,13 @@
                             "type": "object",
                             "$ref": "#/definitions/models.AnswerMessage"
                         }
+                    },
+                  "500": {
+                    "description": "Internal Server Error",
+                    "schema": {
+                      "type": "object",
+                      "$ref": "#/definitions/models.AnswerMessage"
+                    }
                     }
                 }
             },
@@ -300,6 +303,20 @@
                     },
                     "401": {
                         "description": "Unauthorized",
+                      "schema": {
+                        "type": "object",
+                        "$ref": "#/definitions/models.AnswerMessageWithFields"
+                      }
+                    },
+                  "405": {
+                    "description": "Method Not Allowed",
+                    "schema": {
+                      "type": "object",
+                      "$ref": "#/definitions/models.AnswerMessage"
+                    }
+                  },
+                  "500": {
+                    "description": "Internal Server Error",
                         "schema": {
                             "type": "object",
                             "$ref": "#/definitions/models.AnswerMessage"
@@ -336,6 +353,20 @@
                             "$ref": "#/definitions/models.AnswerMessage"
                         }
                     },
+                  "400": {
+                    "description": "Bad Request",
+                    "schema": {
+                      "type": "object",
+                      "$ref": "#/definitions/models.AnswerMessage"
+                    }
+                  },
+                  "401": {
+                    "description": "Unauthorized",
+                    "schema": {
+                      "type": "object",
+                      "$ref": "#/definitions/models.AnswerMessage"
+                    }
+                  },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -372,7 +403,7 @@
                         "description": "OK",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.GetUserAnswerMessage"
+                          "$ref": "#/definitions/models.UserDataAnswerMessage"
                         }
                     },
                     "400": {
@@ -387,6 +418,13 @@
                         "schema": {
                             "type": "object",
                             "$ref": "#/definitions/models.AnswerMessage"
+                        }
+                    },
+                  "500": {
+                    "description": "Internal Server Error",
+                    "schema": {
+                      "type": "object",
+                      "$ref": "#/definitions/models.AnswerMessage"
                         }
                     }
                 }
@@ -411,8 +449,8 @@
                     },
                     {
                         "type": "integer",
-                        "description": "Entries from the first position",
-                        "name": "offset",
+                      "description": "Number of page",
+                      "name": "page",
                         "in": "query"
                     }
                 ],
@@ -425,6 +463,13 @@
                                 "$ref": "#/definitions/models.ScoreboardUserData"
                             }
                         }
+                    },
+                  "500": {
+                    "description": "Internal Server Error",
+                    "schema": {
+                      "type": "object",
+                      "$ref": "#/definitions/models.AnswerMessage"
+                    }
                     }
                 }
             }
@@ -444,12 +489,18 @@
                 }
             }
         },
-        "models.GetUserAnswerMessage": {
+      "models.AnswerMessageWithFields": {
             "type": "object",
             "properties": {
                 "data": {
-                    "type": "object",
-                    "$ref": "#/definitions/models.UserData"
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "example": [
+                    "[email",
+                    " username]"
+                  ]
                 },
                 "message": {
                     "type": "string",
@@ -473,6 +524,10 @@
         "models.ScoreboardUserData": {
             "type": "object",
             "properties": {
+              "avatar": {
+                "type": "string",
+                "example": "\u003csome avatar url\u003e"
+              },
                 "id": {
                     "type": "integer",
                     "example": 1
@@ -484,32 +539,6 @@
                 "username": {
                     "type": "string",
                     "example": "XxX__NaGiBaToR__XxX"
-                }
-            }
-        },
-        "models.SignInAnswer": {
-            "type": "object",
-            "properties": {
-                "login": {
-                    "type": "string",
-                    "example": "test@mail.ru"
-                }
-            }
-        },
-        "models.SignInAnswerMessage": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "type": "object",
-                    "$ref": "#/definitions/models.SignInAnswer"
-                },
-                "message": {
-                    "type": "string",
-                    "example": "Query processed successfully"
-                },
-                "status": {
-                    "type": "integer",
-                    "example": 200
                 }
             }
         },
@@ -529,10 +558,6 @@
         "models.SingUpData": {
             "type": "object",
             "properties": {
-                "avatar": {
-                    "type": "string",
-                    "example": "\u003csome avatar url\u003e"
-                },
                 "email": {
                     "type": "string",
                     "example": "user_test@test.com"
@@ -605,6 +630,23 @@
                     "type": "integer"
                 }
             }
+        },
+      "models.UserDataAnswerMessage": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "$ref": "#/definitions/models.UserData"
+          },
+          "message": {
+            "type": "string",
+            "example": "Query processed successfully"
+          },
+          "status": {
+            "type": "integer",
+            "example": 200
+          }
+        }
         }
     }
 }
