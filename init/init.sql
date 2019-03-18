@@ -29,7 +29,7 @@ USE colors_core;
 
 CREATE TABLE users (
   id int(11) NOT NULL,
-  avatar varchar(64) DEFAULT NULL,
+  avatar varchar(64) NOT NULL DEFAULT '',
   score int(11) NOT NULL DEFAULT '0',
   games int(11) NOT NULL DEFAULT '0',
   win int(11) NOT NULL DEFAULT '0',
