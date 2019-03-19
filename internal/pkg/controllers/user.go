@@ -52,10 +52,10 @@ func (handlers *UserHandlers) CreateUser(w http.ResponseWriter, r *http.Request)
 	jwtData, err, fields := handlers.adapter.CreateUser(signUpData)
 	if err != nil {
 		if fields != nil {
-			models.Send(w, http.StatusBadRequest, models.NewIncorrectFieldsAnswer(fields))
+			models.Send(w, http.StatusBadRequest, models.GetIncorrectFieldsAnswer(fields))
 			return
 		}
-		models.Send(w, http.StatusInternalServerError, models.MessageAnswer{Status: 500, Message: err.Error()})
+		models.Send(w, http.StatusInternalServerError, models.GetDeveloperErrorAnswer(err.Error()))
 		return
 	}
 
@@ -71,7 +71,7 @@ func (handlers *UserHandlers) CreateUser(w http.ResponseWriter, r *http.Request)
 // @accept json
 // @produce json
 // @param id path int false "ProfileData ID, if none, returned logged in user"
-// @success 200 {object} models.UserDataAnswerMessage
+// @success 200 {object} models.UserDataAnswer
 // @failure 400 {object} models.MessageAnswer
 // @failure 404 {object} models.MessageAnswer
 // @failure 500 {object} models.MessageAnswer
@@ -85,12 +85,12 @@ func (handlers *UserHandlers) GetUser(w http.ResponseWriter, r *http.Request) {
 	if ok {
 		id, err = strconv.ParseInt(pathId, 10, 64)
 		if err != nil {
-			models.Send(w, http.StatusBadRequest, models.NewIncorrectFieldsAnswer([]string{"id"}))
+			models.Send(w, http.StatusBadRequest, models.GetIncorrectFieldsAnswer([]string{"id"}))
 			return
 		}
 	} else {
 		if !isAuth(r) {
-			models.Send(w, http.StatusBadRequest, models.NewIncorrectFieldsAnswer([]string{"id"}))
+			models.Send(w, http.StatusBadRequest, models.GetIncorrectFieldsAnswer([]string{"id"}))
 			return
 		}
 		id = jwtData(r).Id
@@ -102,11 +102,11 @@ func (handlers *UserHandlers) GetUser(w http.ResponseWriter, r *http.Request) {
 			models.Send(w, http.StatusNotFound, models.UserNotFoundAnswer)
 			return
 		}
-		models.Send(w, http.StatusInternalServerError, models.MessageAnswer{Status: 500, Message: err.Error()})
+		models.Send(w, http.StatusInternalServerError, models.GetDeveloperErrorAnswer(err.Error()))
 		return
 	}
 
-	models.SendUserDataAnswer(w, http.StatusOK, "user found", userData)
+	models.Send(w, http.StatusOK, models.GetUserDataAnswer(userData))
 }
 
 // UpdateUser godoc
@@ -139,10 +139,10 @@ func (handlers *UserHandlers) UpdateUser(w http.ResponseWriter, r *http.Request)
 	jwtData, err, fields := handlers.adapter.UpdateUser(jwtData(r).Id, updateData)
 	if err != nil {
 		if fields != nil {
-			models.Send(w, http.StatusBadRequest, models.NewIncorrectFieldsAnswer(fields))
+			models.Send(w, http.StatusBadRequest, models.GetIncorrectFieldsAnswer(fields))
 			return
 		}
-		models.Send(w, http.StatusInternalServerError, models.MessageAnswer{Status: 500, Message: err.Error()})
+		models.Send(w, http.StatusInternalServerError, models.GetDeveloperErrorAnswer(err.Error()))
 		return
 	}
 
@@ -179,10 +179,10 @@ func (handlers *UserHandlers) RemoveUser(w http.ResponseWriter, r *http.Request)
 	err, fields := handlers.adapter.RemoveUser(jwtData(r).Id, removeData)
 	if err != nil {
 		if fields != nil {
-			models.Send(w, http.StatusBadRequest, models.NewIncorrectFieldsAnswer(fields))
+			models.Send(w, http.StatusBadRequest, models.GetIncorrectFieldsAnswer(fields))
 			return
 		}
-		models.Send(w, http.StatusInternalServerError, models.MessageAnswer{Status: 500, Message: err.Error()})
+		models.Send(w, http.StatusInternalServerError, models.GetDeveloperErrorAnswer(err.Error()))
 		return
 	}
 

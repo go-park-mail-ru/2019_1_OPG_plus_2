@@ -28,7 +28,7 @@ func isImage(header textproto.MIMEHeader) bool {
 // @accept png
 // @accept jpeg
 // @produce json
-// @success 200 {object} models.MessageAnswer
+// @success 200 {object} models.UploadAvatarAnswer
 // @failure 400 {object} models.MessageAnswer
 // @failure 500 {object} models.MessageAnswer
 // @router /avatar [post]
@@ -69,9 +69,9 @@ func UploadAvatar(w http.ResponseWriter, r *http.Request) {
 	url := "/static/" + newName + "." + ext
 	err = db.ProfileUpdateAvatar(jwtData(r).Id, url)
 	if err != nil {
-		models.Send(w, http.StatusInternalServerError, models.MessageAnswer{Status: 500, Message: err.Error()})
+		models.Send(w, http.StatusInternalServerError, models.GetDeveloperErrorAnswer(err.Error()))
 		return
 	}
 
-	models.Send(w, http.StatusOK, models.MessageAnswer{Status: 100, Message: url})
+	models.Send(w, http.StatusOK, models.GetUploadAvatarAnswer(url))
 }

@@ -55,10 +55,10 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 	jwtData, err, fields := auth.SignIn(signInData)
 	if err != nil {
 		if fields != nil {
-			models.Send(w, http.StatusBadRequest, models.NewIncorrectFieldsAnswer(fields))
+			models.Send(w, http.StatusBadRequest, models.GetIncorrectFieldsAnswer(fields))
 			return
 		}
-		models.Send(w, http.StatusInternalServerError, models.MessageAnswer{Status: 500, Message: err.Error()})
+		models.Send(w, http.StatusInternalServerError, models.GetDeveloperErrorAnswer(err.Error()))
 		return
 	}
 
@@ -117,10 +117,10 @@ func UpdatePassword(w http.ResponseWriter, r *http.Request) {
 	err, fields := auth.UpdatePassword(jwtData(r).Id, updateData)
 	if err != nil {
 		if fields != nil {
-			models.Send(w, http.StatusBadRequest, models.NewIncorrectFieldsAnswer(fields))
+			models.Send(w, http.StatusBadRequest, models.GetIncorrectFieldsAnswer(fields))
 			return
 		}
-		models.Send(w, http.StatusInternalServerError, models.MessageAnswer{Status: 500, Message: err.Error()})
+		models.Send(w, http.StatusInternalServerError, models.GetDeveloperErrorAnswer(err.Error()))
 		return
 	}
 

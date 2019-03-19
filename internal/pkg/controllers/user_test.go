@@ -242,7 +242,7 @@ func TestGetUserSelf(t *testing.T) {
 			expStatus:    200,
 			inputMessage: nil,
 
-			expMessage: models.UserDataAnswerMessage{
+			expMessage: models.UserDataAnswer{
 				Data: models.UserData{
 					Id:       1,
 					Email:    "mail1",
@@ -268,7 +268,7 @@ func TestGetUserSelf(t *testing.T) {
 		if w.Code != tCase.expStatus {
 			t.Errorf("Wrong Status:\n\tGot %d\n\tExpected %d\n", w.Code, tCase.expStatus)
 		}
-		var retMessage models.UserDataAnswerMessage
+		var retMessage models.UserDataAnswer
 		_ = json.NewDecoder(w.Body).Decode(&retMessage)
 		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
 			t.Errorf("Wrong body\n%v\n%v", retMessage, tCase.expMessage)
@@ -299,7 +299,7 @@ func TestGetUserId(t *testing.T) {
 			expStatus:    200,
 			inputMessage: nil,
 
-			expMessage: models.UserDataAnswerMessage{
+			expMessage: models.UserDataAnswer{
 				Data: retData,
 				MessageAnswer: models.MessageAnswer{
 					Status:  200,
@@ -316,7 +316,7 @@ func TestGetUserId(t *testing.T) {
 		if w.Code != tCase.expStatus {
 			t.Errorf("Wrong Status:\n\tGot %d\n\tExpected %d\n", w.Code, tCase.expStatus)
 		}
-		var retMessage models.UserDataAnswerMessage
+		var retMessage models.UserDataAnswer
 		_ = json.NewDecoder(w.Body).Decode(&retMessage)
 		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
 			t.Errorf("Wrong body\n%v\n%v", retMessage, tCase.expMessage)
