@@ -12,7 +12,7 @@ env:
 
 install: true
 
-go_import_path: github.com/go-park-mail-ru/2019_1_OPG_plus_2/
+go_import_path: ${GOPATH}/github.com/go-park-mail-ru/2019_1_OPG_plus_2/
 
 before_script:
   - go mod tidy
