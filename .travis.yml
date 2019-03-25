@@ -17,5 +17,5 @@ install: true
 #  - go mod tidy
 
 script:
-  - go build
+  - go build cmd/server/main.go
   - go test -v -race ./...
