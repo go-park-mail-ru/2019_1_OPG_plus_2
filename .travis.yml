@@ -2,12 +2,18 @@ sudo: false
 
 language: go
 
+env:
+  - GO111MODULE=on
+
 go:
   - 1.11.x
   - master
 
 install: true
 
+before_script:
+  - go mod download
+  -
 script:
-  - env GO111MODULE=on go build
-  - env GO111MODULE=on go test -v -race ./...
+  - go build
+  - go test -v -race ./...
