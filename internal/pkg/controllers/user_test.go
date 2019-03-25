@@ -79,6 +79,7 @@ func testLog(t *testing.T, tCase testCase) {
  *  GET_USER CONTROLLER  *
  *************************/
 func TestGetUserSelf(t *testing.T) {
+	userToFind, _ := mockedStorageAdapter.GetUser(1)
 	tCases := []testCase{
 		{
 			handler: mockedUserHandlers.GetUser,
@@ -99,20 +100,9 @@ func TestGetUserSelf(t *testing.T) {
 			inputMessage: nil,
 
 			expMessage: models.UserDataAnswer{
-				Data: models.UserData{
-					Id:       1,
-					Email:    "mail1",
-					Username: "username1",
-					Score:    1000,
-					Avatar:   "avatar1",
-					Games:    100,
-					Lose:     50,
-					Win:      50,
-				},
-				MessageAnswer: models.MessageAnswer{
-					Status:  200,
-					Message: "user found",
-				},
+				Status:  105,
+				Message: "user found",
+				Data:    userToFind,
 			},
 		},
 	}
@@ -135,7 +125,7 @@ func TestGetUserSelf(t *testing.T) {
 }
 
 func TestGetUserId(t *testing.T) {
-	retData, _ := mockedStorageAdapter.GetUser(3)
+	userToFind, _ := mockedStorageAdapter.GetUser(3)
 	tCases := []testCase{
 		{
 			handler: mockedUserHandlers.GetUser,
@@ -156,11 +146,9 @@ func TestGetUserId(t *testing.T) {
 			inputMessage: nil,
 
 			expMessage: models.UserDataAnswer{
-				Data: retData,
-				MessageAnswer: models.MessageAnswer{
-					Status:  200,
-					Message: "user found",
-				},
+				Status:  105,
+				Message: "user found",
+				Data:    userToFind,
 			},
 		},
 	}
@@ -175,7 +163,7 @@ func TestGetUserId(t *testing.T) {
 		var retMessage models.UserDataAnswer
 		_ = json.NewDecoder(w.Body).Decode(&retMessage)
 		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
-			t.Errorf("Wrong body\n%v\n%v", retMessage, tCase.expMessage)
+			t.Errorf("Wrong body\nGOT:\t%v\nEXP:\t%v", retMessage, tCase.expMessage)
 		}
 
 		//testLog(t, tCase)
@@ -199,13 +187,10 @@ func TestGetUserIdNotExists(t *testing.T) {
 				},
 			},
 
-			expStatus:    500,
+			expStatus:    404,
 			inputMessage: nil,
 
-			expMessage: models.MessageAnswer{
-				Status:  500,
-				Message: "user not found",
-			},
+			expMessage: models.UserNotFoundAnswer,
 		},
 	}
 
@@ -219,7 +204,7 @@ func TestGetUserIdNotExists(t *testing.T) {
 		var retMessage models.MessageAnswer
 		_ = json.NewDecoder(w.Body).Decode(&retMessage)
 		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
-			t.Errorf("Wrong body\n%v\n%v", retMessage, tCase.expMessage)
+			t.Errorf("Wrong body\nGOT:\t%v\nEXP:\t%v", retMessage, tCase.expMessage)
 		}
 
 		//testLog(t, tCase)
@@ -303,7 +288,7 @@ func TestGetUserIdNotNumber(t *testing.T) {
 		var retMessage models.MessageAnswer
 		_ = json.NewDecoder(w.Body).Decode(&retMessage)
 		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
-			t.Errorf("Wrong body\n%v\n%v", retMessage, tCase.expMessage)
+			t.Errorf("Wrong body\nGOT:\t%v\nEXP:\t%v", retMessage, tCase.expMessage)
 		}
 
 		//testLog(t, tCase)
@@ -350,7 +335,7 @@ func TestUpdateUserCorrect(t *testing.T) {
 		var retMessage models.MessageAnswer
 		_ = json.NewDecoder(w.Body).Decode(&retMessage)
 		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
-			t.Errorf("Wrong body\n%v\n%v", retMessage, tCase.expMessage)
+			t.Errorf("Wrong body\nGOT:\t%v\nEXP:\t%v", retMessage, tCase.expMessage)
 		}
 
 		newUserData, err := mockedStorageAdapter.GetUser(tCase.params.jwt.Id)
@@ -410,7 +395,7 @@ func TestUpdateUserNoAuth(t *testing.T) {
 		var retMessage models.MessageAnswer
 		_ = json.NewDecoder(w.Body).Decode(&retMessage)
 		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
-			t.Errorf("Wrong body\n%v\n%v", retMessage, tCase.expMessage)
+			t.Errorf("Wrong body\nGOT:\t%v\nEXP:\t%v", retMessage, tCase.expMessage)
 		}
 
 		//testLog(t, tCase)
@@ -500,7 +485,7 @@ func TestUpdateUserInvalidField(t *testing.T) {
 		var retMessage models.MessageAnswer
 		_ = json.NewDecoder(w.Body).Decode(&retMessage)
 		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
-			t.Errorf("Wrong body\n%v\n%v", retMessage, tCase.expMessage)
+			t.Errorf("Wrong body\nGOT:\t%v\nEXP:\t%v", retMessage, tCase.expMessage)
 		}
 
 		//testLog(t, tCase)
@@ -544,7 +529,7 @@ func TestUpdateUserInvalidJSON(t *testing.T) {
 		var retMessage models.MessageAnswer
 		_ = json.NewDecoder(w.Body).Decode(&retMessage)
 		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
-			t.Errorf("Wrong body\n%v\n%v", retMessage, tCase.expMessage)
+			t.Errorf("Wrong body\nGOT:\t%v\nEXP:\t%v", retMessage, tCase.expMessage)
 		}
 
 		//testLog(t, tCase)
@@ -592,7 +577,7 @@ func TestRemoveUserCorrect(t *testing.T) {
 		var retMessage models.MessageAnswer
 		_ = json.NewDecoder(w.Body).Decode(&retMessage)
 		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
-			t.Errorf("Wrong body\n%v\n%v", retMessage, tCase.expMessage)
+			t.Errorf("Wrong body\nGOT:\t%v\nEXP:\t%v", retMessage, tCase.expMessage)
 		}
 
 		_, err := mockedStorageAdapter.GetUser(tCase.params.jwt.Id)
@@ -638,7 +623,7 @@ func TestRemoveUserNoAuth(t *testing.T) {
 		var retMessage models.MessageAnswer
 		_ = json.NewDecoder(w.Body).Decode(&retMessage)
 		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
-			t.Errorf("Wrong body\n%v\n%v", retMessage, tCase.expMessage)
+			t.Errorf("Wrong body\nGOT:\t%v\nEXP:\t%v", retMessage, tCase.expMessage)
 		}
 	}
 }
@@ -680,7 +665,7 @@ func TestRemoveUserInvalidJSON(t *testing.T) {
 		var retMessage models.MessageAnswer
 		_ = json.NewDecoder(w.Body).Decode(&retMessage)
 		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
-			t.Errorf("Wrong body\n%v\n%v", retMessage, tCase.expMessage)
+			t.Errorf("Wrong body\nGOT:\t%v\nEXP:\t%v", retMessage, tCase.expMessage)
 		}
 	}
 }
@@ -722,7 +707,7 @@ func TestRemoveUserInvalidData(t *testing.T) {
 		var retMessage models.MessageAnswer
 		_ = json.NewDecoder(w.Body).Decode(&retMessage)
 		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
-			t.Errorf("Wrong body\n%v\n%v", retMessage, tCase.expMessage)
+			t.Errorf("Wrong body\nGOT:\t%v\nEXP:\t%v", retMessage, tCase.expMessage)
 		}
 
 		_, err := mockedStorageAdapter.GetUser(tCase.params.jwt.Id)
