@@ -9,6 +9,7 @@ import (
 
 var FieldsError = errors.New("incorrect fields")
 var NotFound = errors.New("not found")
+var AlreadyExists = errors.New("already exists")
 
 type InputModel interface {
 	Check() []string

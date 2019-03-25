@@ -1,7 +1,6 @@
 package db
 
 import (
-	"fmt"
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"
 )
 
@@ -20,7 +19,7 @@ func ProfileCreate(data ProfileData) (err error) {
 		return
 	}
 	if id != 0 {
-		return fmt.Errorf("profile already exists")
+		return models.AlreadyExists
 	}
 
 	id, err = insert(coreDbName, coreUsersTable, "id, avatar", "?, ?", data.Id, data.Avatar)

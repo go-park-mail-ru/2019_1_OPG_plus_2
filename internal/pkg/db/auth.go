@@ -18,7 +18,7 @@ func AuthCreate(data AuthData) (id int64, err error) {
 		return
 	}
 	if id != 0 {
-		return id, fmt.Errorf("user already exists")
+		return id, models.AlreadyExists
 	}
 
 	return insert(authDbName, authUsersTable, "username, email, pass_hash", "?, ?, ?",

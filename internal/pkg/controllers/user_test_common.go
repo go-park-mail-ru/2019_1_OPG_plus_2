@@ -1,9 +1,7 @@
 package controllers
 
 import (
-	"fmt"
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"
-	"strings"
 )
 
 var baseUrl = "localhost:8002/api"
@@ -75,8 +73,12 @@ func newMockStorageAdapter() (storage *mockStorageAdapter) {
 	return storage
 }
 
-//TODO: корректно вернуть неправильные поля
 func (storage *mockStorageAdapter) CreateUser(signUpData models.SingUpData) (models.JwtData, error, []string) {
+	incorrectFields := signUpData.Check()
+	if len(incorrectFields) > 0 {
+		return models.JwtData{}, models.FieldsError, incorrectFields
+	}
+
 	newUser := models.UserData{
 		Id:       int64(len(storage.ProfileData)),
 		Username: signUpData.Username,
@@ -85,7 +87,7 @@ func (storage *mockStorageAdapter) CreateUser(signUpData models.SingUpData) (mod
 
 	for _, profile := range storage.ProfileData {
 		if profile.Username == newUser.Username || profile.Email == newUser.Email {
-			return models.JwtData{}, fmt.Errorf("USERNAME OR EMAIL IS ALREADY USED"), nil
+			return models.JwtData{}, models.AlreadyExists, nil
 		}
 	}
 
@@ -107,7 +109,7 @@ func (storage *mockStorageAdapter) CreateUser(signUpData models.SingUpData) (mod
 
 func (storage *mockStorageAdapter) GetUser(id int64) (userData models.UserData, err error) {
 	if storage.ProfileData[id] == nil {
-		return models.UserData{}, fmt.Errorf("user not found")
+		return models.UserData{}, models.NotFound
 	}
 	return *storage.ProfileData[id], nil
 }
@@ -115,10 +117,10 @@ func (storage *mockStorageAdapter) GetUser(id int64) (userData models.UserData, 
 func (storage *mockStorageAdapter) UpdateUser(id int64, updateData models.UpdateUserData) (models.JwtData, error, []string) {
 	incorrectFields := updateData.Check()
 	if len(incorrectFields) > 0 {
-		return models.JwtData{}, fmt.Errorf("incorrect: " + strings.Join(incorrectFields, ", ")), nil
+		return models.JwtData{}, models.FieldsError, incorrectFields
 	}
 	if storage.ProfileData[id] == nil {
-		return models.JwtData{}, fmt.Errorf("user not found"), nil
+		return models.JwtData{}, models.NotFound, nil
 	}
 
 	user := storage.ProfileData[id]
@@ -136,11 +138,11 @@ func (storage *mockStorageAdapter) UpdateUser(id int64, updateData models.Update
 func (storage *mockStorageAdapter) RemoveUser(id int64, removeData models.RemoveUserData) (error, []string) {
 	incorrectFields := removeData.Check()
 	if len(incorrectFields) > 0 {
-		return fmt.Errorf("incorrect: " + strings.Join(incorrectFields, ", ")), nil
+		return models.FieldsError, incorrectFields
 	}
 
 	if removeData.Password != storage.AuthData[id].Password {
-		return fmt.Errorf("incorrect password"), nil
+		return models.FieldsError, append(incorrectFields, "password")
 	}
 
 	delete(storage.ProfileData, id)
