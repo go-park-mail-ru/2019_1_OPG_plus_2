@@ -12,10 +12,10 @@ env:
 
 install: true
 
-
 before_script:
   - go mod tidy
 
 script:
   - go build cmd/server/main.go
+  - go vet ./...
   - go test -v -race ./...
