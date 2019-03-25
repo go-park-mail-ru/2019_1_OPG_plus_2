@@ -1,9 +1,6 @@
 package models
 
 import (
-	"encoding/json"
-	"fmt"
-	"net/http"
 	"regexp"
 )
 
@@ -112,33 +109,6 @@ func (data RemoveUserData) Check() (incorrectFields []string) {
  *    OUT MODELS    *
  ********************/
 
-/* SIGN IN */
-
-type SignInAnswer struct {
-	Login string `json:"login" example:"test@mail.ru"`
-}
-
-type SignInAnswerMessage struct {
-	MessageAnswer
-	Data SignInAnswer `json:"data"`
-}
-
-func (message SignInAnswerMessage) Send(w http.ResponseWriter) {
-	w.WriteHeader(message.Status)
-	msg, _ := json.Marshal(message)
-	_, _ = fmt.Fprintln(w, string(msg))
-}
-
-func SendSignInAnswer(w http.ResponseWriter, status int, message string, data SignInAnswer) {
-	SignInAnswerMessage{
-		MessageAnswer: MessageAnswer{
-			Status:  status,
-			Message: message,
-		},
-		Data: data,
-	}.Send(w)
-}
-
 /* USER DATA */
 
 type UserData struct {
@@ -153,27 +123,6 @@ type UserData struct {
 	Lose  int64 `json:"lose, number"`
 }
 
-type UserDataAnswerMessage struct {
-	MessageAnswer
-	Data UserData `json:"data"`
-}
-
-func (message UserDataAnswerMessage) Send(w http.ResponseWriter) {
-	w.WriteHeader(message.Status)
-	msg, _ := json.Marshal(message)
-	_, _ = fmt.Fprintln(w, string(msg))
-}
-
-func SendUserDataAnswer(w http.ResponseWriter, status int, message string, data UserData) {
-	UserDataAnswerMessage{
-		MessageAnswer: MessageAnswer{
-			Status:  status,
-			Message: message,
-		},
-		Data: data,
-	}.Send(w)
-}
-
 /* SCOREBOARD DATA */
 
 type ScoreboardUserData struct {
@@ -186,25 +135,4 @@ type ScoreboardUserData struct {
 type ScoreboardData struct {
 	Users []ScoreboardUserData `json:"users"`
 	Count uint64               `json:"count" example:"123"`
-}
-
-type ScoreboardAnswerMessage struct {
-	MessageAnswer
-	Data ScoreboardData `json:"data"`
-}
-
-func (message ScoreboardAnswerMessage) Send(w http.ResponseWriter) {
-	w.WriteHeader(message.Status)
-	msg, _ := json.Marshal(message)
-	_, _ = fmt.Fprintln(w, string(msg))
-}
-
-func SendScoreboardAnswer(w http.ResponseWriter, status int, message string, data ScoreboardData) {
-	ScoreboardAnswerMessage{
-		MessageAnswer: MessageAnswer{
-			Status:  status,
-			Message: message,
-		},
-		Data: data,
-	}.Send(w)
 }

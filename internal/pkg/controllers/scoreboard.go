@@ -33,12 +33,12 @@ func GetScoreboard(w http.ResponseWriter, r *http.Request) {
 
 	users, count, err := db.GetScoreboard(limit, (page-1)*limit)
 	if err != nil {
-		models.Send(w, http.StatusInternalServerError, models.MessageAnswer{Status: 500, Message: err.Error()})
+		models.Send(w, http.StatusInternalServerError, models.GetDeveloperErrorAnswer(err.Error()))
 		return
 	}
 
-	models.SendScoreboardAnswer(w, http.StatusOK, "users found", models.ScoreboardData{
+	models.Send(w, http.StatusOK, models.GetScoreboardAnswer(models.ScoreboardData{
 		Users: users,
 		Count: count,
-	})
+	}))
 }
