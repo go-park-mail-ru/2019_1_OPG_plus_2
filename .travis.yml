@@ -9,12 +9,13 @@ go:
 
 env:
   - GO111MODULE=on
+  - TEST_DB=on
 
 install: true
 
-#
-#before_script:
-#  - go mod tidy
+
+before_script:
+  - go mod tidy
 
 script:
   - go build cmd/server/main.go
