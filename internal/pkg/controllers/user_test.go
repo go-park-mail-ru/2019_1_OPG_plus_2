@@ -227,10 +227,7 @@ func TestGetUserNoAuth(t *testing.T) {
 			expStatus:    400,
 			inputMessage: nil,
 
-			expMessage: models.MessageAnswer{
-				Status:  400,
-				Message: "no id in query",
-			},
+			expMessage: models.GetIncorrectFieldsAnswer([]string{"id"}),
 		},
 	}
 
@@ -241,7 +238,7 @@ func TestGetUserNoAuth(t *testing.T) {
 		if w.Code != tCase.expStatus {
 			t.Errorf("Wrong Status:\n\tGot %d\n\tExpected %d\n", w.Code, tCase.expStatus)
 		}
-		var retMessage models.MessageAnswer
+		var retMessage models.IncorrectFieldsAnswer
 		_ = json.NewDecoder(w.Body).Decode(&retMessage)
 		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
 			t.Errorf("Wrong body\n%v\n%v", retMessage, tCase.expMessage)
@@ -271,10 +268,7 @@ func TestGetUserIdNotNumber(t *testing.T) {
 			expStatus:    400,
 			inputMessage: nil,
 
-			expMessage: models.MessageAnswer{
-				Status:  400,
-				Message: "incorrect id in query",
-			},
+			expMessage: models.GetIncorrectFieldsAnswer([]string{"id"}),
 		},
 	}
 
@@ -285,7 +279,7 @@ func TestGetUserIdNotNumber(t *testing.T) {
 		if w.Code != tCase.expStatus {
 			t.Errorf("Wrong Status:\n\tGot %d\n\tExpected %d\n", w.Code, tCase.expStatus)
 		}
-		var retMessage models.MessageAnswer
+		var retMessage models.IncorrectFieldsAnswer
 		_ = json.NewDecoder(w.Body).Decode(&retMessage)
 		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
 			t.Errorf("Wrong body\nGOT:\t%v\nEXP:\t%v", retMessage, tCase.expMessage)
@@ -318,10 +312,7 @@ func TestUpdateUserCorrect(t *testing.T) {
 			expStatus:    200,
 			inputMessage: []byte(`{"email": "qwerty@mail.com","username": "qwerty"}`),
 
-			expMessage: models.MessageAnswer{
-				Status:  200,
-				Message: "user updated",
-			},
+			expMessage: models.UserUpdatedAnswer,
 		},
 	}
 
@@ -378,10 +369,7 @@ func TestUpdateUserNoAuth(t *testing.T) {
 			expStatus:    401,
 			inputMessage: []byte(`{"email": "qwerty","username": "qwerty"}`),
 
-			expMessage: models.MessageAnswer{
-				Status:  401,
-				Message: "not signed in",
-			},
+			expMessage: models.NotSignedInAnswer,
 		},
 	}
 
@@ -419,13 +407,10 @@ func TestUpdateUserInvalidField(t *testing.T) {
 				},
 			},
 
-			expStatus:    500,
+			expStatus:    400,
 			inputMessage: []byte(`{"email": "qwerty@mail.com","user": "qwerty"}`),
 
-			expMessage: models.MessageAnswer{
-				Status:  500,
-				Message: "incorrect: username",
-			},
+			expMessage: models.GetIncorrectFieldsAnswer([]string{"username"}),
 		},
 		{
 			handler: mockedUserHandlers.UpdateUser,
@@ -442,13 +427,10 @@ func TestUpdateUserInvalidField(t *testing.T) {
 				},
 			},
 
-			expStatus:    500,
+			expStatus:    400,
 			inputMessage: []byte(`{"e-mail": "qwerty@mail.com","username": "qwerty"}`),
 
-			expMessage: models.MessageAnswer{
-				Status:  500,
-				Message: "incorrect: email",
-			},
+			expMessage: models.GetIncorrectFieldsAnswer([]string{"email"}),
 		},
 		{
 			handler: mockedUserHandlers.UpdateUser,
@@ -465,13 +447,10 @@ func TestUpdateUserInvalidField(t *testing.T) {
 				},
 			},
 
-			expStatus:    500,
+			expStatus:    400,
 			inputMessage: []byte(`{"email": "qwerty","user-name": "qwerty"}`),
 
-			expMessage: models.MessageAnswer{
-				Status:  500,
-				Message: "incorrect: email, username",
-			},
+			expMessage: models.GetIncorrectFieldsAnswer([]string{"email", "username"}),
 		},
 	}
 
@@ -482,7 +461,7 @@ func TestUpdateUserInvalidField(t *testing.T) {
 		if w.Code != tCase.expStatus {
 			t.Errorf("Wrong Status:\n\tGot %d\n\tExpected %d\n", w.Code, tCase.expStatus)
 		}
-		var retMessage models.MessageAnswer
+		var retMessage models.IncorrectFieldsAnswer
 		_ = json.NewDecoder(w.Body).Decode(&retMessage)
 		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
 			t.Errorf("Wrong body\nGOT:\t%v\nEXP:\t%v", retMessage, tCase.expMessage)
@@ -512,10 +491,7 @@ func TestUpdateUserInvalidJSON(t *testing.T) {
 			expStatus:    500,
 			inputMessage: []byte(`{"email": "qwerty@mail.com","user": "qwerty"`), //no closing parentheses in JSON
 
-			expMessage: models.MessageAnswer{
-				Status:  500,
-				Message: "incorrect JSON",
-			},
+			expMessage: models.IncorrectJsonAnswer,
 		},
 	}
 
@@ -560,10 +536,7 @@ func TestRemoveUserCorrect(t *testing.T) {
 			expStatus:    200,
 			inputMessage: []byte(`{"password": "pass1"}`),
 
-			expMessage: models.MessageAnswer{
-				Status:  200,
-				Message: "user removed",
-			},
+			expMessage: models.UserRemovedAnswer,
 		},
 	}
 
@@ -606,10 +579,7 @@ func TestRemoveUserNoAuth(t *testing.T) {
 			expStatus:    401,
 			inputMessage: []byte(`{"password": "pass2"}`),
 
-			expMessage: models.MessageAnswer{
-				Status:  401,
-				Message: "not signed in",
-			},
+			expMessage: models.NotSignedInAnswer,
 		},
 	}
 
@@ -648,10 +618,7 @@ func TestRemoveUserInvalidJSON(t *testing.T) {
 			expStatus:    500,
 			inputMessage: []byte(`{"password": "pass1"`), // no closing parentheses
 
-			expMessage: models.MessageAnswer{
-				Status:  500,
-				Message: "incorrect JSON",
-			},
+			expMessage: models.IncorrectJsonAnswer,
 		},
 	}
 
@@ -689,11 +656,8 @@ func TestRemoveUserInvalidData(t *testing.T) {
 
 			inputMessage: []byte(`{"passw": "pass1"}`),
 
-			expStatus: 500,
-			expMessage: models.MessageAnswer{
-				Status:  500,
-				Message: "incorrect: password",
-			},
+			expStatus:  400,
+			expMessage: models.GetIncorrectFieldsAnswer([]string{"password"}),
 		},
 	}
 
@@ -704,7 +668,7 @@ func TestRemoveUserInvalidData(t *testing.T) {
 		if w.Code != tCase.expStatus {
 			t.Errorf("Wrong Status:\n\tGot %d\n\tExpected %d\n", w.Code, tCase.expStatus)
 		}
-		var retMessage models.MessageAnswer
+		var retMessage models.IncorrectFieldsAnswer
 		_ = json.NewDecoder(w.Body).Decode(&retMessage)
 		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
 			t.Errorf("Wrong body\nGOT:\t%v\nEXP:\t%v", retMessage, tCase.expMessage)
