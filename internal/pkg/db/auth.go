@@ -25,14 +25,16 @@ func AuthCreate(data AuthData) (id int64, err error) {
 		data.Username, data.Email, data.PassHash)
 }
 
-func AuthFindByUsername(username string) (data AuthData, err error) {
-	row, err := findRowBy(authDbName, authUsersTable, "id, username, email, pass_hash", "username = ?", username)
-	if err != nil {
-		return
-	}
-	err = row.Scan(&data.Id, &data.Username, &data.Email, &data.PassHash)
-	return
-}
+// For future use
+//
+//func AuthFindByUsername(username string) (data AuthData, err error) {
+//	row, err := findRowBy(authDbName, authUsersTable, "id, username, email, pass_hash", "username = ?", username)
+//	if err != nil {
+//		return
+//	}
+//	err = row.Scan(&data.Id, &data.Username, &data.Email, &data.PassHash)
+//	return
+//}
 
 func AuthFindByEmailAndPassHash(email string, passHash string) (data AuthData, err error) {
 	row, err := findRowBy(authDbName, authUsersTable, "id, username, email, pass_hash", "email = ? AND pass_hash = ?", email, passHash)

@@ -22,33 +22,37 @@ func ProfileCreate(data ProfileData) (err error) {
 		return models.AlreadyExists
 	}
 
-	id, err = insert(coreDbName, coreUsersTable, "id, avatar", "?, ?", data.Id, data.Avatar)
+	_, err = insert(coreDbName, coreUsersTable, "id, avatar", "?, ?", data.Id, data.Avatar)
 	return
 }
 
-func ProfileFindById(id int64) (data ProfileData, err error) {
-	row, err := findRowBy(coreDbName, coreUsersTable, "avatar, score, games, win, lose", "id = ?", id)
-	if err != nil {
-		return
-	}
-	data.Id = id
-	err = row.Scan(&data.Avatar, &data.Score, &data.Games, &data.Win, &data.Lose)
-	return
-}
+// For future use
+//
+//func ProfileFindById(id int64) (data ProfileData, err error) {
+//	row, err := findRowBy(coreDbName, coreUsersTable, "avatar, score, games, win, lose", "id = ?", id)
+//	if err != nil {
+//		return
+//	}
+//	data.Id = id
+//	err = row.Scan(&data.Avatar, &data.Score, &data.Games, &data.Win, &data.Lose)
+//	return
+//}
 
-func ProfileUpdateData(data ProfileData) error {
-	id, err := isExists(coreDbName, coreUsersTable, "id = ?", data.Id)
-	if err != nil {
-		return err
-	}
-	if id == 0 {
-		return models.NotFound
-	}
-
-	_, err = updateBy(coreDbName, coreUsersTable, "score = ?, games = ?, win = ?, lose = ?", "id = ?",
-		data.Score, data.Games, data.Win, data.Lose, data.Id)
-	return err
-}
+// For future use
+//
+//func ProfileUpdateData(data ProfileData) error {
+//	id, err := isExists(coreDbName, coreUsersTable, "id = ?", data.Id)
+//	if err != nil {
+//		return err
+//	}
+//	if id == 0 {
+//		return models.NotFound
+//	}
+//
+//	_, err = updateBy(coreDbName, coreUsersTable, "score = ?, games = ?, win = ?, lose = ?", "id = ?",
+//		data.Score, data.Games, data.Win, data.Lose, data.Id)
+//	return err
+//}
 
 func ProfileUpdateAvatar(id int64, avatar string) error {
 	id, err := isExists(coreDbName, coreUsersTable, "id = ?", id)
