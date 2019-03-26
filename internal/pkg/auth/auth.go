@@ -4,10 +4,11 @@ import (
 	"crypto/sha256"
 	"database/sql"
 	"fmt"
-	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/db"
-	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"
 	"net/http"
 	"time"
+
+	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/db"
+	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"
 )
 
 func CreateAuthCookie(data models.JwtData, lifetime time.Duration) *http.Cookie {

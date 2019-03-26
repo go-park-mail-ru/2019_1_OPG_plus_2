@@ -2,13 +2,15 @@ package controllers
 
 import (
 	"encoding/json"
-	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/auth"
-	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"
-	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/user"
-	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/gorilla/mux"
+
+	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/auth"
+	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"
+	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/user"
 )
 
 type UserHandlers struct {

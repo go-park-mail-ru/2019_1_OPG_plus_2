@@ -2,6 +2,7 @@ package db
 
 import (
 	"fmt"
+
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"
 )
 
@@ -27,14 +28,14 @@ func AuthCreate(data AuthData) (id int64, err error) {
 
 // For future use
 //
-//func AuthFindByUsername(username string) (data AuthData, err error) {
-//	row, err := findRowBy(authDbName, authUsersTable, "id, username, email, pass_hash", "username = ?", username)
-//	if err != nil {
-//		return
-//	}
-//	err = row.Scan(&data.Id, &data.Username, &data.Email, &data.PassHash)
-//	return
-//}
+// func AuthFindByUsername(username string) (data AuthData, err error) {
+// 	row, err := findRowBy(authDbName, authUsersTable, "id, username, email, pass_hash", "username = ?", username)
+// 	if err != nil {
+// 		return
+// 	}
+// 	err = row.Scan(&data.Id, &data.Username, &data.Email, &data.PassHash)
+// 	return
+// }
 
 func AuthFindByEmailAndPassHash(email string, passHash string) (data AuthData, err error) {
 	row, err := findRowBy(authDbName, authUsersTable, "id, username, email, pass_hash", "email = ? AND pass_hash = ?", email, passHash)

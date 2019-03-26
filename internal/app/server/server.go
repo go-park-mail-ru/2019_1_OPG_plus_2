@@ -2,14 +2,16 @@ package server
 
 import (
 	"fmt"
+	"net/http"
+
+	"github.com/gorilla/mux"
+	"github.com/swaggo/http-swagger"
+
 	_ "github.com/go-park-mail-ru/2019_1_OPG_plus_2/docs"
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/controllers"
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/db"
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/middleware"
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/user"
-	"github.com/gorilla/mux"
-	"github.com/swaggo/http-swagger"
-	"net/http"
 )
 
 type Params struct {

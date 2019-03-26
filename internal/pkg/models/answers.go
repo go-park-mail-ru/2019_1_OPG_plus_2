@@ -98,12 +98,14 @@ var UserRemovedAnswer = MessageAnswer{
 
 /* USERS ERRORS */
 
-func GetUserErrorAnswer(error string) MessageAnswer {
-	return MessageAnswer{
-		Status:  200,
-		Message: error,
-	}
-}
+// For future use
+//
+// func GetUserErrorAnswer(error string) MessageAnswer {
+// 	return MessageAnswer{
+// 		Status:  200,
+// 		Message: error,
+// 	}
+// }
 
 var NotSignedInAnswer = MessageAnswer{
 	Status:  201,

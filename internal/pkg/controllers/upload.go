@@ -1,14 +1,15 @@
 package controllers
 
 import (
-	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/db"
-	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"
-	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/util/fileStorage"
 	"net/http"
 	"net/textproto"
 	"path/filepath"
 	"strconv"
 	"strings"
+
+	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/db"
+	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"
+	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/util/fileStorage"
 )
 
 const mByte = 1 << 20

@@ -2,6 +2,7 @@ package user
 
 import (
 	"database/sql"
+
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/auth"
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/db"
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"

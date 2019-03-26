@@ -4,12 +4,14 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"
-	"github.com/gorilla/mux"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
 	"testing"
+
+	"github.com/gorilla/mux"
+
+	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"
 )
 
 var mockedStorageAdapter = newMockStorageAdapter()
@@ -49,31 +51,31 @@ func testInitial(tCase TestCase) (*httptest.ResponseRecorder, *http.Request) {
 	return w, req
 }
 
-//func testLog(t *testing.T, tCase TestCase) {
-//	if !t.Failed() {
-//		t.Logf("\nPASSED TEST:\n"+
-//			"\tURL:\t\t%v\n"+
-//			"\tAUTH:\t\t%v\n"+
-//			"\tMETHOD:\t\t%v\n"+
-//			"\tJWT:\t\t%v\n"+
-//			"\tMUXVARS:\t%v\n"+
-//			"\tBODY:\t\t%v\n"+
-//			"\n"+
-//			"\tEXP_STATUS:\t\t%v\n"+
-//			"\tEXP_BODY:\t\t%v\n",
+// func testLog(t *testing.T, tCase TestCase) {
+// 	if !t.Failed() {
+// 		t.Logf("\nPASSED TEST:\n"+
+// 			"\tURL:\t\t%v\n"+
+// 			"\tAUTH:\t\t%v\n"+
+// 			"\tMETHOD:\t\t%v\n"+
+// 			"\tJWT:\t\t%v\n"+
+// 			"\tMUXVARS:\t%v\n"+
+// 			"\tBODY:\t\t%v\n"+
+// 			"\n"+
+// 			"\tEXP_STATUS:\t\t%v\n"+
+// 			"\tEXP_BODY:\t\t%v\n",
 //
-//			tCase.params.url,
-//			tCase.params.isAuth,
-//			tCase.params.method,
-//			tCase.params.jwt,
-//			tCase.params.muxVars,
-//			tCase.inputMessage,
+// 			tCase.params.url,
+// 			tCase.params.isAuth,
+// 			tCase.params.method,
+// 			tCase.params.jwt,
+// 			tCase.params.muxVars,
+// 			tCase.inputMessage,
 //
-//			tCase.expStatus,
-//			tCase.expMessage,
-//		)
-//	}
-//}
+// 			tCase.expStatus,
+// 			tCase.expMessage,
+// 		)
+// 	}
+// }
 
 /*************************
  *  GET_USER CONTROLLER  *
@@ -116,7 +118,7 @@ func TestGetUserSelf(t *testing.T) {
 			t.Errorf("Wrong Body:\n\tGot: %v\n\tExpected: %v\n", retMessage, tCase.expMessage)
 		}
 
-		//testLog(t, tCase)
+		// testLog(t, tCase)
 	}
 }
 
@@ -158,7 +160,7 @@ func TestGetUserId(t *testing.T) {
 			t.Errorf("Wrong Body:\n\tGot: %v\n\tExpected: %v\n", retMessage, tCase.expMessage)
 		}
 
-		//testLog(t, tCase)
+		// testLog(t, tCase)
 	}
 }
 
@@ -199,7 +201,7 @@ func TestGetUserIdNotExists(t *testing.T) {
 			t.Errorf("Wrong Body:\n\tGot: %v\n\tExpected: %v\n", retMessage, tCase.expMessage)
 		}
 
-		//testLog(t, tCase)
+		// testLog(t, tCase)
 	}
 }
 
@@ -236,7 +238,7 @@ func TestGetUserNoAuth(t *testing.T) {
 			t.Errorf("Wrong Body:\n\tGot: %v\n\tExpected: %v\n", retMessage, tCase.expMessage)
 		}
 
-		//testLog(t, tCase)
+		// testLog(t, tCase)
 	}
 }
 
@@ -277,7 +279,7 @@ func TestGetUserIdNotNumber(t *testing.T) {
 			t.Errorf("Wrong Body:\n\tGot: %v\n\tExpected: %v\n", retMessage, tCase.expMessage)
 		}
 
-		//testLog(t, tCase)
+		// testLog(t, tCase)
 	}
 }
 
@@ -341,7 +343,7 @@ func TestUpdateUserCorrect(t *testing.T) {
 			t.Errorf("Data did not actually update")
 		}
 
-		//testLog(t, tCase)
+		// testLog(t, tCase)
 	}
 }
 
@@ -378,7 +380,7 @@ func TestUpdateUserNoAuth(t *testing.T) {
 			t.Errorf("Wrong Body:\n\tGot: %v\n\tExpected: %v\n", retMessage, tCase.expMessage)
 		}
 
-		//testLog(t, tCase)
+		// testLog(t, tCase)
 	}
 }
 
@@ -459,7 +461,7 @@ func TestUpdateUserInvalidField(t *testing.T) {
 			t.Errorf("Wrong Body:\n\tGot: %v\n\tExpected: %v\n", retMessage, tCase.expMessage)
 		}
 
-		//testLog(t, tCase)
+		// testLog(t, tCase)
 	}
 }
 
@@ -481,7 +483,7 @@ func TestUpdateUserInvalidJSON(t *testing.T) {
 			},
 
 			expStatus:    500,
-			inputMessage: []byte(`{"email": "qwerty@mail.com","user": "qwerty"`), //no closing parentheses in JSON
+			inputMessage: []byte(`{"email": "qwerty@mail.com","user": "qwerty"`), // no closing parentheses in JSON
 
 			expMessage: models.IncorrectJsonAnswer,
 		},
@@ -500,7 +502,7 @@ func TestUpdateUserInvalidJSON(t *testing.T) {
 			t.Errorf("Wrong Body:\n\tGot: %v\n\tExpected: %v\n", retMessage, tCase.expMessage)
 		}
 
-		//testLog(t, tCase)
+		// testLog(t, tCase)
 	}
 }
 
@@ -552,8 +554,8 @@ func TestRemoveUserCorrect(t *testing.T) {
 	}
 }
 
-//since this moment i would use another user as a client for testing
-//because in previous test user 1 has been deleted successfully
+// since this moment i would use another user as a client for testing
+// because in previous test user 1 has been deleted successfully
 
 func TestRemoveUserNoAuth(t *testing.T) {
 	tCases := []TestCase{

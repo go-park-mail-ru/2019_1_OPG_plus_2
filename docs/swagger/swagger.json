@@ -1,7 +1,11 @@
 {
     "info": {
         "contact": {},
-        "license": {}
+        "license": {
+            "name": ""
+        },
+        "title": "",
+        "version": ""
     },
     "paths": {
         "/avatar": {
@@ -395,7 +399,8 @@
                         "type": "integer",
                         "description": "ProfileData ID, if none, returned logged in user",
                         "name": "id",
-                        "in": "path"
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -648,5 +653,6 @@
                 }
             }
         }
-    }
+    },
+    "swagger": "2.0"
 }
