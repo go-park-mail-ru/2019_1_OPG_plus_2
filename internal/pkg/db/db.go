@@ -76,16 +76,18 @@ func findRowBy(dbName string, tableName string, cols string, where string, args 
 	return QueryRow("SELECT "+cols+" FROM "+dbName+"."+tableName+" WHERE "+where, args...)
 }
 
-func findRowsBy(dbName string, tableName string, cols string, where string, args ...interface{}) (*sql.Rows, error) {
-	if dbObj == nil {
-		return nil, fmt.Errorf("db wasn't initialized")
-	}
-
-	if where == "" {
-		where = "1"
-	}
-	return Query("SELECT "+cols+" FROM "+dbName+"."+tableName+" WHERE "+where, args...)
-}
+// For future use
+//
+//func findRowsBy(dbName string, tableName string, cols string, where string, args ...interface{}) (*sql.Rows, error) {
+//	if dbObj == nil {
+//		return nil, fmt.Errorf("db wasn't initialized")
+//	}
+//
+//	if where == "" {
+//		where = "1"
+//	}
+//	return Query("SELECT "+cols+" FROM "+dbName+"."+tableName+" WHERE "+where, args...)
+//}
 
 func updateBy(dbName string, tableName string, set string, where string, args ...interface{}) (int64, error) {
 	if dbObj == nil {
