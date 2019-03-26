@@ -99,11 +99,7 @@ func TestGetUserSelf(t *testing.T) {
 			expStatus:    200,
 			inputMessage: nil,
 
-			expMessage: models.UserDataAnswer{
-				Status:  105,
-				Message: "user found",
-				Data:    userToFind,
-			},
+			expMessage: models.GetUserDataAnswer(userToFind),
 		},
 	}
 
@@ -112,12 +108,12 @@ func TestGetUserSelf(t *testing.T) {
 		tCase.handler(w, req)
 
 		if w.Code != tCase.expStatus {
-			t.Errorf("Wrong Status:\n\tGot %d\n\tExpected %d\n", w.Code, tCase.expStatus)
+			t.Errorf("Wrong Status:\n\tGot: %d\n\tExpected: %d\n", w.Code, tCase.expStatus)
 		}
 		var retMessage models.UserDataAnswer
 		_ = json.NewDecoder(w.Body).Decode(&retMessage)
 		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
-			t.Errorf("Wrong body\n%v\n%v", retMessage, tCase.expMessage)
+			t.Errorf("Wrong Body:\n\tGot: %v\n\tExpected: %v\n", retMessage, tCase.expMessage)
 		}
 
 		//testLog(t, tCase)
@@ -145,11 +141,7 @@ func TestGetUserId(t *testing.T) {
 			expStatus:    200,
 			inputMessage: nil,
 
-			expMessage: models.UserDataAnswer{
-				Status:  105,
-				Message: "user found",
-				Data:    userToFind,
-			},
+			expMessage: models.GetUserDataAnswer(userToFind),
 		},
 	}
 
@@ -158,12 +150,12 @@ func TestGetUserId(t *testing.T) {
 		tCase.handler(w, req)
 
 		if w.Code != tCase.expStatus {
-			t.Errorf("Wrong Status:\n\tGot %d\n\tExpected %d\n", w.Code, tCase.expStatus)
+			t.Errorf("Wrong Status:\n\tGot: %d\n\tExpected: %d\n", w.Code, tCase.expStatus)
 		}
 		var retMessage models.UserDataAnswer
 		_ = json.NewDecoder(w.Body).Decode(&retMessage)
 		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
-			t.Errorf("Wrong body\nGOT:\t%v\nEXP:\t%v", retMessage, tCase.expMessage)
+			t.Errorf("Wrong Body:\n\tGot: %v\n\tExpected: %v\n", retMessage, tCase.expMessage)
 		}
 
 		//testLog(t, tCase)
@@ -199,12 +191,12 @@ func TestGetUserIdNotExists(t *testing.T) {
 		tCase.handler(w, req)
 
 		if w.Code != tCase.expStatus {
-			t.Errorf("Wrong Status:\n\tGot %d\n\tExpected %d\n", w.Code, tCase.expStatus)
+			t.Errorf("Wrong Status:\n\tGot: %d\n\tExpected: %d\n", w.Code, tCase.expStatus)
 		}
 		var retMessage models.MessageAnswer
 		_ = json.NewDecoder(w.Body).Decode(&retMessage)
 		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
-			t.Errorf("Wrong body\nGOT:\t%v\nEXP:\t%v", retMessage, tCase.expMessage)
+			t.Errorf("Wrong Body:\n\tGot: %v\n\tExpected: %v\n", retMessage, tCase.expMessage)
 		}
 
 		//testLog(t, tCase)
@@ -236,12 +228,12 @@ func TestGetUserNoAuth(t *testing.T) {
 		tCase.handler(w, req)
 
 		if w.Code != tCase.expStatus {
-			t.Errorf("Wrong Status:\n\tGot %d\n\tExpected %d\n", w.Code, tCase.expStatus)
+			t.Errorf("Wrong Status:\n\tGot: %d\n\tExpected: %d\n", w.Code, tCase.expStatus)
 		}
 		var retMessage models.IncorrectFieldsAnswer
 		_ = json.NewDecoder(w.Body).Decode(&retMessage)
 		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
-			t.Errorf("Wrong body\n%v\n%v", retMessage, tCase.expMessage)
+			t.Errorf("Wrong Body:\n\tGot: %v\n\tExpected: %v\n", retMessage, tCase.expMessage)
 		}
 
 		//testLog(t, tCase)
@@ -277,12 +269,12 @@ func TestGetUserIdNotNumber(t *testing.T) {
 		tCase.handler(w, req)
 
 		if w.Code != tCase.expStatus {
-			t.Errorf("Wrong Status:\n\tGot %d\n\tExpected %d\n", w.Code, tCase.expStatus)
+			t.Errorf("Wrong Status:\n\tGot: %d\n\tExpected: %d\n", w.Code, tCase.expStatus)
 		}
 		var retMessage models.IncorrectFieldsAnswer
 		_ = json.NewDecoder(w.Body).Decode(&retMessage)
 		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
-			t.Errorf("Wrong body\nGOT:\t%v\nEXP:\t%v", retMessage, tCase.expMessage)
+			t.Errorf("Wrong Body:\n\tGot: %v\n\tExpected: %v\n", retMessage, tCase.expMessage)
 		}
 
 		//testLog(t, tCase)
@@ -321,12 +313,12 @@ func TestUpdateUserCorrect(t *testing.T) {
 		tCase.handler(w, req)
 
 		if w.Code != tCase.expStatus {
-			t.Errorf("Wrong Status:\n\tGot %d\n\tExpected %d\n", w.Code, tCase.expStatus)
+			t.Errorf("Wrong Status:\n\tGot: %d\n\tExpected: %d\n", w.Code, tCase.expStatus)
 		}
 		var retMessage models.MessageAnswer
 		_ = json.NewDecoder(w.Body).Decode(&retMessage)
 		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
-			t.Errorf("Wrong body\nGOT:\t%v\nEXP:\t%v", retMessage, tCase.expMessage)
+			t.Errorf("Wrong Body:\n\tGot: %v\n\tExpected: %v\n", retMessage, tCase.expMessage)
 		}
 
 		newUserData, err := mockedStorageAdapter.GetUser(tCase.params.jwt.Id)
@@ -378,12 +370,12 @@ func TestUpdateUserNoAuth(t *testing.T) {
 		tCase.handler(w, req)
 
 		if w.Code != tCase.expStatus {
-			t.Errorf("Wrong Status:\n\tGot %d\n\tExpected %d\n", w.Code, tCase.expStatus)
+			t.Errorf("Wrong Status:\n\tGot: %d\n\tExpected: %d\n", w.Code, tCase.expStatus)
 		}
 		var retMessage models.MessageAnswer
 		_ = json.NewDecoder(w.Body).Decode(&retMessage)
 		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
-			t.Errorf("Wrong body\nGOT:\t%v\nEXP:\t%v", retMessage, tCase.expMessage)
+			t.Errorf("Wrong Body:\n\tGot: %v\n\tExpected: %v\n", retMessage, tCase.expMessage)
 		}
 
 		//testLog(t, tCase)
@@ -459,12 +451,12 @@ func TestUpdateUserInvalidField(t *testing.T) {
 		tCase.handler(w, req)
 
 		if w.Code != tCase.expStatus {
-			t.Errorf("Wrong Status:\n\tGot %d\n\tExpected %d\n", w.Code, tCase.expStatus)
+			t.Errorf("Wrong Status:\n\tGot: %d\n\tExpected: %d\n", w.Code, tCase.expStatus)
 		}
 		var retMessage models.IncorrectFieldsAnswer
 		_ = json.NewDecoder(w.Body).Decode(&retMessage)
 		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
-			t.Errorf("Wrong body\nGOT:\t%v\nEXP:\t%v", retMessage, tCase.expMessage)
+			t.Errorf("Wrong Body:\n\tGot: %v\n\tExpected: %v\n", retMessage, tCase.expMessage)
 		}
 
 		//testLog(t, tCase)
@@ -500,12 +492,12 @@ func TestUpdateUserInvalidJSON(t *testing.T) {
 		tCase.handler(w, req)
 
 		if w.Code != tCase.expStatus {
-			t.Errorf("Wrong Status:\n\tGot %d\n\tExpected %d\n", w.Code, tCase.expStatus)
+			t.Errorf("Wrong Status:\n\tGot: %d\n\tExpected: %d\n", w.Code, tCase.expStatus)
 		}
 		var retMessage models.MessageAnswer
 		_ = json.NewDecoder(w.Body).Decode(&retMessage)
 		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
-			t.Errorf("Wrong body\nGOT:\t%v\nEXP:\t%v", retMessage, tCase.expMessage)
+			t.Errorf("Wrong Body:\n\tGot: %v\n\tExpected: %v\n", retMessage, tCase.expMessage)
 		}
 
 		//testLog(t, tCase)
@@ -545,12 +537,12 @@ func TestRemoveUserCorrect(t *testing.T) {
 		tCase.handler(w, req)
 
 		if w.Code != tCase.expStatus {
-			t.Errorf("Wrong Status:\n\tGot %d\n\tExpected %d\n", w.Code, tCase.expStatus)
+			t.Errorf("Wrong Status:\n\tGot: %d\n\tExpected: %d\n", w.Code, tCase.expStatus)
 		}
 		var retMessage models.MessageAnswer
 		_ = json.NewDecoder(w.Body).Decode(&retMessage)
 		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
-			t.Errorf("Wrong body\nGOT:\t%v\nEXP:\t%v", retMessage, tCase.expMessage)
+			t.Errorf("Wrong Body:\n\tGot: %v\n\tExpected: %v\n", retMessage, tCase.expMessage)
 		}
 
 		_, err := mockedStorageAdapter.GetUser(tCase.params.jwt.Id)
@@ -588,12 +580,12 @@ func TestRemoveUserNoAuth(t *testing.T) {
 		tCase.handler(w, req)
 
 		if w.Code != tCase.expStatus {
-			t.Errorf("Wrong Status:\n\tGot %d\n\tExpected %d\n", w.Code, tCase.expStatus)
+			t.Errorf("Wrong Status:\n\tGot: %d\n\tExpected: %d\n", w.Code, tCase.expStatus)
 		}
 		var retMessage models.MessageAnswer
 		_ = json.NewDecoder(w.Body).Decode(&retMessage)
 		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
-			t.Errorf("Wrong body\nGOT:\t%v\nEXP:\t%v", retMessage, tCase.expMessage)
+			t.Errorf("Wrong Body:\n\tGot: %v\n\tExpected: %v\n", retMessage, tCase.expMessage)
 		}
 	}
 }
@@ -627,12 +619,12 @@ func TestRemoveUserInvalidJSON(t *testing.T) {
 		tCase.handler(w, req)
 
 		if w.Code != tCase.expStatus {
-			t.Errorf("Wrong Status:\n\tGot %d\n\tExpected %d\n", w.Code, tCase.expStatus)
+			t.Errorf("Wrong Status:\n\tGot: %d\n\tExpected: %d\n", w.Code, tCase.expStatus)
 		}
 		var retMessage models.MessageAnswer
 		_ = json.NewDecoder(w.Body).Decode(&retMessage)
 		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
-			t.Errorf("Wrong body\nGOT:\t%v\nEXP:\t%v", retMessage, tCase.expMessage)
+			t.Errorf("Wrong Body:\n\tGot: %v\n\tExpected: %v\n", retMessage, tCase.expMessage)
 		}
 	}
 }
@@ -666,12 +658,12 @@ func TestRemoveUserInvalidData(t *testing.T) {
 		tCase.handler(w, req)
 
 		if w.Code != tCase.expStatus {
-			t.Errorf("Wrong Status:\n\tGot %d\n\tExpected %d\n", w.Code, tCase.expStatus)
+			t.Errorf("Wrong Status:\n\tGot: %d\n\tExpected: %d\n", w.Code, tCase.expStatus)
 		}
 		var retMessage models.IncorrectFieldsAnswer
 		_ = json.NewDecoder(w.Body).Decode(&retMessage)
 		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
-			t.Errorf("Wrong body\nGOT:\t%v\nEXP:\t%v", retMessage, tCase.expMessage)
+			t.Errorf("Wrong Body:\n\tGot: %v\n\tExpected: %v\n", retMessage, tCase.expMessage)
 		}
 
 		_, err := mockedStorageAdapter.GetUser(tCase.params.jwt.Id)
