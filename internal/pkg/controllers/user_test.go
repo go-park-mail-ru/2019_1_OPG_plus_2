@@ -15,7 +15,7 @@ import (
 var mockedStorageAdapter = newMockStorageAdapter()
 var mockedUserHandlers = NewUserHandlers(mockedStorageAdapter)
 
-type testParams struct {
+type TestParams struct {
 	isAuth  bool
 	muxVars map[string]string
 	jwt     models.JwtData
@@ -23,15 +23,15 @@ type testParams struct {
 	url     string
 }
 
-type testCase struct {
+type TestCase struct {
 	handler      http.HandlerFunc
-	params       testParams
+	params       TestParams
 	inputMessage json.RawMessage
 	expStatus    int
 	expMessage   interface{}
 }
 
-func testInitial(tCase testCase) (*httptest.ResponseRecorder, *http.Request) {
+func testInitial(tCase TestCase) (*httptest.ResponseRecorder, *http.Request) {
 	testParams := tCase.params
 	url := baseUrl + testParams.url
 	req := httptest.NewRequest(testParams.method, url, bytes.NewReader(tCase.inputMessage))
@@ -49,42 +49,42 @@ func testInitial(tCase testCase) (*httptest.ResponseRecorder, *http.Request) {
 	return w, req
 }
 
-func testLog(t *testing.T, tCase testCase) {
-	if !t.Failed() {
-		t.Logf("\nPASSED TEST:\n"+
-			"\tURL:\t\t%v\n"+
-			"\tAUTH:\t\t%v\n"+
-			"\tMETHOD:\t\t%v\n"+
-			"\tJWT:\t\t%v\n"+
-			"\tMUXVARS:\t%v\n"+
-			"\tBODY:\t\t%v\n"+
-			"\n"+
-			"\tEXP_STATUS:\t\t%v\n"+
-			"\tEXP_BODY:\t\t%v\n",
-
-			tCase.params.url,
-			tCase.params.isAuth,
-			tCase.params.method,
-			tCase.params.jwt,
-			tCase.params.muxVars,
-			tCase.inputMessage,
-
-			tCase.expStatus,
-			tCase.expMessage,
-		)
-	}
-}
+//func testLog(t *testing.T, tCase TestCase) {
+//	if !t.Failed() {
+//		t.Logf("\nPASSED TEST:\n"+
+//			"\tURL:\t\t%v\n"+
+//			"\tAUTH:\t\t%v\n"+
+//			"\tMETHOD:\t\t%v\n"+
+//			"\tJWT:\t\t%v\n"+
+//			"\tMUXVARS:\t%v\n"+
+//			"\tBODY:\t\t%v\n"+
+//			"\n"+
+//			"\tEXP_STATUS:\t\t%v\n"+
+//			"\tEXP_BODY:\t\t%v\n",
+//
+//			tCase.params.url,
+//			tCase.params.isAuth,
+//			tCase.params.method,
+//			tCase.params.jwt,
+//			tCase.params.muxVars,
+//			tCase.inputMessage,
+//
+//			tCase.expStatus,
+//			tCase.expMessage,
+//		)
+//	}
+//}
 
 /*************************
  *  GET_USER CONTROLLER  *
  *************************/
 func TestGetUserSelf(t *testing.T) {
 	userToFind, _ := mockedStorageAdapter.GetUser(1)
-	tCases := []testCase{
+	tCases := []TestCase{
 		{
 			handler: mockedUserHandlers.GetUser,
 
-			params: testParams{
+			params: TestParams{
 				muxVars: map[string]string{},
 				method:  "GET",
 				isAuth:  true,
@@ -126,11 +126,11 @@ func TestGetUserSelf(t *testing.T) {
 
 func TestGetUserId(t *testing.T) {
 	userToFind, _ := mockedStorageAdapter.GetUser(3)
-	tCases := []testCase{
+	tCases := []TestCase{
 		{
 			handler: mockedUserHandlers.GetUser,
 
-			params: testParams{
+			params: TestParams{
 				muxVars: map[string]string{"id": "3"},
 				method:  "GET",
 				isAuth:  true,
@@ -171,11 +171,11 @@ func TestGetUserId(t *testing.T) {
 }
 
 func TestGetUserIdNotExists(t *testing.T) {
-	tCases := []testCase{
+	tCases := []TestCase{
 		{
 			handler: mockedUserHandlers.GetUser,
 
-			params: testParams{
+			params: TestParams{
 				muxVars: map[string]string{"id": "1278"},
 				method:  "GET",
 				isAuth:  true,
@@ -212,11 +212,11 @@ func TestGetUserIdNotExists(t *testing.T) {
 }
 
 func TestGetUserNoAuth(t *testing.T) {
-	tCases := []testCase{
+	tCases := []TestCase{
 		{
 			handler: mockedUserHandlers.GetUser,
 
-			params: testParams{
+			params: TestParams{
 				muxVars: map[string]string{},
 				method:  "GET",
 				isAuth:  false,
@@ -249,11 +249,11 @@ func TestGetUserNoAuth(t *testing.T) {
 }
 
 func TestGetUserIdNotNumber(t *testing.T) {
-	tCases := []testCase{
+	tCases := []TestCase{
 		{
 			handler: mockedUserHandlers.GetUser,
 
-			params: testParams{
+			params: TestParams{
 				muxVars: map[string]string{"id": "qwerty"},
 				method:  "GET",
 				isAuth:  true,
@@ -293,11 +293,11 @@ func TestGetUserIdNotNumber(t *testing.T) {
  *  UPDATE_USER CONTROLLER  *
  ****************************/
 func TestUpdateUserCorrect(t *testing.T) {
-	tCases := []testCase{
+	tCases := []TestCase{
 		{
 			handler: mockedUserHandlers.UpdateUser,
 
-			params: testParams{
+			params: TestParams{
 				muxVars: map[string]string{},
 				method:  "PUT",
 				isAuth:  true,
@@ -354,11 +354,11 @@ func TestUpdateUserCorrect(t *testing.T) {
 }
 
 func TestUpdateUserNoAuth(t *testing.T) {
-	tCases := []testCase{
+	tCases := []TestCase{
 		{
 			handler: mockedUserHandlers.UpdateUser,
 
-			params: testParams{
+			params: TestParams{
 				muxVars: map[string]string{},
 				method:  "PUT",
 				isAuth:  false,
@@ -391,11 +391,11 @@ func TestUpdateUserNoAuth(t *testing.T) {
 }
 
 func TestUpdateUserInvalidField(t *testing.T) {
-	tCases := []testCase{
+	tCases := []TestCase{
 		{
 			handler: mockedUserHandlers.UpdateUser,
 
-			params: testParams{
+			params: TestParams{
 				muxVars: map[string]string{},
 				method:  "PUT",
 				isAuth:  true,
@@ -415,7 +415,7 @@ func TestUpdateUserInvalidField(t *testing.T) {
 		{
 			handler: mockedUserHandlers.UpdateUser,
 
-			params: testParams{
+			params: TestParams{
 				muxVars: map[string]string{},
 				method:  "PUT",
 				isAuth:  true,
@@ -435,7 +435,7 @@ func TestUpdateUserInvalidField(t *testing.T) {
 		{
 			handler: mockedUserHandlers.UpdateUser,
 
-			params: testParams{
+			params: TestParams{
 				muxVars: map[string]string{},
 				method:  "PUT",
 				isAuth:  true,
@@ -472,11 +472,11 @@ func TestUpdateUserInvalidField(t *testing.T) {
 }
 
 func TestUpdateUserInvalidJSON(t *testing.T) {
-	tCases := []testCase{
+	tCases := []TestCase{
 		{
 			handler: mockedUserHandlers.UpdateUser,
 
-			params: testParams{
+			params: TestParams{
 				muxVars: map[string]string{},
 				method:  "PUT",
 				isAuth:  true,
@@ -517,11 +517,11 @@ func TestUpdateUserInvalidJSON(t *testing.T) {
  ****************************/
 
 func TestRemoveUserCorrect(t *testing.T) {
-	tCases := []testCase{
+	tCases := []TestCase{
 		{
 			handler: mockedUserHandlers.RemoveUser,
 
-			params: testParams{
+			params: TestParams{
 				muxVars: map[string]string{},
 				method:  "DELETE",
 				isAuth:  true,
@@ -564,11 +564,11 @@ func TestRemoveUserCorrect(t *testing.T) {
 //because in previous test user 1 has been deleted successfully
 
 func TestRemoveUserNoAuth(t *testing.T) {
-	tCases := []testCase{
+	tCases := []TestCase{
 		{
 			handler: mockedUserHandlers.RemoveUser,
 
-			params: testParams{
+			params: TestParams{
 				muxVars: map[string]string{},
 				method:  "DELETE",
 				isAuth:  false,
@@ -599,11 +599,11 @@ func TestRemoveUserNoAuth(t *testing.T) {
 }
 
 func TestRemoveUserInvalidJSON(t *testing.T) {
-	tCases := []testCase{
+	tCases := []TestCase{
 		{
 			handler: mockedUserHandlers.RemoveUser,
 
-			params: testParams{
+			params: TestParams{
 				muxVars: map[string]string{},
 				method:  "DELETE",
 				isAuth:  true,
@@ -638,11 +638,11 @@ func TestRemoveUserInvalidJSON(t *testing.T) {
 }
 
 func TestRemoveUserInvalidData(t *testing.T) {
-	tCases := []testCase{
+	tCases := []TestCase{
 		{
 			handler: mockedUserHandlers.RemoveUser,
 
-			params: testParams{
+			params: TestParams{
 				muxVars: map[string]string{},
 				method:  "DELETE",
 				isAuth:  true,
