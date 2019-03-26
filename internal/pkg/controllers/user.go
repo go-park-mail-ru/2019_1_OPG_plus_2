@@ -11,8 +11,6 @@ import (
 	"time"
 )
 
-var storageAdapter = user.NewStorageAdapter()
-
 type UserHandlers struct {
 	adapter user.IUser
 }
