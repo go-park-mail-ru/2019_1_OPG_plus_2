@@ -80,7 +80,7 @@ func (storage *mockStorageAdapter) CreateUser(signUpData models.SingUpData) (mod
 	}
 
 	newUser := models.UserData{
-		Id:       int64(len(storage.ProfileData)),
+		Id:       int64(storage.ProfileData[int64(len(storage.ProfileData))].Id + 1),
 		Username: signUpData.Username,
 		Email:    signUpData.Email,
 	}
