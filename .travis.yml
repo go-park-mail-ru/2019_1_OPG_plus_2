@@ -1,0 +1,22 @@
+sudo: false
+
+language: go
+
+go:
+  - 1.11.x
+  - master
+
+
+env:
+  - GO111MODULE=on TEST_DB=on
+
+install: true
+
+before_script:
+  - go mod tidy
+  - go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
+
+script:
+  - go build cmd/server/main.go
+  - go test -v -race ./...
+  - golangci-lint run -c .golangci.yml
