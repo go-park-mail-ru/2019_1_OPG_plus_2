@@ -1,11 +1,33 @@
 package db
 
-const host = ""
-const username = "colors"
-const password = "StrongPassword1!"
+import "os"
 
-const authDbName = "colors_auth"
-const authUsersTable = "users"
+// Docker DB params
+var host = ""
+var port = "12345"
+var username = "root"
+var password = "root"
 
-const coreDbName = "colors_core"
-const coreUsersTable = "users"
+var authDbName = "colors_auth"
+var authUsersTable = "users"
+
+var coreDbName = "colors_core"
+var coreUsersTable = "users"
+
+func init(){
+    // На реальном сервере будет переменная окружения PRODUCTION=on. Меняем параметры на параметры реальной DB.
+    if os.Getenv("PRODUCTION") == "on"{
+        host = ""
+        port = "3306"
+        username = "colors"
+        password = "StrongPassword1!"
+    } else
+    // При сборке бэка в докере будет переменная окружения IN_DOCKER=on.
+    // Контейнер бэка работает в одной с базой виртуальной сети под названием opg-net.
+    // Эту сеть необходимо предварительно создать командой `docker network create opg-net`.
+    // За это отвечает скрипт initial.sh
+    if os.Getenv("IN_DOCKER") == "on"{
+        host = "colors-db"
+        port = "3306"
+    }
+}

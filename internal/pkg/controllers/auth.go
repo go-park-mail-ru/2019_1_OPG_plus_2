@@ -2,10 +2,11 @@ package controllers
 
 import (
 	"encoding/json"
-	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/auth"
-	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"
 	"net/http"
 	"time"
+
+	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/auth"
+	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"
 )
 
 // IsAuth godoc
@@ -14,14 +15,14 @@ import (
 // @description This method checks whether user is signed in or signed out
 // @tags auth
 // @produce json
-// @success 200 {object} models.AnswerMessage
-// @failure 401 {object} models.AnswerMessage
+// @success 200 {object} models.MessageAnswer
+// @failure 401 {object} models.MessageAnswer
 // @router /session [get]
 func IsAuth(w http.ResponseWriter, r *http.Request) {
 	if isAuth(r) {
-		models.SendMessage(w, http.StatusOK, "signed in")
+		models.Send(w, http.StatusOK, models.SignedInAnswer)
 	} else {
-		models.SendMessage(w, http.StatusUnauthorized, "signed out")
+		models.Send(w, http.StatusUnauthorized, models.SignedOutAnswer)
 	}
 }
 
@@ -33,32 +34,37 @@ func IsAuth(w http.ResponseWriter, r *http.Request) {
 // @accept json
 // @produce json
 // @param credentials body models.SignInData true "Credentials"
-// @success 200 {object} models.AnswerMessage
-// @failure 401 {object} models.AnswerMessage
-// @failure 500 {object} models.AnswerMessage
+// @success 200 {object} models.MessageAnswer
+// @failure 400 {object} models.IncorrectFieldsAnswer
+// @failure 405 {object} models.MessageAnswer
+// @failure 500 {object} models.MessageAnswer
 // @router /session [post]
 func SignIn(w http.ResponseWriter, r *http.Request) {
 	if isAuth(r) {
-		models.SendMessage(w, http.StatusOK, "already signed in")
+		models.Send(w, http.StatusMethodNotAllowed, models.AlreadySignedInAnswer)
 		return
 	}
 
 	signInData := models.SignInData{}
 	err := json.NewDecoder(r.Body).Decode(&signInData)
 	if err != nil {
-		models.SendMessage(w, http.StatusInternalServerError, "incorrect JSON")
+		models.Send(w, http.StatusInternalServerError, models.IncorrectJsonAnswer)
 		return
 	}
 	defer r.Body.Close()
 
-	jwtData, err := auth.SignIn(signInData)
+	jwtData, err, fields := auth.SignIn(signInData)
 	if err != nil {
-		models.SendMessage(w, http.StatusUnauthorized, err.Error())
+		if fields != nil {
+			models.Send(w, http.StatusBadRequest, models.GetIncorrectFieldsAnswer(fields))
+			return
+		}
+		models.Send(w, http.StatusInternalServerError, models.GetDeveloperErrorAnswer(err.Error()))
 		return
 	}
 
 	http.SetCookie(w, auth.CreateAuthCookie(jwtData, 30*24*time.Hour))
-	models.SendMessage(w, http.StatusOK, "signed in")
+	models.Send(w, http.StatusOK, models.SignedInAnswer)
 }
 
 // SignOut godoc
@@ -67,25 +73,19 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 // @description This method logs user out and deletes cookie
 // @tags auth
 // @produce json
-// @success 200 {object} models.AnswerMessage
-// @failure 401 {object} models.AnswerMessage
-// @failure 500 {object} models.AnswerMessage
+// @success 200 {object} models.MessageAnswer
+// @failure 405 {object} models.MessageAnswer
 // @router /session [delete]
 func SignOut(w http.ResponseWriter, r *http.Request) {
 	if !isAuth(r) {
-		models.SendMessage(w, http.StatusOK, "already signed out")
+		models.Send(w, http.StatusMethodNotAllowed, models.AlreadySignedOutAnswer)
 		return
 	}
 
-	jwtCookie, errNoCookie := r.Cookie(auth.CookieName)
-	if errNoCookie != nil {
-		models.SendMessage(w, http.StatusOK, "already signed out")
-		return
-	}
-
-	jwtCookie.Expires = time.Unix(-1, 0)
+	jwtCookie, _ := r.Cookie(auth.CookieName)
+	jwtCookie.Expires = time.Unix(0, 0)
 	http.SetCookie(w, jwtCookie)
-	models.SendMessage(w, http.StatusOK, "signed out")
+	models.Send(w, http.StatusOK, models.SignedOutAnswer)
 }
 
 // UpdatePassword godoc
@@ -96,29 +96,34 @@ func SignOut(w http.ResponseWriter, r *http.Request) {
 // @accepts json
 // @produce json
 // @param update_data body models.UpdatePasswordData true "New password info"
-// @success 200 {object} models.AnswerMessage
-// @failure 401 {object} models.AnswerMessage
-// @failure 500 {object} models.AnswerMessage
+// @success 200 {object} models.MessageAnswer
+// @failure 400 {object} models.IncorrectFieldsAnswer
+// @failure 401 {object} models.MessageAnswer
+// @failure 500 {object} models.MessageAnswer
 // @router /password [put]
 func UpdatePassword(w http.ResponseWriter, r *http.Request) {
 	if !isAuth(r) {
-		models.SendMessage(w, http.StatusUnauthorized, "not signed in")
+		models.Send(w, http.StatusUnauthorized, models.NotSignedInAnswer)
 		return
 	}
 
 	updateData := models.UpdatePasswordData{}
 	err := json.NewDecoder(r.Body).Decode(&updateData)
 	if err != nil {
-		models.SendMessage(w, http.StatusInternalServerError, "incorrect JSON")
+		models.Send(w, http.StatusInternalServerError, models.IncorrectJsonAnswer)
 		return
 	}
 	defer r.Body.Close()
 
-	err = auth.UpdatePassword(jwtData(r).Id, updateData)
+	err, fields := auth.UpdatePassword(jwtData(r).Id, updateData)
 	if err != nil {
-		models.SendMessage(w, http.StatusInternalServerError, err.Error())
+		if fields != nil {
+			models.Send(w, http.StatusBadRequest, models.GetIncorrectFieldsAnswer(fields))
+			return
+		}
+		models.Send(w, http.StatusInternalServerError, models.GetDeveloperErrorAnswer(err.Error()))
 		return
 	}
 
-	models.SendMessage(w, http.StatusOK, "password updated")
+	models.Send(w, http.StatusOK, models.PasswordUpdatedAnswer)
 }
