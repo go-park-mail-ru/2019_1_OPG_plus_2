@@ -1,7 +1,13 @@
 package controllers
 
 import (
+	"bytes"
+	"context"
+	"encoding/json"
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"
+	"github.com/gorilla/mux"
+	"net/http"
+	"net/http/httptest"
 )
 
 var baseUrl = "localhost:8002/api"
@@ -148,4 +154,38 @@ func (storage *mockStorageAdapter) RemoveUser(id int64, removeData models.Remove
 	delete(storage.ProfileData, id)
 	delete(storage.AuthData, id)
 	return nil, nil
+}
+
+type TestParams struct {
+	isAuth  bool
+	muxVars map[string]string
+	jwt     models.JwtData
+	method  string
+	url     string
+}
+
+type TestCase struct {
+	handler      http.HandlerFunc
+	params       TestParams
+	inputMessage json.RawMessage
+	expStatus    int
+	expMessage   interface{}
+}
+
+func testInitial(tCase TestCase) (*httptest.ResponseRecorder, *http.Request) {
+	testParams := tCase.params
+	url := baseUrl + testParams.url
+	req := httptest.NewRequest(testParams.method, url, bytes.NewReader(tCase.inputMessage))
+	w := httptest.NewRecorder()
+	ctx := req.Context()
+
+	data := testParams.jwt
+	ctx = context.WithValue(ctx, "isAuth", testParams.isAuth)
+	ctx = context.WithValue(ctx, "jwtData", data)
+
+	req = req.WithContext(ctx)
+
+	req = mux.SetURLVars(req, tCase.params.muxVars)
+
+	return w, req
 }
