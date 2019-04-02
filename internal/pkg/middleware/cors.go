@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -19,7 +20,8 @@ type CorsData struct {
 var corsData = CorsData{
 	AllowOrigins: []string{
 		"https://colors.hackallcode.ru",
-		"https://api.colors.hackallcode.ru",
+		"http://localhost:8001",
+		"http://127.0.0.1:8001",
 	},
 	AllowMethods: []string{
 		"GET",
@@ -36,11 +38,23 @@ var corsData = CorsData{
 
 func CorsMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
-		val, ok := req.Header["Origin"]
-		if ok {
-			res.Header().Set("Access-Control-Allow-Origin", val[0])
-			res.Header().Set("Access-Control-Allow-Credentials", "true")
+		origin, hasOrigin := req.Header["Origin"]
+		if hasOrigin {
+			found := false
+			for _, allowed := range corsData.AllowOrigins {
+				if origin[0] == allowed {
+					found = true
+					break
+				}
+			}
+			if found {
+				res.Header().Set("Access-Control-Allow-Origin", origin[0])
+				res.Header().Set("Access-Control-Allow-Credentials", strconv.FormatBool(corsData.AllowCredentials))
+			} else {
+				fmt.Println("Origin " + origin[0] + " wasn't found!")
+			}
 		}
+
 		if req.Method == "OPTIONS" {
 			res.Header().Set("Access-Control-Allow-Methods", strings.Join(corsData.AllowMethods, ", "))
 			res.Header().Set("Access-Control-Allow-Headers", strings.Join(corsData.AllowHeaders, ", "))
@@ -48,13 +62,6 @@ func CorsMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		next.ServeHTTP(res, req)
-	})
-}
-
-func ApplyJsonContentType(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
-		res.Header().Set("Content-Type", "application/json; charset=utf-8")
 		next.ServeHTTP(res, req)
 	})
 }

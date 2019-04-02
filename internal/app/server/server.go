@@ -2,13 +2,16 @@ package server
 
 import (
 	"fmt"
+	"net/http"
+
+	"github.com/gorilla/mux"
+	"github.com/swaggo/http-swagger"
+
 	_ "github.com/go-park-mail-ru/2019_1_OPG_plus_2/docs"
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/controllers"
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/db"
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/middleware"
-	"github.com/gorilla/mux"
-	"github.com/swaggo/http-swagger"
-	"net/http"
+	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/user"
 )
 
 type Params struct {
@@ -22,10 +25,13 @@ func StartApp(params Params) error {
 		fmt.Println(err.Error())
 	}
 
+	userHandlers := controllers.NewUserHandlers(user.NewStorageAdapter())
+
 	router := mux.NewRouter()
 	apiRouter := router.PathPrefix("/api").Subrouter()
 
 	router.Use(middleware.CorsMiddleware)
+	router.Use(middleware.PanicMiddleware)
 
 	router.HandleFunc("/", controllers.MainHandler)
 	router.PathPrefix("/docs").Handler(httpSwagger.WrapHandler)
@@ -40,20 +46,19 @@ func StartApp(params Params) error {
 	apiRouter.HandleFunc("/session", controllers.SignOut).Methods("DELETE", "OPTIONS")
 	apiRouter.HandleFunc("/password", controllers.UpdatePassword).Methods("PUT", "OPTIONS")
 
-	apiRouter.HandleFunc("/user", controllers.GetUser).Methods("GET", "OPTIONS")
-	apiRouter.HandleFunc("/user/{id:[0-9]+}", controllers.GetUser).Methods("GET", "OPTIONS")
-	apiRouter.HandleFunc("/user", controllers.CreateUser).Methods("POST", "OPTIONS")
-	apiRouter.HandleFunc("/user", controllers.UpdateUser).Methods("PUT", "OPTIONS")
-	apiRouter.HandleFunc("/user", controllers.RemoveUser).Methods("DELETE", "OPTIONS")
+	apiRouter.HandleFunc("/user", userHandlers.GetUser).Methods("GET", "OPTIONS")
+	apiRouter.HandleFunc("/user/{id:[0-9]+}", userHandlers.GetUser).Methods("GET", "OPTIONS")
+	apiRouter.HandleFunc("/user", userHandlers.CreateUser).Methods("POST", "OPTIONS")
+	apiRouter.HandleFunc("/user", userHandlers.UpdateUser).Methods("PUT", "OPTIONS")
+	apiRouter.HandleFunc("/user", userHandlers.RemoveUser).Methods("DELETE", "OPTIONS")
 	apiRouter.HandleFunc("/avatar", controllers.UploadAvatar).Methods("POST", "OPTIONS")
 
 	apiRouter.HandleFunc("/users", controllers.GetScoreboard).Methods("GET", "OPTIONS")
 
-	staticHandler := http.StripPrefix(
+	router.PathPrefix("/static").Handler(http.StripPrefix(
 		"/static",
 		http.FileServer(http.Dir(controllers.StaticPath)),
-	)
-	router.PathPrefix("/static").Handler(staticHandler)
+	))
 
 	return http.ListenAndServe(":"+params.Port, router)
 }
