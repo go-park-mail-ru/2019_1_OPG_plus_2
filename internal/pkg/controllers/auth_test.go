@@ -43,7 +43,7 @@ func TestIsAuth(t *testing.T) {
 			expMessage: models.SignedInAnswer,
 		},
 		{
-			handler: a.GetHandlers().Auth.SignIn,
+			handler: a.GetHandlers().Auth.IsAuth,
 
 			params: TestParams{
 				muxVars: map[string]string{},
@@ -56,7 +56,7 @@ func TestIsAuth(t *testing.T) {
 			expStatus:    http.StatusUnauthorized,
 			inputMessage: nil,
 
-			expMessage: models.NotSignedInAnswer,
+			expMessage: models.SignedOutAnswer,
 		},
 	}
 
