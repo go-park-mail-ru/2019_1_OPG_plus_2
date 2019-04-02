@@ -31,7 +31,13 @@ func CheckJwt(token string) (models.JwtData, error) {
 	return data, err
 }
 
-func SignUp(signUpData models.SingUpData) (models.JwtData, error, []string) {
+func NewStorage() *Storage {
+	return &Storage{}
+}
+
+type Storage struct{}
+
+func (*Storage) SignUp(signUpData models.SingUpData) (models.JwtData, error, []string) {
 	incorrectFields := signUpData.Check()
 	if len(incorrectFields) > 0 {
 		return models.JwtData{}, models.FieldsError, incorrectFields
@@ -55,7 +61,7 @@ func SignUp(signUpData models.SingUpData) (models.JwtData, error, []string) {
 	}, nil, nil
 }
 
-func SignIn(signInData models.SignInData) (data models.JwtData, err error, incorrectFields []string) {
+func (*Storage) SignIn(signInData models.SignInData) (data models.JwtData, err error, incorrectFields []string) {
 	var userData db.AuthData
 	passHash := fmt.Sprintf("%x", sha256.Sum256([]byte(signInData.Password)))
 
@@ -92,7 +98,7 @@ func SignIn(signInData models.SignInData) (data models.JwtData, err error, incor
 	}, nil, nil
 }
 
-func UpdatePassword(id int64, passwordData models.UpdatePasswordData) (error, []string) {
+func (*Storage) UpdatePassword(id int64, passwordData models.UpdatePasswordData) (error, []string) {
 	incorrectFields := passwordData.Check()
 	if len(incorrectFields) > 0 {
 		return models.FieldsError, incorrectFields
@@ -102,7 +108,7 @@ func UpdatePassword(id int64, passwordData models.UpdatePasswordData) (error, []
 	return db.AuthUpdatePassword(id, passHash), nil
 }
 
-func UpdateAuth(id int64, userData models.UpdateUserData) (models.JwtData, error, []string) {
+func (*Storage) UpdateAuth(id int64, userData models.UpdateUserData) (models.JwtData, error, []string) {
 	incorrectFields := userData.Check()
 	if len(incorrectFields) > 0 {
 		return models.JwtData{}, models.FieldsError, incorrectFields
@@ -124,7 +130,7 @@ func UpdateAuth(id int64, userData models.UpdateUserData) (models.JwtData, error
 	}, nil, nil
 }
 
-func RemoveAuth(id int64, removeData models.RemoveUserData) (error, []string) {
+func (*Storage) RemoveAuth(id int64, removeData models.RemoveUserData) (error, []string) {
 	incorrectFields := removeData.Check()
 	if len(incorrectFields) > 0 {
 		return models.FieldsError, incorrectFields

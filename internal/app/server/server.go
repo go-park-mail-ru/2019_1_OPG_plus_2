@@ -8,6 +8,8 @@ import (
 	"github.com/swaggo/http-swagger"
 
 	_ "github.com/go-park-mail-ru/2019_1_OPG_plus_2/docs"
+	a "github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/adapters"
+	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/auth"
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/controllers"
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/db"
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/middleware"
@@ -25,7 +27,8 @@ func StartApp(params Params) error {
 		fmt.Println(err.Error())
 	}
 
-	userHandlers := controllers.NewUserHandlers(user.NewStorageAdapter())
+	a.SetStorages(user.NewStorage(), auth.NewStorage())
+	a.SetHandlers(controllers.NewUserHandlers(), controllers.NewAuthHandlers())
 
 	router := mux.NewRouter()
 	apiRouter := router.PathPrefix("/api").Subrouter()
@@ -41,16 +44,17 @@ func StartApp(params Params) error {
 
 	apiRouter.HandleFunc("/", controllers.IndexApiHandler)
 
-	apiRouter.HandleFunc("/session", controllers.IsAuth).Methods("GET", "OPTIONS")
-	apiRouter.HandleFunc("/session", controllers.SignIn).Methods("POST", "OPTIONS")
-	apiRouter.HandleFunc("/session", controllers.SignOut).Methods("DELETE", "OPTIONS")
-	apiRouter.HandleFunc("/password", controllers.UpdatePassword).Methods("PUT", "OPTIONS")
+	apiRouter.HandleFunc("/session", a.GetHandlers().Auth.IsAuth).Methods("GET", "OPTIONS")
+	apiRouter.HandleFunc("/session", a.GetHandlers().Auth.SignIn).Methods("POST", "OPTIONS")
+	apiRouter.HandleFunc("/session", a.GetHandlers().Auth.SignOut).Methods("DELETE", "OPTIONS")
+	apiRouter.HandleFunc("/password", a.GetHandlers().Auth.UpdatePassword).Methods("PUT", "OPTIONS")
 
-	apiRouter.HandleFunc("/user", userHandlers.GetUser).Methods("GET", "OPTIONS")
-	apiRouter.HandleFunc("/user/{id:[0-9]+}", userHandlers.GetUser).Methods("GET", "OPTIONS")
-	apiRouter.HandleFunc("/user", userHandlers.CreateUser).Methods("POST", "OPTIONS")
-	apiRouter.HandleFunc("/user", userHandlers.UpdateUser).Methods("PUT", "OPTIONS")
-	apiRouter.HandleFunc("/user", userHandlers.RemoveUser).Methods("DELETE", "OPTIONS")
+	apiRouter.HandleFunc("/user", a.GetHandlers().User.GetUser).Methods("GET", "OPTIONS")
+	apiRouter.HandleFunc("/user/{id:[0-9]+}", a.GetHandlers().User.GetUser).Methods("GET", "OPTIONS")
+	apiRouter.HandleFunc("/user", a.GetHandlers().User.CreateUser).Methods("POST", "OPTIONS")
+	apiRouter.HandleFunc("/user", a.GetHandlers().User.UpdateUser).Methods("PUT", "OPTIONS")
+	apiRouter.HandleFunc("/user", a.GetHandlers().User.RemoveUser).Methods("DELETE", "OPTIONS")
+
 	apiRouter.HandleFunc("/avatar", controllers.UploadAvatar).Methods("POST", "OPTIONS")
 
 	apiRouter.HandleFunc("/users", controllers.GetScoreboard).Methods("GET", "OPTIONS")

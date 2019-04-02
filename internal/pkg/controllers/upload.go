@@ -23,9 +23,9 @@ func isImage(header textproto.MIMEHeader) bool {
 
 // UploadAvatar godoc
 // @title Upload new avatar
-// @summary Saves new avatar image of client's user
-// @description This method saves avatar image in server storage and sets it as clients user avatar
-// @tags user
+// @summary Saves new avatar image of client's User
+// @description This method saves avatar image in server storage and sets it as clients User avatar
+// @tags User
 // @accept png
 // @accept jpeg
 // @produce json

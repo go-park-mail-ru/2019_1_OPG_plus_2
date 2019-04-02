@@ -8,24 +8,22 @@ import (
 
 	"github.com/gorilla/mux"
 
+	a "github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/adapters"
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/auth"
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"
-	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/user"
 )
 
-type UserHandlers struct {
-	adapter user.IUser
+func NewUserHandlers() *UserHandlers {
+	return &UserHandlers{}
 }
 
-func NewUserHandlers(adapter user.IUser) *UserHandlers {
-	return &UserHandlers{adapter: adapter}
-}
+type UserHandlers struct{}
 
 // CreateUser godoc
-// @title Create user
-// @summary Registers user
-// @description This method creates records about new user in auth-bd and user-db and then sends cookie to user in order to identify
-// @tags user
+// @title Create User
+// @summary Registers User
+// @description This method creates records about new User in Auth-bd and User-db and then sends cookie to User in order to identify
+// @tags User
 // @accept json
 // @produce json
 // @param profile_data body models.SingUpData true "User data"
@@ -34,8 +32,8 @@ func NewUserHandlers(adapter user.IUser) *UserHandlers {
 // @failure 401 {object} models.IncorrectFieldsAnswer
 // @failure 405 {object} models.MessageAnswer
 // @failure 500 {object} models.MessageAnswer
-// @router /user [post]
-func (handlers *UserHandlers) CreateUser(w http.ResponseWriter, r *http.Request) {
+// @router /User [post]
+func (*UserHandlers) CreateUser(w http.ResponseWriter, r *http.Request) {
 	if isAuth(r) {
 		models.Send(w, http.StatusMethodNotAllowed, models.AlreadySignedInAnswer)
 		return
@@ -49,7 +47,7 @@ func (handlers *UserHandlers) CreateUser(w http.ResponseWriter, r *http.Request)
 	}
 	defer r.Body.Close()
 
-	jwtData, err, fields := handlers.adapter.CreateUser(signUpData)
+	jwtData, err, fields := a.GetStorages().User.CreateUser(signUpData)
 	if err != nil {
 		if fields != nil {
 			models.Send(w, http.StatusBadRequest, models.GetIncorrectFieldsAnswer(fields))
@@ -64,19 +62,19 @@ func (handlers *UserHandlers) CreateUser(w http.ResponseWriter, r *http.Request)
 }
 
 // GetUser godoc
-// @title Get user
-// @summary Produces user profile info
-// @description This method provides client with user data, matching required ID
-// @tags user
+// @title Get User
+// @summary Produces User profile info
+// @description This method provides client with User data, matching required ID
+// @tags User
 // @accept json
 // @produce json
-// @param id path int false "ProfileData ID, if none, returned logged in user"
+// @param id path int false "ProfileData ID, if none, returned logged in User"
 // @success 200 {object} models.UserDataAnswer
 // @failure 400 {object} models.MessageAnswer
 // @failure 404 {object} models.MessageAnswer
 // @failure 500 {object} models.MessageAnswer
-// @router /user/{id} [get]
-func (handlers *UserHandlers) GetUser(w http.ResponseWriter, r *http.Request) {
+// @router /User/{id} [get]
+func (*UserHandlers) GetUser(w http.ResponseWriter, r *http.Request) {
 	var id int64
 	var err error
 
@@ -96,7 +94,7 @@ func (handlers *UserHandlers) GetUser(w http.ResponseWriter, r *http.Request) {
 		id = jwtData(r).Id
 	}
 
-	userData, err := handlers.adapter.GetUser(id)
+	userData, err := a.GetStorages().User.GetUser(id)
 	if err != nil {
 		if err == models.NotFound {
 			models.Send(w, http.StatusNotFound, models.UserNotFoundAnswer)
@@ -110,10 +108,10 @@ func (handlers *UserHandlers) GetUser(w http.ResponseWriter, r *http.Request) {
 }
 
 // UpdateUser godoc
-// @title Update user
-// @summary Updates client's user
-// @description This method updates info in profile and auth-db record of user, who is making a query
-// @tags user
+// @title Update User
+// @summary Updates client's User
+// @description This method updates info in profile and Auth-db record of User, who is making a query
+// @tags User
 // @accept json
 // @produce json
 // @param profile_data body models.UpdateUserData true "User new profile data"
@@ -121,8 +119,8 @@ func (handlers *UserHandlers) GetUser(w http.ResponseWriter, r *http.Request) {
 // @failure 400 {object} models.MessageAnswer
 // @failure 401 {object} models.MessageAnswer
 // @failure 500 {object} models.MessageAnswer
-// @router /user [put]
-func (handlers *UserHandlers) UpdateUser(w http.ResponseWriter, r *http.Request) {
+// @router /User [put]
+func (*UserHandlers) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	if !isAuth(r) {
 		models.Send(w, http.StatusUnauthorized, models.NotSignedInAnswer)
 		return
@@ -136,7 +134,7 @@ func (handlers *UserHandlers) UpdateUser(w http.ResponseWriter, r *http.Request)
 	}
 	defer r.Body.Close()
 
-	jwtData, err, fields := handlers.adapter.UpdateUser(jwtData(r).Id, updateData)
+	jwtData, err, fields := a.GetStorages().User.UpdateUser(jwtData(r).Id, updateData)
 	if err != nil {
 		if fields != nil {
 			models.Send(w, http.StatusBadRequest, models.GetIncorrectFieldsAnswer(fields))
@@ -151,18 +149,18 @@ func (handlers *UserHandlers) UpdateUser(w http.ResponseWriter, r *http.Request)
 }
 
 // RemoveUser godoc
-// @title Delete user
-// @summary Deletes user and user of client
-// @description This method deletes all information about user, making a query, including profile, game stats and authorization info
-// @tags user
+// @title Delete User
+// @summary Deletes User and User of client
+// @description This method deletes all information about User, making a query, including profile, game stats and authorization info
+// @tags User
 // @produce json
-// @param remove_data body models.RemoveUserData true "Info required to remove current user"
+// @param remove_data body models.RemoveUserData true "Info required to remove current User"
 // @success 200 {object} models.MessageAnswer
 // @failure 400 {object} models.MessageAnswer
 // @failure 401 {object} models.MessageAnswer
 // @failure 500 {object} models.MessageAnswer
-// @router /user [delete]
-func (handlers *UserHandlers) RemoveUser(w http.ResponseWriter, r *http.Request) {
+// @router /User [delete]
+func (*UserHandlers) RemoveUser(w http.ResponseWriter, r *http.Request) {
 	if !isAuth(r) {
 		models.Send(w, http.StatusUnauthorized, models.NotSignedInAnswer)
 		return
@@ -176,7 +174,7 @@ func (handlers *UserHandlers) RemoveUser(w http.ResponseWriter, r *http.Request)
 	}
 	defer r.Body.Close()
 
-	err, fields := handlers.adapter.RemoveUser(jwtData(r).Id, removeData)
+	err, fields := a.GetStorages().User.RemoveUser(jwtData(r).Id, removeData)
 	if err != nil {
 		if fields != nil {
 			models.Send(w, http.StatusBadRequest, models.GetIncorrectFieldsAnswer(fields))
