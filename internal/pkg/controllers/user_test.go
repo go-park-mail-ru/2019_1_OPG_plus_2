@@ -8,11 +8,15 @@ import (
 	"strings"
 	"testing"
 
+	a "github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/adapters"
+	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/auth"
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"
 )
 
-var mockedStorageAdapter = newMockStorageAdapter()
-var mockedUserHandlers = NewUserHandlers(mockedStorageAdapter)
+func init() {
+	a.SetStorages(newMockStorage(), auth.NewStorage())
+	a.SetHandlers(NewUserHandlers(), NewAuthHandlers())
+}
 
 // func testLog(t *testing.T, tCase TestCase) {
 // 	if !t.Failed() {
@@ -44,16 +48,16 @@ var mockedUserHandlers = NewUserHandlers(mockedStorageAdapter)
  *  GET_USER CONTROLLER  *
  *************************/
 func TestGetUserSelf(t *testing.T) {
-	userToFind, _ := mockedStorageAdapter.GetUser(1)
+	userToFind, _ := a.GetStorages().User.GetUser(1)
 	tCases := []TestCase{
 		{
-			handler: mockedUserHandlers.GetUser,
+			handler: a.GetHandlers().User.GetUser,
 
 			params: TestParams{
 				muxVars: map[string]string{},
 				method:  "GET",
 				isAuth:  true,
-				url:     "/user",
+				url:     "/User",
 				jwt: models.JwtData{
 					Id:       1,
 					Username: "username1",
@@ -87,16 +91,16 @@ func TestGetUserSelf(t *testing.T) {
 }
 
 func TestGetUserId(t *testing.T) {
-	userToFind, _ := mockedStorageAdapter.GetUser(3)
+	userToFind, _ := a.GetStorages().User.GetUser(3)
 	tCases := []TestCase{
 		{
-			handler: mockedUserHandlers.GetUser,
+			handler: a.GetHandlers().User.GetUser,
 
 			params: TestParams{
 				muxVars: map[string]string{"id": "3"},
 				method:  "GET",
 				isAuth:  true,
-				url:     "/user",
+				url:     "/User",
 				jwt: models.JwtData{
 					Id:       1,
 					Username: "username1",
@@ -124,21 +128,21 @@ func TestGetUserId(t *testing.T) {
 			t.Errorf("Wrong Body:\n\tGot: %v\n\tExpected: %v\n", retMessage, tCase.expMessage)
 		}
 		//
-		//// testLog(t, tCase)
-		//CheckStatusAndAnswer(t, w, retMessage, tCase)
+		// // testLog(t, tCase)
+		// CheckStatusAndAnswer(t, w, retMessage, tCase)
 	}
 }
 
 func TestGetUserIdNotExists(t *testing.T) {
 	tCases := []TestCase{
 		{
-			handler: mockedUserHandlers.GetUser,
+			handler: a.GetHandlers().User.GetUser,
 
 			params: TestParams{
 				muxVars: map[string]string{"id": "1278"},
 				method:  "GET",
 				isAuth:  true,
-				url:     "/user",
+				url:     "/User",
 				jwt: models.JwtData{
 					Id:       1,
 					Username: "username1",
@@ -173,13 +177,13 @@ func TestGetUserIdNotExists(t *testing.T) {
 func TestGetUserNoAuth(t *testing.T) {
 	tCases := []TestCase{
 		{
-			handler: mockedUserHandlers.GetUser,
+			handler: a.GetHandlers().User.GetUser,
 
 			params: TestParams{
 				muxVars: map[string]string{},
 				method:  "GET",
 				isAuth:  false,
-				url:     "/user",
+				url:     "/User",
 				jwt:     models.JwtData{},
 			},
 
@@ -210,13 +214,13 @@ func TestGetUserNoAuth(t *testing.T) {
 func TestGetUserIdNotNumber(t *testing.T) {
 	tCases := []TestCase{
 		{
-			handler: mockedUserHandlers.GetUser,
+			handler: a.GetHandlers().User.GetUser,
 
 			params: TestParams{
 				muxVars: map[string]string{"id": "qwerty"},
 				method:  "GET",
 				isAuth:  true,
-				url:     "/user",
+				url:     "/User",
 				jwt: models.JwtData{
 					Id:       1,
 					Username: "username1",
@@ -254,13 +258,13 @@ func TestGetUserIdNotNumber(t *testing.T) {
 func TestUpdateUserCorrect(t *testing.T) {
 	tCases := []TestCase{
 		{
-			handler: mockedUserHandlers.UpdateUser,
+			handler: a.GetHandlers().User.UpdateUser,
 
 			params: TestParams{
 				muxVars: map[string]string{},
 				method:  "PUT",
 				isAuth:  true,
-				url:     "/user",
+				url:     "/User",
 				jwt: models.JwtData{
 					Id:       1,
 					Username: "username1",
@@ -288,9 +292,9 @@ func TestUpdateUserCorrect(t *testing.T) {
 			t.Errorf("Wrong Body:\n\tGot: %v\n\tExpected: %v\n", retMessage, tCase.expMessage)
 		}
 
-		newUserData, err := mockedStorageAdapter.GetUser(tCase.params.jwt.Id)
+		newUserData, err := a.GetStorages().User.GetUser(tCase.params.jwt.Id)
 		if err != nil {
-			t.Errorf("Test failed while getting user from storage: %e", err)
+			t.Errorf("Test failed while getting User from storage: %e", err)
 		}
 
 		expUserData := models.UserData{
@@ -315,13 +319,13 @@ func TestUpdateUserCorrect(t *testing.T) {
 func TestUpdateUserNoAuth(t *testing.T) {
 	tCases := []TestCase{
 		{
-			handler: mockedUserHandlers.UpdateUser,
+			handler: a.GetHandlers().User.UpdateUser,
 
 			params: TestParams{
 				muxVars: map[string]string{},
 				method:  "PUT",
 				isAuth:  false,
-				url:     "/user",
+				url:     "/User",
 				jwt:     models.JwtData{},
 			},
 
@@ -352,13 +356,13 @@ func TestUpdateUserNoAuth(t *testing.T) {
 func TestUpdateUserInvalidField(t *testing.T) {
 	tCases := []TestCase{
 		{
-			handler: mockedUserHandlers.UpdateUser,
+			handler: a.GetHandlers().User.UpdateUser,
 
 			params: TestParams{
 				muxVars: map[string]string{},
 				method:  "PUT",
 				isAuth:  true,
-				url:     "/user",
+				url:     "/User",
 				jwt: models.JwtData{
 					Id:       1,
 					Username: "qwerty",
@@ -367,18 +371,18 @@ func TestUpdateUserInvalidField(t *testing.T) {
 			},
 
 			expStatus:    400,
-			inputMessage: []byte(`{"email": "qwerty@mail.com","user": "qwerty"}`),
+			inputMessage: []byte(`{"email": "qwerty@mail.com","User": "qwerty"}`),
 
 			expMessage: models.GetIncorrectFieldsAnswer([]string{"username"}),
 		},
 		{
-			handler: mockedUserHandlers.UpdateUser,
+			handler: a.GetHandlers().User.UpdateUser,
 
 			params: TestParams{
 				muxVars: map[string]string{},
 				method:  "PUT",
 				isAuth:  true,
-				url:     "/user",
+				url:     "/User",
 				jwt: models.JwtData{
 					Id:       1,
 					Username: "qwerty",
@@ -392,13 +396,13 @@ func TestUpdateUserInvalidField(t *testing.T) {
 			expMessage: models.GetIncorrectFieldsAnswer([]string{"email"}),
 		},
 		{
-			handler: mockedUserHandlers.UpdateUser,
+			handler: a.GetHandlers().User.UpdateUser,
 
 			params: TestParams{
 				muxVars: map[string]string{},
 				method:  "PUT",
 				isAuth:  true,
-				url:     "/user",
+				url:     "/User",
 				jwt: models.JwtData{
 					Id:       1,
 					Username: "qwerty",
@@ -407,7 +411,7 @@ func TestUpdateUserInvalidField(t *testing.T) {
 			},
 
 			expStatus:    400,
-			inputMessage: []byte(`{"email": "qwerty","user-name": "qwerty"}`),
+			inputMessage: []byte(`{"email": "qwerty","User-name": "qwerty"}`),
 
 			expMessage: models.GetIncorrectFieldsAnswer([]string{"email", "username"}),
 		},
@@ -433,13 +437,13 @@ func TestUpdateUserInvalidField(t *testing.T) {
 func TestUpdateUserInvalidJSON(t *testing.T) {
 	tCases := []TestCase{
 		{
-			handler: mockedUserHandlers.UpdateUser,
+			handler: a.GetHandlers().User.UpdateUser,
 
 			params: TestParams{
 				muxVars: map[string]string{},
 				method:  "PUT",
 				isAuth:  true,
-				url:     "/user",
+				url:     "/User",
 				jwt: models.JwtData{
 					Id:       1,
 					Username: "qwerty",
@@ -448,7 +452,7 @@ func TestUpdateUserInvalidJSON(t *testing.T) {
 			},
 
 			expStatus:    500,
-			inputMessage: []byte(`{"email": "qwerty@mail.com","user": "qwerty"`), // no closing parentheses in JSON
+			inputMessage: []byte(`{"email": "qwerty@mail.com","User": "qwerty"`), // no closing parentheses in JSON
 
 			expMessage: models.IncorrectJsonAnswer,
 		},
@@ -478,13 +482,13 @@ func TestUpdateUserInvalidJSON(t *testing.T) {
 func TestRemoveUserCorrect(t *testing.T) {
 	tCases := []TestCase{
 		{
-			handler: mockedUserHandlers.RemoveUser,
+			handler: a.GetHandlers().User.RemoveUser,
 
 			params: TestParams{
 				muxVars: map[string]string{},
 				method:  "DELETE",
 				isAuth:  true,
-				url:     "/user",
+				url:     "/User",
 				jwt: models.JwtData{
 					Id:       1,
 					Username: "qwerty",
@@ -512,25 +516,25 @@ func TestRemoveUserCorrect(t *testing.T) {
 			t.Errorf("Wrong Body:\n\tGot: %v\n\tExpected: %v\n", retMessage, tCase.expMessage)
 		}
 
-		_, err := mockedStorageAdapter.GetUser(tCase.params.jwt.Id)
+		_, err := a.GetStorages().User.GetUser(tCase.params.jwt.Id)
 		if err == nil {
 			t.Errorf("Data did not actually delete")
 		}
 	}
 }
 
-// since this moment i would use another user as a client for testing
-// because in previous test user 1 has been deleted successfully
+// since this moment i would use another User as a client for testing
+// because in previous test User 1 has been deleted successfully
 func TestRemoveUserNoAuth(t *testing.T) {
 	tCases := []TestCase{
 		{
-			handler: mockedUserHandlers.RemoveUser,
+			handler: a.GetHandlers().User.RemoveUser,
 
 			params: TestParams{
 				muxVars: map[string]string{},
 				method:  "DELETE",
 				isAuth:  false,
-				url:     "/user",
+				url:     "/User",
 				jwt:     models.JwtData{},
 			},
 
@@ -559,13 +563,13 @@ func TestRemoveUserNoAuth(t *testing.T) {
 func TestRemoveUserInvalidJSON(t *testing.T) {
 	tCases := []TestCase{
 		{
-			handler: mockedUserHandlers.RemoveUser,
+			handler: a.GetHandlers().User.RemoveUser,
 
 			params: TestParams{
 				muxVars: map[string]string{},
 				method:  "DELETE",
 				isAuth:  true,
-				url:     "/user",
+				url:     "/User",
 				jwt: models.JwtData{
 					Id:       2,
 					Username: "username2",
@@ -598,13 +602,13 @@ func TestRemoveUserInvalidJSON(t *testing.T) {
 func TestRemoveUserInvalidData(t *testing.T) {
 	tCases := []TestCase{
 		{
-			handler: mockedUserHandlers.RemoveUser,
+			handler: a.GetHandlers().User.RemoveUser,
 
 			params: TestParams{
 				muxVars: map[string]string{},
 				method:  "DELETE",
 				isAuth:  true,
-				url:     "/user",
+				url:     "/User",
 				jwt: models.JwtData{
 					Id:       2,
 					Username: "username2",
@@ -632,7 +636,7 @@ func TestRemoveUserInvalidData(t *testing.T) {
 			t.Errorf("Wrong Body:\n\tGot: %v\n\tExpected: %v\n", retMessage, tCase.expMessage)
 		}
 
-		_, err := mockedStorageAdapter.GetUser(tCase.params.jwt.Id)
+		_, err := a.GetStorages().User.GetUser(tCase.params.jwt.Id)
 		if err != nil {
 			t.Errorf("Data did actually delete!")
 		}
@@ -646,13 +650,13 @@ func TestRemoveUserInvalidData(t *testing.T) {
 func TestCreateUserCorrect(t *testing.T) {
 	tCases := []TestCase{
 		{
-			handler: mockedUserHandlers.CreateUser,
+			handler: a.GetHandlers().User.CreateUser,
 
 			params: TestParams{
 				muxVars: map[string]string{},
 				method:  "POST",
 				isAuth:  false,
-				url:     "/user",
+				url:     "/User",
 				jwt:     models.JwtData{},
 			},
 
@@ -676,13 +680,13 @@ func TestCreateUserCorrect(t *testing.T) {
 			t.Errorf("Wrong Body:\n\tGot: %v\n\tExpected: %v\n", retMessage, tCase.expMessage)
 		}
 
-		//checking if user is actually created
+		// checking if User is actually created
 
-		//getting data field from cookie set to user
+		// getting data field from cookie set to User
 		rawJwtData := strings.Split(w.Result().Cookies()[0].Value, ".")[1]
 		parsedCookie, _ := base64.StdEncoding.DecodeString(rawJwtData)
 
-		//parsing data of user stored in cache into struct
+		// parsing data of User stored in cache into struct
 		var storedUserData models.JwtData
 		_ = json.Unmarshal(parsedCookie, &storedUserData)
 
@@ -701,13 +705,13 @@ func TestCreateUsersAuth(t *testing.T) {
 
 	tCases := []TestCase{
 		{
-			handler: mockedUserHandlers.CreateUser,
+			handler: a.GetHandlers().User.CreateUser,
 
 			params: TestParams{
 				muxVars: map[string]string{},
 				method:  "POST",
 				isAuth:  true,
-				url:     "/user",
+				url:     "/User",
 				jwt: models.JwtData{
 					Id:       2,
 					Username: "username2",
@@ -743,18 +747,18 @@ func TestCreateUserIncorrectJson(t *testing.T) {
 
 	tCases := []TestCase{
 		{
-			handler: mockedUserHandlers.CreateUser,
+			handler: a.GetHandlers().User.CreateUser,
 
 			params: TestParams{
 				muxVars: map[string]string{},
 				method:  "POST",
 				isAuth:  false,
-				url:     "/user",
+				url:     "/User",
 				jwt:     models.JwtData{},
 			},
 
 			expStatus:    http.StatusInternalServerError,
-			inputMessage: []byte(`"email": "new_user@mail.com","username": "new_user", "password": "pass"}`), //no opening bracket
+			inputMessage: []byte(`"email": "new_user@mail.com","username": "new_user", "password": "pass"}`), // no opening bracket
 
 			expMessage: models.IncorrectJsonAnswer,
 		},
@@ -778,13 +782,13 @@ func TestCreateUserIncorrectJson(t *testing.T) {
 func TestCreateUserIncorrectFields(t *testing.T) {
 	tCases := []TestCase{
 		{
-			handler: mockedUserHandlers.CreateUser,
+			handler: a.GetHandlers().User.CreateUser,
 
 			params: TestParams{
 				muxVars: map[string]string{},
 				method:  "POST",
 				isAuth:  false,
-				url:     "/user",
+				url:     "/User",
 				jwt:     models.JwtData{},
 			},
 
@@ -813,13 +817,13 @@ func TestCreateUserIncorrectFields(t *testing.T) {
 func TestCreateUserAlreadyExists(t *testing.T) {
 	tCases := []TestCase{
 		{
-			handler: mockedUserHandlers.CreateUser,
+			handler: a.GetHandlers().User.CreateUser,
 
 			params: TestParams{
 				muxVars: map[string]string{},
 				method:  "POST",
 				isAuth:  false,
-				url:     "/user",
+				url:     "/User",
 				jwt:     models.JwtData{},
 			},
 

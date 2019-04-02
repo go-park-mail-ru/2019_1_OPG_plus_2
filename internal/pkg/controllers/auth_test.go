@@ -2,14 +2,19 @@ package controllers
 
 import (
 	"encoding/json"
-	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"
 	"net/http"
 	"reflect"
 	"testing"
+
+	a "github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/adapters"
+	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/auth"
+	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"
 )
 
-//var mockedStorageAdapter = newMockStorageAdapter()
-//var mockedUserHandlers = NewUserHandlers(mockedStorageAdapter)
+func init() {
+	a.SetStorages(newMockStorage(), auth.NewStorage())
+	a.SetHandlers(NewUserHandlers(), NewAuthHandlers())
+}
 
 /**********************
  *  IS_AUTH CONTROLLER*
@@ -18,7 +23,7 @@ import (
 func TestIsAuth(t *testing.T) {
 	tCases := []TestCase{
 		{
-			handler: IsAuth,
+			handler: a.GetHandlers().Auth.IsAuth,
 
 			params: TestParams{
 				muxVars: map[string]string{},
@@ -38,7 +43,7 @@ func TestIsAuth(t *testing.T) {
 			expMessage: models.SignedInAnswer,
 		},
 		{
-			handler: mockedUserHandlers.UpdateUser,
+			handler: a.GetHandlers().Auth.SignIn,
 
 			params: TestParams{
 				muxVars: map[string]string{},

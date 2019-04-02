@@ -19,13 +19,13 @@ type authData struct {
 	Password string
 }
 
-type mockStorageAdapter struct {
+type mockStorage struct {
 	ProfileData map[int64]*models.UserData
 	AuthData    map[int64]*authData
 }
 
-func newMockStorageAdapter() (storage *mockStorageAdapter) {
-	storage = new(mockStorageAdapter)
+func newMockStorage() (storage *mockStorage) {
+	storage = new(mockStorage)
 	storage.ProfileData = make(map[int64]*models.UserData)
 	storage.AuthData = make(map[int64]*authData)
 	storage.ProfileData[1] = &models.UserData{
@@ -79,7 +79,7 @@ func newMockStorageAdapter() (storage *mockStorageAdapter) {
 	return storage
 }
 
-func (storage *mockStorageAdapter) CreateUser(signUpData models.SingUpData) (models.JwtData, error, []string) {
+func (storage *mockStorage) CreateUser(signUpData models.SingUpData) (models.JwtData, error, []string) {
 	incorrectFields := signUpData.Check()
 	if len(incorrectFields) > 0 {
 		return models.JwtData{}, models.FieldsError, incorrectFields
@@ -113,14 +113,14 @@ func (storage *mockStorageAdapter) CreateUser(signUpData models.SingUpData) (mod
 	return newJwtData, nil, nil
 }
 
-func (storage *mockStorageAdapter) GetUser(id int64) (userData models.UserData, err error) {
+func (storage *mockStorage) GetUser(id int64) (userData models.UserData, err error) {
 	if storage.ProfileData[id] == nil {
 		return models.UserData{}, models.NotFound
 	}
 	return *storage.ProfileData[id], nil
 }
 
-func (storage *mockStorageAdapter) UpdateUser(id int64, updateData models.UpdateUserData) (models.JwtData, error, []string) {
+func (storage *mockStorage) UpdateUser(id int64, updateData models.UpdateUserData) (models.JwtData, error, []string) {
 	incorrectFields := updateData.Check()
 	if len(incorrectFields) > 0 {
 		return models.JwtData{}, models.FieldsError, incorrectFields
@@ -141,7 +141,7 @@ func (storage *mockStorageAdapter) UpdateUser(id int64, updateData models.Update
 	return newJwtData, nil, nil
 }
 
-func (storage *mockStorageAdapter) RemoveUser(id int64, removeData models.RemoveUserData) (error, []string) {
+func (storage *mockStorage) RemoveUser(id int64, removeData models.RemoveUserData) (error, []string) {
 	incorrectFields := removeData.Check()
 	if len(incorrectFields) > 0 {
 		return models.FieldsError, incorrectFields
