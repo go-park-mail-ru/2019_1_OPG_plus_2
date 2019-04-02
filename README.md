@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/go-park-mail-ru/2019_1_OPG_plus_2.svg?branch=master)](https://travis-ci.org/go-park-mail-ru/2019_1_OPG_plus_2)
+
 # 2019_1_OPG_plus_2
 ## Команда
  - Даниил Никольcкий [@DanikNik](https://github.com/DanikNik)
