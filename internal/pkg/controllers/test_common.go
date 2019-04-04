@@ -24,7 +24,7 @@ type mockStorage struct {
 	AuthData    map[int64]*authData
 }
 
-func newMockStorage() (storage *mockStorage) {
+func NewMockStorage() (storage *mockStorage) {
 	storage = new(mockStorage)
 	storage.ProfileData = make(map[int64]*models.UserData)
 	storage.AuthData = make(map[int64]*authData)
@@ -79,7 +79,7 @@ func newMockStorage() (storage *mockStorage) {
 	return storage
 }
 
-func (storage *mockStorage) CreateUser(signUpData models.SingUpData) (models.JwtData, error, []string) {
+func (storage *mockStorage) CreateUser(signUpData models.SignUpData) (models.JwtData, error, []string) {
 	incorrectFields := signUpData.Check()
 	if len(incorrectFields) > 0 {
 		return models.JwtData{}, models.FieldsError, incorrectFields

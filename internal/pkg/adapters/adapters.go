@@ -46,20 +46,25 @@ type IAuthHandlers interface {
 	UpdatePassword(w http.ResponseWriter, r *http.Request)
 }
 
+type IOAuthHandlers interface {
+	Login1stStageRetrieveCode(w http.ResponseWriter, r *http.Request)
+	Login2ndStageRetrieveTokenGetData(w http.ResponseWriter, r *http.Request)
+}
+
 type Storages struct {
 	User IUserStorage
 	Auth IAuthStorage
 }
 
 type IUserStorage interface {
-	CreateUser(signUpData models.SingUpData) (models.JwtData, error, []string)
+	CreateUser(signUpData models.SignUpData) (models.JwtData, error, []string)
 	GetUser(id int64) (models.UserData, error)
 	UpdateUser(id int64, updateData models.UpdateUserData) (models.JwtData, error, []string)
 	RemoveUser(id int64, removeData models.RemoveUserData) (error, []string)
 }
 
 type IAuthStorage interface {
-	SignUp(signUpData models.SingUpData) (models.JwtData, error, []string)
+	SignUp(signUpData models.SignUpData) (models.JwtData, error, []string)
 	SignIn(signInData models.SignInData) (data models.JwtData, err error, incorrectFields []string)
 	UpdatePassword(id int64, passwordData models.UpdatePasswordData) (error, []string)
 	UpdateAuth(id int64, userData models.UpdateUserData) (models.JwtData, error, []string)

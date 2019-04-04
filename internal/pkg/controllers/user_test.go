@@ -14,7 +14,7 @@ import (
 )
 
 func init() {
-	a.SetStorages(newMockStorage(), auth.NewStorage())
+	a.SetStorages(NewMockStorage(), auth.NewStorage())
 	a.SetHandlers(NewUserHandlers(), NewAuthHandlers())
 }
 
@@ -690,7 +690,7 @@ func TestCreateUserCorrect(t *testing.T) {
 		var storedUserData models.JwtData
 		_ = json.Unmarshal(parsedCookie, &storedUserData)
 
-		var inputData models.SingUpData
+		var inputData models.SignUpData
 		_ = json.Unmarshal(tCase.inputMessage, &inputData)
 
 		if storedUserData.Email != inputData.Email || storedUserData.Username != inputData.Username {

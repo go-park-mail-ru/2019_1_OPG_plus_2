@@ -30,6 +30,7 @@ func StartApp(params Params) error {
 	a.SetStorages(user.NewStorage(), auth.NewStorage())
 	a.SetHandlers(controllers.NewUserHandlers(), controllers.NewAuthHandlers())
 
+	vk := controllers.NewVkAuthHandlers()
 	router := mux.NewRouter()
 	apiRouter := router.PathPrefix("/api").Subrouter()
 
@@ -63,6 +64,9 @@ func StartApp(params Params) error {
 		"/static",
 		http.FileServer(http.Dir(controllers.StaticPath)),
 	))
+
+	apiRouter.HandleFunc("/vk_login", vk.Login1stStageRetrieveCode)
+	apiRouter.HandleFunc("/callback", vk.Login2ndStageRetrieveTokenGetData)
 
 	return http.ListenAndServe(":"+params.Port, router)
 }
