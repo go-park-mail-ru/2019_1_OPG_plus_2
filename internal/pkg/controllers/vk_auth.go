@@ -96,7 +96,11 @@ func (*VkAuthHandlers) Login2ndStageRetrieveTokenGetData(w http.ResponseWriter, 
 	jwtData, err, _ := adapters.GetStorages().User.CreateUser(sData)
 
 	if err == models.AlreadyExists {
-		jwtData, _, _ = adapters.GetStorages().Auth.SignIn(models.SignInData{username, password})
+		jwtData, _, _ = adapters.GetStorages().Auth.SignIn(
+			models.SignInData{
+				Login:    username,
+				Password: password,
+			})
 	}
 
 	http.SetCookie(w, auth.CreateAuthCookie(jwtData, 30*24*time.Hour))

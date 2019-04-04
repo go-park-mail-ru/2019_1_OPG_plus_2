@@ -13,7 +13,7 @@ import (
 
 func init() {
 	a.SetStorages(NewMockStorage(), auth.NewStorage())
-	a.SetHandlers(NewUserHandlers(), NewAuthHandlers())
+	a.SetHandlers(NewUserHandlers(), NewAuthHandlers(), NewVkAuthHandlers())
 }
 
 /**********************
