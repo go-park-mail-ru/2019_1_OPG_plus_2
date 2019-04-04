@@ -15,12 +15,6 @@ import (
 	"time"
 )
 
-const (
-	AppId     = "6924682"
-	AppKey    = "UE7pR5HINrm6zsM3S29I"
-	AppSecret = "70ed7b1c70ed7b1c70ed7b1cee7084d296770ed70ed7b1c2c4e3f65fc4e4f266a56dfb8"
-)
-
 type Response struct {
 	Response []map[string]interface{}
 }
@@ -89,9 +83,6 @@ func (*VkAuthHandlers) Login2ndStageRetrieveTokenGetData(w http.ResponseWriter, 
 
 	data := &Response{}
 	_ = json.Unmarshal(body, data)
-	fmt.Println(data.Response)
-	time.Sleep(1000)
-	fmt.Println(email)
 
 	username := data.Response[0]["domain"].(string)
 	password := "nil"
@@ -102,10 +93,7 @@ func (*VkAuthHandlers) Login2ndStageRetrieveTokenGetData(w http.ResponseWriter, 
 		Password: password,
 	}
 
-	fmt.Println(sData)
-
-	jwtData, err, fields := adapters.GetStorages().User.CreateUser(sData)
-	fmt.Println(err, fields, jwtData)
+	jwtData, err, _ := adapters.GetStorages().User.CreateUser(sData)
 
 	if err == models.AlreadyExists {
 		jwtData, _, _ = adapters.GetStorages().Auth.SignIn(models.SignInData{username, password})

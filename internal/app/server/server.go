@@ -28,9 +28,8 @@ func StartApp(params Params) error {
 	}
 
 	a.SetStorages(user.NewStorage(), auth.NewStorage())
-	a.SetHandlers(controllers.NewUserHandlers(), controllers.NewAuthHandlers())
+	a.SetHandlers(controllers.NewUserHandlers(), controllers.NewAuthHandlers(), controllers.NewVkAuthHandlers())
 
-	vk := controllers.NewVkAuthHandlers()
 	router := mux.NewRouter()
 	apiRouter := router.PathPrefix("/api").Subrouter()
 
@@ -65,8 +64,8 @@ func StartApp(params Params) error {
 		http.FileServer(http.Dir(controllers.StaticPath)),
 	))
 
-	apiRouter.HandleFunc("/vk_login", vk.Login1stStageRetrieveCode)
-	apiRouter.HandleFunc("/callback", vk.Login2ndStageRetrieveTokenGetData)
+	apiRouter.HandleFunc("/vk_login", a.GetHandlers().OAuth.Login1stStageRetrieveCode)
+	apiRouter.HandleFunc("/callback", a.GetHandlers().OAuth.Login2ndStageRetrieveTokenGetData)
 
 	return http.ListenAndServe(":"+params.Port, router)
 }

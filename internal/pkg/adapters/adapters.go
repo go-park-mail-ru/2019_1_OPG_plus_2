@@ -11,8 +11,8 @@ var (
 	storages Storages
 )
 
-func SetHandlers(userHandlers IUserHandlers, authHandlers IAuthHandlers) {
-	handlers = Handlers{User: userHandlers, Auth: authHandlers}
+func SetHandlers(userHandlers IUserHandlers, authHandlers IAuthHandlers, oAuthHandlers IOAuthHandlers) {
+	handlers = Handlers{User: userHandlers, Auth: authHandlers, OAuth: oAuthHandlers}
 }
 
 func GetHandlers() *Handlers {
@@ -28,8 +28,9 @@ func GetStorages() *Storages {
 }
 
 type Handlers struct {
-	User IUserHandlers
-	Auth IAuthHandlers
+	User  IUserHandlers
+	Auth  IAuthHandlers
+	OAuth IOAuthHandlers
 }
 
 type IUserHandlers interface {
