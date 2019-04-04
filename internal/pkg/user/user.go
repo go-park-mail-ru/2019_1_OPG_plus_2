@@ -15,7 +15,7 @@ func NewStorage() *Storage {
 
 type Storage struct{}
 
-func (*Storage) CreateUser(signUpData models.SingUpData) (jwtData models.JwtData, err error, fields []string) {
+func (*Storage) CreateUser(signUpData models.SignUpData) (jwtData models.JwtData, err error, fields []string) {
 	incorrectFields := signUpData.Check()
 	if len(incorrectFields) > 0 {
 		return models.JwtData{}, models.FieldsError, incorrectFields
