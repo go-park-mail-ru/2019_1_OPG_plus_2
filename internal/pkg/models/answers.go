@@ -35,8 +35,8 @@ type UploadAvatarAnswer struct {
 
 /* SUCCESS ANSWERS */
 
-func GetSuccessAnswer(message string) MessageAnswer {
-	return MessageAnswer{
+func GetSuccessAnswer(message string) *MessageAnswer {
+	return &MessageAnswer{
 		Status:  100,
 		Message: message,
 	}
@@ -62,16 +62,16 @@ var PasswordUpdatedAnswer = MessageAnswer{
 	Message: "password updated",
 }
 
-func GetUserDataAnswer(data UserData) UserDataAnswer {
-	return UserDataAnswer{
+func GetUserDataAnswer(data UserData) *UserDataAnswer {
+	return &UserDataAnswer{
 		Status:  105,
 		Message: "user found",
 		Data:    data,
 	}
 }
 
-func GetScoreboardAnswer(data ScoreboardData) ScoreboardAnswer {
-	return ScoreboardAnswer{
+func GetScoreboardAnswer(data ScoreboardData) *ScoreboardAnswer {
+	return &ScoreboardAnswer{
 		Status:  106,
 		Message: "users found",
 		Data:    data,
@@ -83,8 +83,8 @@ var UserUpdatedAnswer = MessageAnswer{
 	Message: "user updated",
 }
 
-func GetUploadAvatarAnswer(url string) UploadAvatarAnswer {
-	return UploadAvatarAnswer{
+func GetUploadAvatarAnswer(url string) *UploadAvatarAnswer {
+	return &UploadAvatarAnswer{
 		Status:  108,
 		Message: "avatar uploaded",
 		Data:    url,
@@ -100,8 +100,8 @@ var UserRemovedAnswer = MessageAnswer{
 
 // For future use
 //
-// func GetUserErrorAnswer(error string) MessageAnswer {
-// 	return MessageAnswer{
+// func GetUserErrorAnswer(error string) *MessageAnswer {
+// 	return &MessageAnswer{
 // 		Status:  200,
 // 		Message: error,
 // 	}
@@ -127,8 +127,8 @@ var UserNotFoundAnswer = MessageAnswer{
 	Message: "user not found",
 }
 
-func GetIncorrectFieldsAnswer(data []string) IncorrectFieldsAnswer {
-	return IncorrectFieldsAnswer{
+func GetIncorrectFieldsAnswer(data []string) *IncorrectFieldsAnswer {
+	return &IncorrectFieldsAnswer{
 		Status:  204,
 		Message: "incorrect fields",
 		Data:    data,
@@ -147,8 +147,8 @@ var NotImageAnswer = MessageAnswer{
 
 /* DEVELOPERS ERRORS */
 
-func GetDeveloperErrorAnswer(error string) MessageAnswer {
-	return MessageAnswer{
+func GetDeveloperErrorAnswer(error string) *MessageAnswer {
+	return &MessageAnswer{
 		Status:  300,
 		Message: error,
 	}

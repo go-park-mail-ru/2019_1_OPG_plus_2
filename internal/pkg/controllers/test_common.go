@@ -6,6 +6,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
+	"testing"
 
 	"github.com/gorilla/mux"
 
@@ -15,7 +17,7 @@ import (
 
 var baseUrl = "localhost:8002/api"
 
-type TestParams struct {
+type testParams struct {
 	isAuth  bool
 	muxVars map[string]string
 	jwt     models.JwtData
@@ -23,12 +25,13 @@ type TestParams struct {
 	url     string
 }
 
-type TestCase struct {
-	handler      http.HandlerFunc
-	params       TestParams
-	inputMessage json.RawMessage
-	expStatus    int
-	expMessage   interface{}
+type testCase struct {
+	handler       http.HandlerFunc
+	params        testParams
+	inputMessage  json.RawMessage
+	outputMessage interface{}
+	expStatus     int
+	expMessage    interface{}
 }
 
 func testInitial() {
@@ -36,20 +39,37 @@ func testInitial() {
 	a.SetHandlers(NewUserHandlers(), NewAuthHandlers())
 }
 
-func testCaseInitial(tCase TestCase) (*httptest.ResponseRecorder, *http.Request) {
+func testCaseInitial(tCase *testCase) (*httptest.ResponseRecorder, *http.Request) {
 	testParams := tCase.params
 	url := baseUrl + testParams.url
-	req := httptest.NewRequest(testParams.method, url, bytes.NewReader(tCase.inputMessage))
+	r := httptest.NewRequest(testParams.method, url, bytes.NewReader(tCase.inputMessage))
 	w := httptest.NewRecorder()
-	ctx := req.Context()
+	ctx := r.Context()
 
 	data := testParams.jwt
 	ctx = context.WithValue(ctx, "isAuth", testParams.isAuth)
 	ctx = context.WithValue(ctx, "jwtData", data)
 
-	req = req.WithContext(ctx)
+	r = r.WithContext(ctx)
 
-	req = mux.SetURLVars(req, tCase.params.muxVars)
+	r = mux.SetURLVars(r, tCase.params.muxVars)
 
-	return w, req
+	return w, r
+}
+
+func test(t *testing.T, tCase *testCase) (*httptest.ResponseRecorder, *http.Request) {
+	w, r := testCaseInitial(tCase)
+	tCase.handler(w, r)
+
+	if w.Code != tCase.expStatus {
+		t.Errorf("Wrong Status:\n\tGot: %d\n\tExpected: %d\n", w.Code, tCase.expStatus)
+	}
+
+	_ = json.NewDecoder(w.Body).Decode(tCase.outputMessage)
+
+	if !reflect.DeepEqual(tCase.outputMessage, tCase.expMessage) {
+		t.Errorf("Wrong Body:\n\tGot: %v\n\tExpected: %v\n", tCase.outputMessage, &tCase.expMessage)
+	}
+
+	return w, r
 }

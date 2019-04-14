@@ -1,9 +1,7 @@
 package controllers
 
 import (
-	"encoding/json"
 	"net/http"
-	"reflect"
 	"testing"
 
 	a "github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/adapters"
@@ -19,11 +17,11 @@ func init()  {
  **********************/
 
 func TestIsAuth(t *testing.T) {
-	tCases := []TestCase{
+	tCases := []testCase{
 		{
 			handler: a.GetHandlers().Auth.IsAuth,
 
-			params: TestParams{
+			params: testParams{
 				muxVars: map[string]string{},
 				method:  "GET",
 				isAuth:  true,
@@ -35,15 +33,16 @@ func TestIsAuth(t *testing.T) {
 				},
 			},
 
-			expStatus:    http.StatusOK,
 			inputMessage: nil,
+			outputMessage: &models.MessageAnswer{},
 
-			expMessage: models.SignedInAnswer,
+			expStatus:    http.StatusOK,
+			expMessage: &models.SignedInAnswer,
 		},
 		{
 			handler: a.GetHandlers().Auth.IsAuth,
 
-			params: TestParams{
+			params: testParams{
 				muxVars: map[string]string{},
 				method:  "GET",
 				isAuth:  false,
@@ -51,26 +50,15 @@ func TestIsAuth(t *testing.T) {
 				jwt:     models.JwtData{},
 			},
 
-			expStatus:    http.StatusUnauthorized,
 			inputMessage: nil,
+			outputMessage: &models.MessageAnswer{},
 
-			expMessage: models.SignedOutAnswer,
+			expStatus:    http.StatusUnauthorized,
+			expMessage: &models.SignedOutAnswer,
 		},
 	}
 
 	for _, tCase := range tCases {
-		w, req := testCaseInitial(tCase)
-		tCase.handler(w, req)
-
-		if w.Code != tCase.expStatus {
-			t.Errorf("Wrong Status:\n\tGot: %d\n\tExpected: %d\n", w.Code, tCase.expStatus)
-		}
-		var retMessage models.MessageAnswer
-		_ = json.NewDecoder(w.Body).Decode(&retMessage)
-		if !reflect.DeepEqual(retMessage, tCase.expMessage) {
-			t.Errorf("Wrong Body:\n\tGot: %v\n\tExpected: %v\n", retMessage, tCase.expMessage)
-		}
-
-		// testLog(t, tCase)
+		test(t, &tCase)
 	}
 }
