@@ -26,7 +26,7 @@ type UserHandlers struct{}
 // @tags User
 // @accept json
 // @produce json
-// @param profile_data body models.SingUpData true "User data"
+// @param profile_data body models.SignUpData true "User data"
 // @success 200 {object} models.MessageAnswer
 // @failure 400 {object} models.MessageAnswer
 // @failure 401 {object} models.IncorrectFieldsAnswer
@@ -39,7 +39,7 @@ func (*UserHandlers) CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	signUpData := models.SingUpData{}
+	signUpData := models.SignUpData{}
 	err := json.NewDecoder(r.Body).Decode(&signUpData)
 	if err != nil {
 		models.Send(w, http.StatusInternalServerError, models.IncorrectJsonAnswer)

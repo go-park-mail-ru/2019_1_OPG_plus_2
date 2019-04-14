@@ -39,13 +39,13 @@ func (data SignInData) Check() (incorrectFields []string) {
 
 /* SIGN UP DATA */
 
-type SingUpData struct {
+type SignUpData struct {
 	Email    string `json:"email" example:"user_test@test.com"`
 	Username string `json:"username" example:"user_test"`
 	Password string `json:"password" example:"SecretPass1!"`
 }
 
-func (data SingUpData) Check() (incorrectFields []string) {
+func (data SignUpData) Check() (incorrectFields []string) {
 	if !CheckEmail(data.Email) {
 		incorrectFields = append(incorrectFields, "email")
 	}
