@@ -9,40 +9,12 @@ import (
 	"testing"
 
 	a "github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/adapters"
-	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/auth"
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"
 )
 
-func init() {
-	a.SetStorages(newMockStorage(), auth.NewStorage())
-	a.SetHandlers(NewUserHandlers(), NewAuthHandlers())
+func init()  {
+	testInitial()
 }
-
-// func testLog(t *testing.T, tCase TestCase) {
-// 	if !t.Failed() {
-// 		t.Logf("\nPASSED TEST:\n"+
-// 			"\tURL:\t\t%v\n"+
-// 			"\tAUTH:\t\t%v\n"+
-// 			"\tMETHOD:\t\t%v\n"+
-// 			"\tJWT:\t\t%v\n"+
-// 			"\tMUXVARS:\t%v\n"+
-// 			"\tBODY:\t\t%v\n"+
-// 			"\n"+
-// 			"\tEXP_STATUS:\t\t%v\n"+
-// 			"\tEXP_BODY:\t\t%v\n",
-//
-// 			tCase.params.url,
-// 			tCase.params.isAuth,
-// 			tCase.params.method,
-// 			tCase.params.jwt,
-// 			tCase.params.muxVars,
-// 			tCase.inputMessage,
-//
-// 			tCase.expStatus,
-// 			tCase.expMessage,
-// 		)
-// 	}
-// }
 
 /*************************
  *  GET_USER CONTROLLER  *
@@ -57,7 +29,7 @@ func TestGetUserSelf(t *testing.T) {
 				muxVars: map[string]string{},
 				method:  "GET",
 				isAuth:  true,
-				url:     "/User",
+				url:     "/user",
 				jwt: models.JwtData{
 					Id:       1,
 					Username: "username1",
@@ -73,7 +45,7 @@ func TestGetUserSelf(t *testing.T) {
 	}
 
 	for _, tCase := range tCases {
-		w, req := testInitial(tCase)
+		w, req := testCaseInitial(tCase)
 		tCase.handler(w, req)
 
 		if w.Code != tCase.expStatus {
@@ -100,7 +72,7 @@ func TestGetUserId(t *testing.T) {
 				muxVars: map[string]string{"id": "3"},
 				method:  "GET",
 				isAuth:  true,
-				url:     "/User",
+				url:     "/user",
 				jwt: models.JwtData{
 					Id:       1,
 					Username: "username1",
@@ -117,7 +89,7 @@ func TestGetUserId(t *testing.T) {
 
 	for _, tCase := range tCases {
 		var retMessage models.UserDataAnswer
-		w, req := testInitial(tCase)
+		w, req := testCaseInitial(tCase)
 		tCase.handler(w, req)
 
 		if w.Code != tCase.expStatus {
@@ -142,7 +114,7 @@ func TestGetUserIdNotExists(t *testing.T) {
 				muxVars: map[string]string{"id": "1278"},
 				method:  "GET",
 				isAuth:  true,
-				url:     "/User",
+				url:     "/user",
 				jwt: models.JwtData{
 					Id:       1,
 					Username: "username1",
@@ -158,7 +130,7 @@ func TestGetUserIdNotExists(t *testing.T) {
 	}
 
 	for _, tCase := range tCases {
-		w, req := testInitial(tCase)
+		w, req := testCaseInitial(tCase)
 		tCase.handler(w, req)
 
 		if w.Code != tCase.expStatus {
@@ -183,7 +155,7 @@ func TestGetUserNoAuth(t *testing.T) {
 				muxVars: map[string]string{},
 				method:  "GET",
 				isAuth:  false,
-				url:     "/User",
+				url:     "/user",
 				jwt:     models.JwtData{},
 			},
 
@@ -195,7 +167,7 @@ func TestGetUserNoAuth(t *testing.T) {
 	}
 
 	for _, tCase := range tCases {
-		w, req := testInitial(tCase)
+		w, req := testCaseInitial(tCase)
 		tCase.handler(w, req)
 
 		if w.Code != tCase.expStatus {
@@ -220,7 +192,7 @@ func TestGetUserIdNotNumber(t *testing.T) {
 				muxVars: map[string]string{"id": "qwerty"},
 				method:  "GET",
 				isAuth:  true,
-				url:     "/User",
+				url:     "/user",
 				jwt: models.JwtData{
 					Id:       1,
 					Username: "username1",
@@ -236,7 +208,7 @@ func TestGetUserIdNotNumber(t *testing.T) {
 	}
 
 	for _, tCase := range tCases {
-		w, req := testInitial(tCase)
+		w, req := testCaseInitial(tCase)
 		tCase.handler(w, req)
 
 		if w.Code != tCase.expStatus {
@@ -264,7 +236,7 @@ func TestUpdateUserCorrect(t *testing.T) {
 				muxVars: map[string]string{},
 				method:  "PUT",
 				isAuth:  true,
-				url:     "/User",
+				url:     "/user",
 				jwt: models.JwtData{
 					Id:       1,
 					Username: "username1",
@@ -280,7 +252,7 @@ func TestUpdateUserCorrect(t *testing.T) {
 	}
 
 	for _, tCase := range tCases {
-		w, req := testInitial(tCase)
+		w, req := testCaseInitial(tCase)
 		tCase.handler(w, req)
 
 		if w.Code != tCase.expStatus {
@@ -325,7 +297,7 @@ func TestUpdateUserNoAuth(t *testing.T) {
 				muxVars: map[string]string{},
 				method:  "PUT",
 				isAuth:  false,
-				url:     "/User",
+				url:     "/user",
 				jwt:     models.JwtData{},
 			},
 
@@ -337,7 +309,7 @@ func TestUpdateUserNoAuth(t *testing.T) {
 	}
 
 	for _, tCase := range tCases {
-		w, req := testInitial(tCase)
+		w, req := testCaseInitial(tCase)
 		tCase.handler(w, req)
 
 		if w.Code != tCase.expStatus {
@@ -362,7 +334,7 @@ func TestUpdateUserInvalidField(t *testing.T) {
 				muxVars: map[string]string{},
 				method:  "PUT",
 				isAuth:  true,
-				url:     "/User",
+				url:     "/user",
 				jwt: models.JwtData{
 					Id:       1,
 					Username: "qwerty",
@@ -382,7 +354,7 @@ func TestUpdateUserInvalidField(t *testing.T) {
 				muxVars: map[string]string{},
 				method:  "PUT",
 				isAuth:  true,
-				url:     "/User",
+				url:     "/user",
 				jwt: models.JwtData{
 					Id:       1,
 					Username: "qwerty",
@@ -402,7 +374,7 @@ func TestUpdateUserInvalidField(t *testing.T) {
 				muxVars: map[string]string{},
 				method:  "PUT",
 				isAuth:  true,
-				url:     "/User",
+				url:     "/user",
 				jwt: models.JwtData{
 					Id:       1,
 					Username: "qwerty",
@@ -418,7 +390,7 @@ func TestUpdateUserInvalidField(t *testing.T) {
 	}
 
 	for _, tCase := range tCases {
-		w, req := testInitial(tCase)
+		w, req := testCaseInitial(tCase)
 		tCase.handler(w, req)
 
 		if w.Code != tCase.expStatus {
@@ -443,7 +415,7 @@ func TestUpdateUserInvalidJSON(t *testing.T) {
 				muxVars: map[string]string{},
 				method:  "PUT",
 				isAuth:  true,
-				url:     "/User",
+				url:     "/user",
 				jwt: models.JwtData{
 					Id:       1,
 					Username: "qwerty",
@@ -459,7 +431,7 @@ func TestUpdateUserInvalidJSON(t *testing.T) {
 	}
 
 	for _, tCase := range tCases {
-		w, req := testInitial(tCase)
+		w, req := testCaseInitial(tCase)
 		tCase.handler(w, req)
 
 		if w.Code != tCase.expStatus {
@@ -488,7 +460,7 @@ func TestRemoveUserCorrect(t *testing.T) {
 				muxVars: map[string]string{},
 				method:  "DELETE",
 				isAuth:  true,
-				url:     "/User",
+				url:     "/user",
 				jwt: models.JwtData{
 					Id:       1,
 					Username: "qwerty",
@@ -504,7 +476,7 @@ func TestRemoveUserCorrect(t *testing.T) {
 	}
 
 	for _, tCase := range tCases {
-		w, req := testInitial(tCase)
+		w, req := testCaseInitial(tCase)
 		tCase.handler(w, req)
 
 		if w.Code != tCase.expStatus {
@@ -534,7 +506,7 @@ func TestRemoveUserNoAuth(t *testing.T) {
 				muxVars: map[string]string{},
 				method:  "DELETE",
 				isAuth:  false,
-				url:     "/User",
+				url:     "/user",
 				jwt:     models.JwtData{},
 			},
 
@@ -546,7 +518,7 @@ func TestRemoveUserNoAuth(t *testing.T) {
 	}
 
 	for _, tCase := range tCases {
-		w, req := testInitial(tCase)
+		w, req := testCaseInitial(tCase)
 		tCase.handler(w, req)
 
 		if w.Code != tCase.expStatus {
@@ -569,7 +541,7 @@ func TestRemoveUserInvalidJSON(t *testing.T) {
 				muxVars: map[string]string{},
 				method:  "DELETE",
 				isAuth:  true,
-				url:     "/User",
+				url:     "/user",
 				jwt: models.JwtData{
 					Id:       2,
 					Username: "username2",
@@ -585,7 +557,7 @@ func TestRemoveUserInvalidJSON(t *testing.T) {
 	}
 
 	for _, tCase := range tCases {
-		w, req := testInitial(tCase)
+		w, req := testCaseInitial(tCase)
 		tCase.handler(w, req)
 
 		if w.Code != tCase.expStatus {
@@ -608,7 +580,7 @@ func TestRemoveUserInvalidData(t *testing.T) {
 				muxVars: map[string]string{},
 				method:  "DELETE",
 				isAuth:  true,
-				url:     "/User",
+				url:     "/user",
 				jwt: models.JwtData{
 					Id:       2,
 					Username: "username2",
@@ -624,7 +596,7 @@ func TestRemoveUserInvalidData(t *testing.T) {
 	}
 
 	for _, tCase := range tCases {
-		w, req := testInitial(tCase)
+		w, req := testCaseInitial(tCase)
 		tCase.handler(w, req)
 
 		if w.Code != tCase.expStatus {
@@ -656,7 +628,7 @@ func TestCreateUserCorrect(t *testing.T) {
 				muxVars: map[string]string{},
 				method:  "POST",
 				isAuth:  false,
-				url:     "/User",
+				url:     "/user",
 				jwt:     models.JwtData{},
 			},
 
@@ -668,7 +640,7 @@ func TestCreateUserCorrect(t *testing.T) {
 	}
 
 	for _, tCase := range tCases {
-		w, req := testInitial(tCase)
+		w, req := testCaseInitial(tCase)
 		tCase.handler(w, req)
 
 		if w.Code != tCase.expStatus {
@@ -702,7 +674,6 @@ func TestCreateUserCorrect(t *testing.T) {
 }
 
 func TestCreateUsersAuth(t *testing.T) {
-
 	tCases := []TestCase{
 		{
 			handler: a.GetHandlers().User.CreateUser,
@@ -711,7 +682,7 @@ func TestCreateUsersAuth(t *testing.T) {
 				muxVars: map[string]string{},
 				method:  "POST",
 				isAuth:  true,
-				url:     "/User",
+				url:     "/user",
 				jwt: models.JwtData{
 					Id:       2,
 					Username: "username2",
@@ -727,7 +698,7 @@ func TestCreateUsersAuth(t *testing.T) {
 	}
 
 	for _, tCase := range tCases {
-		w, req := testInitial(tCase)
+		w, req := testCaseInitial(tCase)
 		tCase.handler(w, req)
 
 		if w.Code != tCase.expStatus {
@@ -744,7 +715,6 @@ func TestCreateUsersAuth(t *testing.T) {
 }
 
 func TestCreateUserIncorrectJson(t *testing.T) {
-
 	tCases := []TestCase{
 		{
 			handler: a.GetHandlers().User.CreateUser,
@@ -753,7 +723,7 @@ func TestCreateUserIncorrectJson(t *testing.T) {
 				muxVars: map[string]string{},
 				method:  "POST",
 				isAuth:  false,
-				url:     "/User",
+				url:     "/user",
 				jwt:     models.JwtData{},
 			},
 
@@ -765,7 +735,7 @@ func TestCreateUserIncorrectJson(t *testing.T) {
 	}
 
 	for _, tCase := range tCases {
-		w, req := testInitial(tCase)
+		w, req := testCaseInitial(tCase)
 		tCase.handler(w, req)
 
 		if w.Code != tCase.expStatus {
@@ -788,7 +758,7 @@ func TestCreateUserIncorrectFields(t *testing.T) {
 				muxVars: map[string]string{},
 				method:  "POST",
 				isAuth:  false,
-				url:     "/User",
+				url:     "/user",
 				jwt:     models.JwtData{},
 			},
 
@@ -800,7 +770,7 @@ func TestCreateUserIncorrectFields(t *testing.T) {
 	}
 
 	for _, tCase := range tCases {
-		w, req := testInitial(tCase)
+		w, req := testCaseInitial(tCase)
 		tCase.handler(w, req)
 
 		if w.Code != tCase.expStatus {
@@ -823,7 +793,7 @@ func TestCreateUserAlreadyExists(t *testing.T) {
 				muxVars: map[string]string{},
 				method:  "POST",
 				isAuth:  false,
-				url:     "/User",
+				url:     "/user",
 				jwt:     models.JwtData{},
 			},
 
@@ -835,7 +805,7 @@ func TestCreateUserAlreadyExists(t *testing.T) {
 	}
 
 	for _, tCase := range tCases {
-		w, req := testInitial(tCase)
+		w, req := testCaseInitial(tCase)
 		tCase.handler(w, req)
 
 		if w.Code != tCase.expStatus {

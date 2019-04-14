@@ -7,13 +7,11 @@ import (
 	"testing"
 
 	a "github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/adapters"
-	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/auth"
 	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"
 )
 
-func init() {
-	a.SetStorages(newMockStorage(), auth.NewStorage())
-	a.SetHandlers(NewUserHandlers(), NewAuthHandlers())
+func init()  {
+	testInitial()
 }
 
 /**********************
@@ -61,7 +59,7 @@ func TestIsAuth(t *testing.T) {
 	}
 
 	for _, tCase := range tCases {
-		w, req := testInitial(tCase)
+		w, req := testCaseInitial(tCase)
 		tCase.handler(w, req)
 
 		if w.Code != tCase.expStatus {
