@@ -52,10 +52,10 @@ INSERT INTO colors_auth.users (id, username, email, pass_hash) VALUES
 (5, 'user3', 'user3@mail.ru', '5906ac361a137e2d286465cd6588ebb5ac3f5ae955001100bc41577c3d751764'); #password password3
 
 INSERT INTO colors_core.users (id, avatar, score, games, win, lose) VALUES
-(1, 'avatar_1.jpg', 100500, 10, 7, 3),
-(2, 'avatar_2.jpg', 1337, 12, 7, 5),
-(3, 'avatar_3.jpg', 1982, 100, 20, 80),
-(4, 'avatar_4.jpg', 100, 17, 7, 10),
-(5, 'avatar_5.jpg', 228, 5, 2, 3);
+(1, '', 100500, 10, 7, 3),
+(2, '', 1337, 12, 7, 5),
+(3, '', 1982, 100, 20, 80),
+(4, '', 100, 17, 7, 10),
+(5, '', 228, 5, 2, 3);
 
 COMMIT;
