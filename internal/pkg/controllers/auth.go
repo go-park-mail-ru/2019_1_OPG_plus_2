@@ -89,8 +89,7 @@ func (*AuthHandlers) SignOut(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	jwtCookie, _ := r.Cookie(auth.CookieName)
-	jwtCookie.Expires = time.Unix(0, 0)
+	jwtCookie := auth.CreateAuthCookie(models.JwtData{}, -1)
 	http.SetCookie(w, jwtCookie)
 	models.Send(w, http.StatusOK, models.SignedOutAnswer)
 }

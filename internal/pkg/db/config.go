@@ -20,7 +20,7 @@ func init() {
 		host = ""
 		port = "3306"
 		username = "colors"
-		password = "StrongPassword1!"
+		password = "A$55Ea~r~|lGvaZ~"
 	} else if os.Getenv("TEST_DB") == "on" {
 		host = "82.146.59.94"
 		port = "12345"

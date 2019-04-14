@@ -15,30 +15,30 @@ func NewStorage() *Storage {
 
 type Storage struct{}
 
-func (*Storage) CreateUser(signUpData models.SignUpData) (jwtData models.JwtData, err error, fields []string) {
+func (*Storage) CreateUser(signUpData models.SingUpData) (models.JwtData, error, []string) {
 	incorrectFields := signUpData.Check()
 	if len(incorrectFields) > 0 {
 		return models.JwtData{}, models.FieldsError, incorrectFields
 	}
 
-	jwtData, err, fields = adapters.GetStorages().Auth.SignUp(signUpData)
+	jwtData, err, fields := adapters.GetStorages().Auth.SignUp(signUpData)
 	if err != nil {
-		return
+		return jwtData, err, fields
 	}
 
 	err = db.ProfileCreate(db.ProfileData{
 		Id: jwtData.Id,
 	})
-	return
+	return jwtData, err, fields
 }
-func (*Storage) GetUser(id int64) (userData models.UserData, err error) {
-	userData, err = db.GetUser(id)
+func (*Storage) GetUser(id int64) (models.UserData, error) {
+	userData, err := db.GetUser(id)
 	if err == sql.ErrNoRows {
 		return userData, models.NotFound
 	}
-	return
+	return userData, err
 }
-func (*Storage) UpdateUser(id int64, updateData models.UpdateUserData) (jwtData models.JwtData, err error, fields []string) {
+func (*Storage) UpdateUser(id int64, updateData models.UpdateUserData) (models.JwtData, error, []string) {
 	return adapters.GetStorages().Auth.UpdateAuth(id, updateData)
 }
 func (*Storage) RemoveUser(id int64, removeData models.RemoveUserData) (error, []string) {
