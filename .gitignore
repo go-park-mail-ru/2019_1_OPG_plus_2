@@ -39,3 +39,4 @@ fabric.properties
 
 
 static/*
+tmp/
