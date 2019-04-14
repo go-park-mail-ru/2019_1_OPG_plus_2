@@ -68,7 +68,7 @@ func test(t *testing.T, tCase *testCase) (*httptest.ResponseRecorder, *http.Requ
 	_ = json.NewDecoder(w.Body).Decode(tCase.outputMessage)
 
 	if !reflect.DeepEqual(tCase.outputMessage, tCase.expMessage) {
-		t.Errorf("Wrong Body:\n\tGot: %v\n\tExpected: %v\n", tCase.outputMessage, &tCase.expMessage)
+		t.Errorf("Wrong Body:\n\tGot: %v\n\tExpected: %v\n", tCase.outputMessage, tCase.expMessage)
 	}
 
 	return w, r

@@ -14,19 +14,19 @@ func NewMockAuthStorage() (storage *mockAuthStorage) {
 	storage = new(mockAuthStorage)
 	storage.users = make(map[int64]*db.AuthData)
 	storage.users[1] = &db.AuthData{
-		Email:    "mail1",
+		Email:    "mail1@mail.ru",
 		Username: "username1",
 		Id:       1,
 		PassHash: auth.PasswordHash("pass1"),
 	}
 	storage.users[2] = &db.AuthData{
-		Email:    "mail2",
+		Email:    "mail2@mail.ru",
 		Username: "username2",
 		Id:       2,
 		PassHash: auth.PasswordHash("pass2"),
 	}
 	storage.users[3] = &db.AuthData{
-		Email:    "mail3",
+		Email:    "mail3@mail.ru",
 		Username: "username3",
 		Id:       3,
 		PassHash: auth.PasswordHash("pass3"),

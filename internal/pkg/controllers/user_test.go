@@ -19,6 +19,7 @@ func init() {
 /*************************
  *  GET_USER CONTROLLER  *
  *************************/
+
 func TestGetUserSelf(t *testing.T) {
 	userToFind, _ := a.GetStorages().User.GetUser(1)
 	tCases := []testCase{
@@ -33,7 +34,7 @@ func TestGetUserSelf(t *testing.T) {
 				jwt: models.JwtData{
 					Id:       1,
 					Username: "username1",
-					Email:    "mail1",
+					Email:    "mail1@mail.ru",
 				},
 			},
 
@@ -64,7 +65,7 @@ func TestGetUserId(t *testing.T) {
 				jwt: models.JwtData{
 					Id:       1,
 					Username: "username1",
-					Email:    "mail1",
+					Email:    "mail1@mail.ru",
 				},
 			},
 
@@ -94,7 +95,7 @@ func TestGetUserIdNotExists(t *testing.T) {
 				jwt: models.JwtData{
 					Id:       1,
 					Username: "username1",
-					Email:    "mail1",
+					Email:    "mail1@mail.ru",
 				},
 			},
 
@@ -150,7 +151,7 @@ func TestGetUserIdNotNumber(t *testing.T) {
 				jwt: models.JwtData{
 					Id:       1,
 					Username: "username1",
-					Email:    "mail1",
+					Email:    "mail1@mail.ru",
 				},
 			},
 
@@ -170,6 +171,7 @@ func TestGetUserIdNotNumber(t *testing.T) {
 /****************************
  *  UPDATE_USER CONTROLLER  *
  ****************************/
+
 func TestUpdateUserCorrect(t *testing.T) {
 	tCases := []testCase{
 		{
@@ -183,7 +185,7 @@ func TestUpdateUserCorrect(t *testing.T) {
 				jwt: models.JwtData{
 					Id:       1,
 					Username: "username1",
-					Email:    "mail1",
+					Email:    "mail1@mail.ru",
 				},
 			},
 
@@ -371,7 +373,7 @@ func TestRemoveUserCorrect(t *testing.T) {
 				},
 			},
 
-			inputMessage:  []byte(`{"password": "pass1"}`),
+			inputMessage:  []byte(`{"password": "new_pass"}`),
 			outputMessage: &models.MessageAnswer{},
 
 			expStatus:  200,
@@ -389,8 +391,6 @@ func TestRemoveUserCorrect(t *testing.T) {
 	}
 }
 
-// since this moment i would use another User as a client for testing
-// because in previous test User 1 has been deleted successfully
 func TestRemoveUserNoAuth(t *testing.T) {
 	tCases := []testCase{
 		{
@@ -430,7 +430,7 @@ func TestRemoveUserInvalidJSON(t *testing.T) {
 				jwt: models.JwtData{
 					Id:       2,
 					Username: "username2",
-					Email:    "mail2",
+					Email:    "mail2@mail.ru",
 				},
 			},
 
@@ -460,7 +460,7 @@ func TestRemoveUserInvalidData(t *testing.T) {
 				jwt: models.JwtData{
 					Id:       2,
 					Username: "username2",
-					Email:    "mail2",
+					Email:    "mail2@mail.ru",
 				},
 			},
 
@@ -544,7 +544,7 @@ func TestCreateUsersAuth(t *testing.T) {
 				jwt: models.JwtData{
 					Id:       2,
 					Username: "username2",
-					Email:    "mail2",
+					Email:    "mail2@mail.ru",
 				},
 			},
 

@@ -100,15 +100,6 @@ func (*Storage) SignIn(signInData models.SignInData) (data models.JwtData, err e
 	}, nil, nil
 }
 
-func (*Storage) UpdatePassword(id int64, passwordData models.UpdatePasswordData) (error, []string) {
-	incorrectFields := passwordData.Check()
-	if len(incorrectFields) > 0 {
-		return models.FieldsError, incorrectFields
-	}
-
-	return db.AuthUpdatePassword(id, PasswordHash(passwordData.NewPassword)), nil
-}
-
 func (*Storage) UpdateAuth(id int64, userData models.UpdateUserData) (models.JwtData, error, []string) {
 	incorrectFields := userData.Check()
 	if len(incorrectFields) > 0 {
@@ -129,6 +120,15 @@ func (*Storage) UpdateAuth(id int64, userData models.UpdateUserData) (models.Jwt
 		Email:    userData.Email,
 		Username: userData.Username,
 	}, nil, nil
+}
+
+func (*Storage) UpdatePassword(id int64, passwordData models.UpdatePasswordData) (error, []string) {
+	incorrectFields := passwordData.Check()
+	if len(incorrectFields) > 0 {
+		return models.FieldsError, incorrectFields
+	}
+
+	return db.AuthUpdatePassword(id, PasswordHash(passwordData.NewPassword)), nil
 }
 
 func (*Storage) RemoveAuth(id int64, removeData models.RemoveUserData) (error, []string) {
