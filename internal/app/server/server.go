@@ -7,13 +7,13 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/swaggo/http-swagger"
 
-	_ "github.com/go-park-mail-ru/2019_1_OPG_plus_2/docs"
-	a "github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/adapters"
-	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/auth"
-	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/controllers"
-	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/db"
-	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/middleware"
-	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/user"
+	_ "2019_1_OPG_plus_2/docs"
+	a "2019_1_OPG_plus_2/internal/pkg/adapters"
+	"2019_1_OPG_plus_2/internal/pkg/auth"
+	"2019_1_OPG_plus_2/internal/pkg/controllers"
+	"2019_1_OPG_plus_2/internal/pkg/db"
+	"2019_1_OPG_plus_2/internal/pkg/middleware"
+	"2019_1_OPG_plus_2/internal/pkg/user"
 )
 
 type Params struct {

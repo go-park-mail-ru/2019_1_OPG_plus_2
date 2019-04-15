@@ -11,8 +11,8 @@ import (
 
 	"github.com/gorilla/mux"
 
-	a "github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/adapters"
-	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"
+	a "2019_1_OPG_plus_2/internal/pkg/adapters"
+	"2019_1_OPG_plus_2/internal/pkg/models"
 )
 
 var baseUrl = "localhost:8002/api"
@@ -40,14 +40,14 @@ func testInitial() {
 }
 
 func testCaseInitial(tCase *testCase) (*httptest.ResponseRecorder, *http.Request) {
-	testParams := tCase.params
-	url := baseUrl + testParams.url
-	r := httptest.NewRequest(testParams.method, url, bytes.NewReader(tCase.inputMessage))
+	params := tCase.params
+	url := baseUrl + params.url
+	r := httptest.NewRequest(params.method, url, bytes.NewReader(tCase.inputMessage))
 	w := httptest.NewRecorder()
 	ctx := r.Context()
 
-	data := testParams.jwt
-	ctx = context.WithValue(ctx, "isAuth", testParams.isAuth)
+	data := params.jwt
+	ctx = context.WithValue(ctx, "isAuth", params.isAuth)
 	ctx = context.WithValue(ctx, "jwtData", data)
 
 	r = r.WithContext(ctx)

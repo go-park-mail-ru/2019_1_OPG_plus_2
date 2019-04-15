@@ -1,7 +1,7 @@
 package db
 
 import (
-	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"
+	"2019_1_OPG_plus_2/internal/pkg/models"
 )
 
 func GetUser(id int64) (userData models.UserData, err error) {

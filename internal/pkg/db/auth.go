@@ -3,7 +3,7 @@ package db
 import (
 	"fmt"
 
-	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"
+	"2019_1_OPG_plus_2/internal/pkg/models"
 )
 
 type AuthData struct {

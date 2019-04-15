@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/app/server"
+	"2019_1_OPG_plus_2/internal/app/server"
 )
 
 // @title Colors service API by OPG+2

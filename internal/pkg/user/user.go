@@ -3,10 +3,10 @@ package user
 import (
 	"database/sql"
 
-	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/adapters"
+	"2019_1_OPG_plus_2/internal/pkg/adapters"
 
-	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/db"
-	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"
+	"2019_1_OPG_plus_2/internal/pkg/db"
+	"2019_1_OPG_plus_2/internal/pkg/models"
 )
 
 func NewStorage() *Storage {

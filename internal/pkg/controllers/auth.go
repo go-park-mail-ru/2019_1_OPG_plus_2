@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"time"
 
-	a "github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/adapters"
-	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/auth"
-	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"
+	a "2019_1_OPG_plus_2/internal/pkg/adapters"
+	"2019_1_OPG_plus_2/internal/pkg/auth"
+	"2019_1_OPG_plus_2/internal/pkg/models"
 )
 
 func NewAuthHandlers() *AuthHandlers {

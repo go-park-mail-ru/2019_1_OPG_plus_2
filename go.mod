@@ -1,4 +1,4 @@
-module github.com/go-park-mail-ru/2019_1_OPG_plus_2
+module 2019_1_OPG_plus_2
 
 require (
 	github.com/PuerkitoBio/purell v1.1.1 // indirect

@@ -1,9 +1,9 @@
 package adapters
 
 import (
-	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/auth"
-	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/db"
-	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"
+	"2019_1_OPG_plus_2/internal/pkg/auth"
+	"2019_1_OPG_plus_2/internal/pkg/db"
+	"2019_1_OPG_plus_2/internal/pkg/models"
 )
 
 type mockAuthStorage struct {
