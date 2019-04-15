@@ -36,7 +36,7 @@ type testCase struct {
 
 func testInitial() {
 	a.SetStorages(a.NewMockCoreStorage(), a.NewMockAuthStorage())
-	a.SetHandlers(NewUserHandlers(), NewAuthHandlers())
+	a.SetHandlers(NewUserHandlers(), NewAuthHandlers(), NewVkAuthHandlers())
 }
 
 func testCaseInitial(tCase *testCase) (*httptest.ResponseRecorder, *http.Request) {

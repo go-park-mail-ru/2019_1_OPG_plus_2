@@ -34,7 +34,7 @@ func NewMockAuthStorage() (storage *mockAuthStorage) {
 	return storage
 }
 
-func (storage mockAuthStorage) SignUp(signUpData models.SingUpData) (models.JwtData, error, []string) {
+func (storage mockAuthStorage) SignUp(signUpData models.SignUpData) (models.JwtData, error, []string) {
 	incorrectFields := signUpData.Check()
 	if len(incorrectFields) > 0 {
 		return models.JwtData{}, models.FieldsError, incorrectFields

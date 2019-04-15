@@ -14,6 +14,10 @@ func Open() (err error) {
 		return fmt.Errorf("db already initialized")
 	}
 	dbObj, err = sql.Open("mysql", username+":"+password+"@tcp("+host+":"+port+")/")
+	if err != nil {
+		return
+	}
+	err = dbObj.Ping()
 	return
 }
 
