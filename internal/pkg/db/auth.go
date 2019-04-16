@@ -1,7 +1,10 @@
 package db
 
 import (
+	"database/sql"
 	"fmt"
+
+	"github.com/go-sql-driver/mysql"
 
 	"2019_1_OPG_plus_2/internal/pkg/models"
 )
@@ -43,15 +46,21 @@ func AuthFindByEmailAndPassHash(email string, passHash string) (data AuthData, e
 		return
 	}
 	err = row.Scan(&data.Id, &data.Username, &data.Email, &data.PassHash)
+	if err == sql.ErrNoRows {
+		return data, models.NotFound
+	}
 	return
 }
 
-func AuthFindByNicknameAndPassHash(username string, passHash string) (data AuthData, err error) {
+func AuthFindByUsernameAndPassHash(username string, passHash string) (data AuthData, err error) {
 	row, err := findRowBy(authDbName, authUsersTable, "id, username, email, pass_hash", "username = ? AND pass_hash = ?", username, passHash)
 	if err != nil {
 		return
 	}
 	err = row.Scan(&data.Id, &data.Username, &data.Email, &data.PassHash)
+	if err == sql.ErrNoRows {
+		return data, models.NotFound
+	}
 	return
 }
 
@@ -65,6 +74,11 @@ func AuthUpdateData(data AuthData) error {
 	}
 
 	_, err = updateBy(authDbName, authUsersTable, "username = ?, email = ?", "id = ?", data.Username, data.Email, data.Id)
+	if mysqlError, ok := err.(*mysql.MySQLError); ok {
+		if mysqlError.Number == 1062 {
+			return models.AlreadyExists
+		}
+	}
 	return err
 }
 
@@ -98,4 +112,8 @@ func AuthRemove(id int64, passHash string) error {
 		return fmt.Errorf("incorrect password")
 	}
 	return nil
+}
+
+func AuthTruncate() error {
+	return truncate(authDbName, authUsersTable)
 }

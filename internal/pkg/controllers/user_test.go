@@ -13,7 +13,7 @@ import (
 )
 
 func init() {
-	testInitial()
+	testsInitial()
 }
 
 /*************************

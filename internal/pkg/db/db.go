@@ -125,3 +125,15 @@ func removeBy(dbName string, tableName string, where string, args ...interface{}
 
 	return result.RowsAffected()
 }
+
+func truncate(dbName string, tableName string) error {
+	if dbObj == nil {
+		return fmt.Errorf("db wasn't initialized")
+	}
+
+	_, err := Exec("TRUNCATE TABLE " + dbName + "." + tableName)
+	if err != nil {
+		return err
+	}
+	return nil
+}
