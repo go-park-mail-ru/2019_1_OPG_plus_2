@@ -8,14 +8,14 @@ go:
 services: docker
 
 env:
-  - GO111MODULE=on USE_DOCKER_DB=ON
+  - GO111MODULE=on USE_DOCKER_DB=on
 
 install: true
 
 before_script:
   - go mod tidy
   - go get github.com/golangci/golangci-lint/cmd/golangci-lint
-  - cd build && ./db_run_container.sh && cd ..
+  - cd build && && ./initial.sh && ./db_run_container.sh && cd ..
 
 script:
   - go build cmd/server/main.go
