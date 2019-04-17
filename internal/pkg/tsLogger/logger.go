@@ -1,6 +1,7 @@
 package tsLogger
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -34,23 +35,28 @@ func NewLogger() *TSLogger {
 	return l
 }
 
-func (l *TSLogger) LogTrace(msg interface{}) {
+func (l *TSLogger) LogTrace(formatMessage string, values ...interface{}) {
+	msg := fmt.Sprintf(formatMessage, values...)
 	l.traceChan <- msg
 }
 
-func (l *TSLogger) LogInfo(msg interface{}) {
+func (l *TSLogger) LogInfo(formatMessage string, values ...interface{}) {
+	msg := fmt.Sprintf(formatMessage, values...)
 	l.infoChan <- msg
 }
 
-func (l *TSLogger) LogWarn(msg interface{}) {
+func (l *TSLogger) LogWarn(formatMessage string, values ...interface{}) {
+	msg := fmt.Sprintf(formatMessage, values...)
 	l.warningChan <- msg
 }
 
-func (l *TSLogger) LogErr(msg interface{}) {
+func (l *TSLogger) LogErr(formatMessage string, values ...interface{}) {
+	msg := fmt.Sprintf(formatMessage, values...)
 	l.errorChan <- msg
 }
 
-func (l *TSLogger) LogReq(msg interface{}) {
+func (l *TSLogger) LogReq(formatMessage string, values ...interface{}) {
+	msg := fmt.Sprintf(formatMessage, values...)
 	l.reqChan <- msg
 }
 
@@ -83,19 +89,19 @@ func (l *TSLogger) SetLoggers(
 
 	l.TraceLogger = log.New(traceHandle,
 		"TRACE: ",
-		log.Ldate|log.Ltime|log.Lshortfile)
+		log.Ldate|log.Ltime)
 
 	l.InfoLogger = log.New(infoHandle,
 		"INFO: ",
-		log.Ldate|log.Ltime|log.Lshortfile)
+		log.Ldate|log.Ltime)
 
 	l.WarningLogger = log.New(warningHandle,
 		"WARN: ",
-		log.Ldate|log.Ltime|log.Lshortfile)
+		log.Ldate|log.Ltime)
 
 	l.ErrorLogger = log.New(errorHandle,
 		"ERROR: ",
-		log.Ldate|log.Ltime|log.Lshortfile)
+		log.Ldate|log.Ltime)
 
 	l.RequestBenchLogger = log.New(reqHandle,
 		"REQ: ",

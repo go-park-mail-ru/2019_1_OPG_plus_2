@@ -1,6 +1,7 @@
 package gameservice
 
 import (
+	"2019_1_OPG_plus_2/internal/pkg/tsLogger"
 	"fmt"
 )
 
@@ -19,7 +20,8 @@ func NewHub() *Hub {
 func (h *Hub) AttachRooms(rooms ...*Room) error {
 	for _, room := range rooms {
 		if h.rooms[room.id] != nil {
-			return fmt.Errorf("room exists")
+			tsLogger.Logger.LogErr("ROOM %d EXISTS", room.id)
+			return fmt.Errorf("ROOM %d EXISTS", room.id)
 		}
 		h.rooms[room.id] = room
 		go room.Run()
