@@ -1,7 +1,6 @@
 package adapters
 
 import (
-	"2019_1_OPG_plus_2/internal/pkg/auth"
 	"2019_1_OPG_plus_2/internal/pkg/db"
 	"2019_1_OPG_plus_2/internal/pkg/models"
 )
@@ -17,19 +16,19 @@ func NewMockAuthStorage() (storage *mockAuthStorage) {
 		Email:    "mail1@mail.ru",
 		Username: "username1",
 		Id:       1,
-		PassHash: auth.PasswordHash("pass1"),
+		Password: "pass1",
 	}
 	storage.users[2] = &db.AuthData{
 		Email:    "mail2@mail.ru",
 		Username: "username2",
 		Id:       2,
-		PassHash: auth.PasswordHash("pass2"),
+		Password: "pass2",
 	}
 	storage.users[3] = &db.AuthData{
 		Email:    "mail3@mail.ru",
 		Username: "username3",
 		Id:       3,
-		PassHash: auth.PasswordHash("pass3"),
+		Password: "pass3",
 	}
 	return storage
 }
@@ -53,7 +52,7 @@ func (storage mockAuthStorage) SignUp(signUpData models.SignUpData) (models.JwtD
 	storage.users[id] = &db.AuthData{
 		Email:    signUpData.Email,
 		Username: signUpData.Username,
-		PassHash: auth.PasswordHash(signUpData.Password),
+		Password: signUpData.Password,
 	}
 
 	return models.JwtData{
@@ -65,13 +64,13 @@ func (storage mockAuthStorage) SignUp(signUpData models.SignUpData) (models.JwtD
 
 func (storage mockAuthStorage) SignIn(signInData models.SignInData) (data models.JwtData, err error, incorrectFields []string) {
 	var userData db.AuthData
-	passHash := auth.PasswordHash(signInData.Password)
+	passHash := signInData.Password
 
 	isEmail := models.CheckEmail(signInData.Login)
 	if isEmail {
 		isExists := false
 		for _, user := range storage.users {
-			if user.Email == signInData.Login && user.PassHash == passHash {
+			if user.Email == signInData.Login && user.Password == passHash {
 				userData = *user
 				isExists = true
 				break
@@ -86,7 +85,7 @@ func (storage mockAuthStorage) SignIn(signInData models.SignInData) (data models
 	if isUsername {
 		isExists := false
 		for _, user := range storage.users {
-			if user.Username == signInData.Login && user.PassHash == passHash {
+			if user.Username == signInData.Login && user.Password == passHash {
 				userData = *user
 				isExists = true
 				break
@@ -118,7 +117,7 @@ func (storage mockAuthStorage) UpdatePassword(id int64, passwordData models.Upda
 		return models.NotFound, nil
 	}
 
-	storage.users[id].PassHash = auth.PasswordHash(passwordData.NewPassword)
+	storage.users[id].Password = passwordData.NewPassword
 	return nil, nil
 }
 
@@ -154,7 +153,7 @@ func (storage mockAuthStorage) RemoveAuth(id int64, removeData models.RemoveUser
 		return models.NotFound, nil
 	}
 
-	if storage.users[id].PassHash != auth.PasswordHash(removeData.Password) {
+	if storage.users[id].Password != removeData.Password {
 		return models.FieldsError, append(incorrectFields, "password")
 	}
 

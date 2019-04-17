@@ -49,7 +49,7 @@ func (*Storage) SignUp(signUpData models.SignUpData) (models.JwtData, error, []s
 	id, err := db.AuthCreate(db.AuthData{
 		Email:    signUpData.Email,
 		Username: signUpData.Username,
-		PassHash: PasswordHash(signUpData.Password),
+		Password: PasswordHash(signUpData.Password),
 	})
 	if err != nil {
 		return models.JwtData{}, err, nil

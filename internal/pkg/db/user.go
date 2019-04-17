@@ -8,7 +8,7 @@ import (
 
 func GetUser(id int64) (userData models.UserData, err error) {
 	row, err := QueryRow("SELECT a.id, a.username, a.email, c.avatar, c.score, c.games, c.win, c.lose FROM "+
-		authDbName+"."+authUsersTable+" AS a JOIN "+coreDbName+"."+coreUsersTable+" AS c ON a.id = c.id WHERE a.id = ?", id)
+		AuthDbName+"."+AuthUsersTable+" AS a JOIN "+CoreDbName+"."+CoreUsersTable+" AS c ON a.id = c.id WHERE a.id = ?", id)
 	if err != nil {
 		return
 	}
@@ -22,14 +22,14 @@ func GetUser(id int64) (userData models.UserData, err error) {
 }
 
 func GetScoreboard(limit, offset int64) (usersData []models.ScoreboardUserData, count uint64, err error) {
-	row, err := QueryRow("SELECT COUNT(id) FROM " + authDbName + "." + authUsersTable)
+	row, err := QueryRow("SELECT COUNT(id) FROM " + AuthDbName + "." + AuthUsersTable)
 	if err != nil {
 		return
 	}
 	err = row.Scan(&count)
 
-	rows, err := Query("SELECT a.id, a.username, c.avatar, c.score FROM "+authDbName+"."+authUsersTable+" AS a JOIN "+
-		coreDbName+"."+coreUsersTable+" AS c ON a.id = c.id ORDER BY c.score DESC, c.win DESC, c.id LIMIT ? OFFSET ?", limit, offset)
+	rows, err := Query("SELECT a.id, a.username, c.avatar, c.score FROM "+AuthDbName+"."+AuthUsersTable+" AS a JOIN "+
+		CoreDbName+"."+CoreUsersTable+" AS c ON a.id = c.id ORDER BY c.score DESC, c.win DESC, c.id LIMIT ? OFFSET ?", limit, offset)
 	if err != nil {
 		return
 	}

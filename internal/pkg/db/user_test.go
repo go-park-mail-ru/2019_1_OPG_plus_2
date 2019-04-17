@@ -45,7 +45,7 @@ func TestUsersCreate(t *testing.T) {
 			Email:    user.Email,
 		})
 		if err != nil {
-			t.Errorf("Unknown ErrorLogger: %v", err)
+			t.Errorf("Unknown Error: %v", err)
 			continue
 		}
 		user.Id = id
@@ -55,7 +55,7 @@ func TestUsersCreate(t *testing.T) {
 			Avatar: user.Avatar,
 		})
 		if err != nil {
-			t.Errorf("Unknown ErrorLogger: %v", err)
+			t.Errorf("Unknown Error: %v", err)
 			continue
 		}
 
@@ -77,7 +77,7 @@ func TestUsersUpdate(t *testing.T) {
 			Lose:  user.Lose,
 		})
 		if err != nil {
-			t.Errorf("Unknown ErrorLogger: %v", err)
+			t.Errorf("Unknown Error: %v", err)
 			continue
 		}
 		users[i] = user
@@ -88,7 +88,7 @@ func TestGetUser(t *testing.T) {
 	for _, user := range users {
 		data, err := GetUser(user.Id)
 		if err != nil {
-			t.Errorf("Unknown ErrorLogger: %v", err)
+			t.Errorf("Unknown Error: %v", err)
 			continue
 		}
 		if !reflect.DeepEqual(data, user) {
@@ -100,7 +100,7 @@ func TestGetUser(t *testing.T) {
 func TestTestGetUserIncorrectId(t *testing.T) {
 	_, err := GetUser(0)
 	if err != models.NotFound {
-		t.Errorf("Wrong ErrorLogger:\n\tGot: %v\n\tExpected: %v\n", err, models.NotFound)
+		t.Errorf("Wrong Error:\n\tGot: %v\n\tExpected: %v\n", err, models.NotFound)
 	}
 }
 
@@ -122,7 +122,7 @@ func TestGetScoreboard(t *testing.T) {
 	for i := range limits {
 		data, count, err := GetScoreboard(limits[i], limits[i]*pages[i])
 		if err != nil {
-			t.Errorf("Unknown ErrorLogger: %v", err)
+			t.Errorf("Unknown Error: %v", err)
 			continue
 		}
 

@@ -47,7 +47,7 @@ var doc = `{
                         }
                     },
                     "500": {
-                        "description": "Internal Server ErrorLogger",
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "object",
                             "$ref": "#/definitions/models.MessageAnswer"
@@ -101,7 +101,7 @@ var doc = `{
                         }
                     },
                     "500": {
-                        "description": "Internal Server ErrorLogger",
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "object",
                             "$ref": "#/definitions/models.MessageAnswer"
@@ -184,7 +184,7 @@ var doc = `{
                         }
                     },
                     "500": {
-                        "description": "Internal Server ErrorLogger",
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "object",
                             "$ref": "#/definitions/models.MessageAnswer"
@@ -267,7 +267,7 @@ var doc = `{
                         }
                     },
                     "500": {
-                        "description": "Internal Server ErrorLogger",
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "object",
                             "$ref": "#/definitions/models.MessageAnswer"
@@ -329,7 +329,7 @@ var doc = `{
                         }
                     },
                     "500": {
-                        "description": "Internal Server ErrorLogger",
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "object",
                             "$ref": "#/definitions/models.MessageAnswer"
@@ -381,7 +381,7 @@ var doc = `{
                         }
                     },
                     "500": {
-                        "description": "Internal Server ErrorLogger",
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "object",
                             "$ref": "#/definitions/models.MessageAnswer"
@@ -434,7 +434,7 @@ var doc = `{
                         }
                     },
                     "500": {
-                        "description": "Internal Server ErrorLogger",
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "object",
                             "$ref": "#/definitions/models.MessageAnswer"
@@ -478,7 +478,7 @@ var doc = `{
                         }
                     },
                     "500": {
-                        "description": "Internal Server ErrorLogger",
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "object",
                             "$ref": "#/definitions/models.MessageAnswer"

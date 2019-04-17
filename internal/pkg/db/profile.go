@@ -16,7 +16,7 @@ type ProfileData struct {
 }
 
 func ProfileCreate(data ProfileData) (err error) {
-	id, err := isExists(coreDbName, coreUsersTable, "id = ?", data.Id)
+	id, err := isExists(CoreDbName, CoreUsersTable, "id = ?", data.Id)
 	if err != nil {
 		return
 	}
@@ -24,12 +24,12 @@ func ProfileCreate(data ProfileData) (err error) {
 		return models.AlreadyExists
 	}
 
-	_, err = insert(coreDbName, coreUsersTable, "id, avatar", "?, ?", data.Id, data.Avatar)
+	_, err = insert(CoreDbName, CoreUsersTable, "id, avatar", "?, ?", data.Id, data.Avatar)
 	return
 }
 
 func ProfileFindById(id int64) (data ProfileData, err error) {
-	row, err := findRowBy(coreDbName, coreUsersTable, "avatar, score, games, win, lose", "id = ?", id)
+	row, err := findRowBy(CoreDbName, CoreUsersTable, "avatar, score, games, win, lose", "id = ?", id)
 	if err != nil {
 		return
 	}
@@ -42,7 +42,7 @@ func ProfileFindById(id int64) (data ProfileData, err error) {
 }
 
 func ProfileUpdateData(data ProfileData) error {
-	id, err := isExists(coreDbName, coreUsersTable, "id = ?", data.Id)
+	id, err := isExists(CoreDbName, CoreUsersTable, "id = ?", data.Id)
 	if err != nil {
 		return err
 	}
@@ -50,13 +50,13 @@ func ProfileUpdateData(data ProfileData) error {
 		return models.NotFound
 	}
 
-	_, err = updateBy(coreDbName, coreUsersTable, "score = ?, games = ?, win = ?, lose = ?", "id = ?",
+	_, err = updateBy(CoreDbName, CoreUsersTable, "score = ?, games = ?, win = ?, lose = ?", "id = ?",
 		data.Score, data.Games, data.Win, data.Lose, data.Id)
 	return err
 }
 
 func ProfileUpdateAvatar(id int64, avatar string) error {
-	id, err := isExists(coreDbName, coreUsersTable, "id = ?", id)
+	id, err := isExists(CoreDbName, CoreUsersTable, "id = ?", id)
 	if err != nil {
 		return err
 	}
@@ -64,12 +64,12 @@ func ProfileUpdateAvatar(id int64, avatar string) error {
 		return models.NotFound
 	}
 
-	_, err = updateBy(coreDbName, coreUsersTable, "avatar = ?", "id = ?", avatar, id)
+	_, err = updateBy(CoreDbName, CoreUsersTable, "avatar = ?", "id = ?", avatar, id)
 	return err
 }
 
 func ProfileRemove(id int64) error {
-	id, err := isExists(coreDbName, coreUsersTable, "id = ?", id)
+	id, err := isExists(CoreDbName, CoreUsersTable, "id = ?", id)
 	if err != nil {
 		return err
 	}
@@ -77,10 +77,10 @@ func ProfileRemove(id int64) error {
 		return models.NotFound
 	}
 
-	_, err = removeBy(coreDbName, coreUsersTable, "id = ?", id)
+	_, err = removeBy(CoreDbName, CoreUsersTable, "id = ?", id)
 	return err
 }
 
 func ProfileTruncate() error {
-	return truncate(coreDbName, coreUsersTable)
+	return truncate(CoreDbName, CoreUsersTable)
 }

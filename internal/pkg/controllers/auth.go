@@ -1,11 +1,12 @@
 package controllers
 
 import (
-	"2019_1_OPG_plus_2/internal/pkg/tsLogger"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
+
+	"2019_1_OPG_plus_2/internal/pkg/tsLogger"
 
 	a "2019_1_OPG_plus_2/internal/pkg/adapters"
 	"2019_1_OPG_plus_2/internal/pkg/auth"
