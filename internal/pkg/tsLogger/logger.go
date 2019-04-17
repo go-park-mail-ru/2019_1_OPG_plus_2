@@ -33,49 +33,8 @@ func NewLogger() *TSLogger {
 		errorChan:   make(chan interface{}, 256),
 		reqChan:     make(chan interface{}, 256),
 	}
-	l.InitLoggers(os.Stdout, os.Stdout, os.Stdout, os.Stdout, os.Stdout)
+	l.SetLoggers(os.Stdout, os.Stdout, os.Stdout, os.Stdout, os.Stdout)
 	return l
-}
-
-type statusWriter struct {
-	http.ResponseWriter
-	status int
-	length int
-}
-
-func newStatusWriter(responseWriter http.ResponseWriter) *statusWriter {
-	return &statusWriter{ResponseWriter: responseWriter}
-}
-
-func (w *statusWriter) WriteHeader(status int) {
-	w.status = status
-	w.ResponseWriter.WriteHeader(status)
-}
-
-func (w *statusWriter) Write(b []byte) (int, error) {
-	if w.status == 0 {
-		w.status = 200
-	}
-	n, err := w.ResponseWriter.Write(b)
-	w.length += n
-	return n, err
-}
-
-func (l *TSLogger) RequestLoggingMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		start := time.Now()
-
-		sw := newStatusWriter(w)
-		next.ServeHTTP(sw, r)
-
-		l.LogReq(fmt.Sprintf(
-			"%v %s %s %s",
-			sw.status,
-			r.Method,
-			r.RequestURI,
-			time.Since(start),
-		))
-	})
 }
 
 func (l *TSLogger) LogTrace(msg interface{}) {
@@ -118,7 +77,7 @@ func (l *TSLogger) Run() {
 	}()
 }
 
-func (l *TSLogger) InitLoggers(
+func (l *TSLogger) SetLoggers(
 	traceHandle io.Writer,
 	infoHandle io.Writer,
 	warningHandle io.Writer,
@@ -144,4 +103,21 @@ func (l *TSLogger) InitLoggers(
 	l.RequestBenchLogger = log.New(reqHandle,
 		"REQ: ",
 		log.Ldate|log.Ltime)
+}
+
+func (l *TSLogger) RequestLoggingMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+
+		sw := NewStatusWriter(w)
+		next.ServeHTTP(sw, r)
+
+		l.LogReq(fmt.Sprintf(
+			"%v %s %s %s",
+			sw.Status,
+			r.Method,
+			r.RequestURI,
+			time.Since(start),
+		))
+	})
 }

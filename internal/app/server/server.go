@@ -38,7 +38,7 @@ func StartApp(params Params) error {
 	apiRouter := router.PathPrefix("/api").Subrouter()
 
 	router.Use(middleware.CorsMiddleware)
-	router.Use(SingletonLogger.RequestLoggingMiddleware)
+	router.Use(middleware.RequestLoggingMiddleware)
 	router.Use(middleware.PanicMiddleware)
 
 	router.HandleFunc("/", controllers.MainHandler)
