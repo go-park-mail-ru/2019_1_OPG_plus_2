@@ -28,6 +28,7 @@ type Room struct {
 
 	maxPlayersNum     int
 	currentPlayersNum int
+	win               bool
 }
 
 func newRoom(hub *Hub, id int) *Room {
@@ -62,15 +63,17 @@ func (r *Room) Run() {
 			m, err := r.handleMessage(message)
 			if err != nil {
 				var bMsg = NewBroadcastErrorMessage(err.Error())
-				errorm, _ := json.Marshal(&bMsg)
-				message.feedback.send <- errorm
+				errorMsg, _ := json.Marshal(&bMsg)
+				message.feedback.send <- errorMsg
 			} else {
 				r.broadcastMsg(m)
+			}
+			if r.win {
+				r.hub.closeRoom(r.id)
 			}
 		case id := <-r.hub.closer:
 			if id == r.id {
 				for client := range r.clients {
-					client.send <- []byte("ROOM CLOSES")
 					close(client.send)
 					delete(r.clients, client)
 				}
@@ -129,7 +132,7 @@ func (r *Room) performGameLogic(message Message) ([]byte, error) {
 	if !r.gameModel.IsReady() {
 		return nil, fmt.Errorf("room not ready yet")
 	}
-
+	msg := message.msg
 	var gameAction GameMessage
 	err := json.Unmarshal(message.msg, &gameAction)
 	if err != nil {
@@ -140,8 +143,16 @@ func (r *Room) performGameLogic(message Message) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+	if r.gameModel.Check() {
+		u := NewBroadcastEventMessage("win", map[string]interface{}{
+			"winner": r.gameModel.players[r.gameModel.whoseTurn],
+		})
+		msg, _ = json.Marshal(&u)
+		r.win = true
+		return msg, nil
+	}
 
-	return message.msg, nil
+	return msg, nil
 }
 
 func (r *Room) performChatLogic(message Message) ([]byte, error) {
