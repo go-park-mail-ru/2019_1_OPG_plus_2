@@ -1,6 +1,7 @@
 package server
 
 import (
+	"2019_1_OPG_plus_2/internal/pkg/gameservice"
 	"fmt"
 	"net/http"
 
@@ -59,6 +60,8 @@ func StartApp(params Params) error {
 
 	apiRouter.HandleFunc("/users", controllers.GetScoreboard).Methods("GET", "OPTIONS")
 
+	gameRouter := router.PathPrefix("/game").Subrouter()
+
 	router.PathPrefix("/static").Handler(http.StripPrefix(
 		"/static",
 		http.FileServer(http.Dir(controllers.StaticPath)),
@@ -66,6 +69,7 @@ func StartApp(params Params) error {
 
 	apiRouter.HandleFunc("/vk_login", a.GetHandlers().OAuth.Login1stStageRetrieveCode)
 	apiRouter.HandleFunc("/callback", a.GetHandlers().OAuth.Login2ndStageRetrieveTokenGetData)
+	gameservice.AddGameServicePaths(gameRouter)
 
 	return http.ListenAndServe(":"+params.Port, router)
 }
