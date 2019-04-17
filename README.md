@@ -1,5 +1,7 @@
 # 2019_1_OPG_plus_2
-[![Build Status](https://travis-ci.org/go-park-mail-ru/2019_1_OPG_plus_2.svg?branch=master)](https://travis-ci.org/go-park-mail-ru/2019_1_OPG_plus_2)
+MASTER: [![Build Status](https://travis-ci.org/go-park-mail-ru/2019_1_OPG_plus_2.svg?branch=master)](https://travis-ci.org/go-park-mail-ru/2019_1_OPG_plus_2)
+
+DEV: [![Build Status](https://travis-ci.org/go-park-mail-ru/2019_1_OPG_plus_2.svg?branch=dev)](https://travis-ci.org/go-park-mail-ru/2019_1_OPG_plus_2)
 
 API-бэкенд для проекта COLORS команды OPG+2 
 ## Команда
