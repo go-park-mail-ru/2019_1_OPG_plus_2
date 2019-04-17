@@ -3,6 +3,7 @@ package gameservice
 import (
 	"2019_1_OPG_plus_2/internal/pkg/tsLogger"
 	"fmt"
+	"time"
 )
 
 type Hub struct {
@@ -30,8 +31,13 @@ func (h *Hub) AttachRooms(rooms ...*Room) error {
 }
 
 func (h *Hub) run() {
+	ticker := time.NewTicker(time.Second * 5)
 	for _, room := range h.rooms {
 		go room.Run()
+	}
+
+	for range ticker.C {
+		tsLogger.Logger.LogInfo("HUB INFO: %+v", h.rooms)
 	}
 }
 

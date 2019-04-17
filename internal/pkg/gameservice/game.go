@@ -50,8 +50,9 @@ type GameModel struct {
 	players   []string
 	whoseTurn int
 
-	ready   bool
-	running bool
+	ready      bool
+	running    bool
+	cellsCount int
 }
 
 func NewGameModel(room *Room) *GameModel {
@@ -65,8 +66,13 @@ func (g *GameModel) DoTurn(a GameMessage) error {
 	if err != nil {
 		return err
 	}
+	g.cellsCount -= len(a.Data.Coords)
 	g.whoseTurn = (g.whoseTurn + 1) % len(g.players)
 	return nil
+}
+
+func (g *GameModel) Check() bool {
+	return g.cellsCount <= 24
 }
 
 func (g *GameModel) IsReady() bool {
@@ -80,4 +86,5 @@ func (g *GameModel) IsRunning() bool {
 func (g *GameModel) Init() {
 	g.whoseTurn = rand.Intn(len(g.players))
 	g.field = NewFieldModel()
+	g.cellsCount = 25
 }
