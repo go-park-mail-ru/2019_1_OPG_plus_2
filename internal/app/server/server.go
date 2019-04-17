@@ -3,7 +3,6 @@ package server
 import (
 	"2019_1_OPG_plus_2/internal/pkg/gameservice"
 	"2019_1_OPG_plus_2/internal/pkg/tsLogger"
-	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -22,14 +21,20 @@ type Params struct {
 	Port string
 }
 
+var logger = tsLogger.Logger
+
+func init() {
+	logger.Run()
+}
+
 func StartApp(params Params) error {
-	fmt.Println("Server starting at " + params.Port)
+	//fmt.Println("Server starting at " + params.Port)
+	logger.LogTrace("Server starting at " + params.Port)
 
 	if err := db.Open(); err != nil {
-		fmt.Println(err.Error())
+		//fmt.Println(err.Error())
+		logger.LogErr("%v", err)
 	}
-	SingletonLogger := tsLogger.Logger
-	SingletonLogger.Run()
 
 	a.SetStorages(user.NewStorage(), auth.NewStorage())
 	a.SetHandlers(controllers.NewUserHandlers(), controllers.NewAuthHandlers(), controllers.NewVkAuthHandlers())
@@ -38,7 +43,6 @@ func StartApp(params Params) error {
 	apiRouter := router.PathPrefix("/api").Subrouter()
 
 	router.Use(middleware.CorsMiddleware)
-	router.Use(middleware.RequestLoggingMiddleware)
 	router.Use(middleware.PanicMiddleware)
 
 	router.HandleFunc("/", controllers.MainHandler)
@@ -46,6 +50,7 @@ func StartApp(params Params) error {
 
 	apiRouter.Use(middleware.AuthMiddleware)
 	apiRouter.Use(middleware.ApplyJsonContentType)
+	apiRouter.Use(middleware.RequestLoggingMiddleware)
 
 	apiRouter.HandleFunc("/", controllers.IndexApiHandler)
 
@@ -71,16 +76,18 @@ func StartApp(params Params) error {
 		http.FileServer(http.Dir(controllers.StaticPath)),
 	))
 
-	apiRouter.HandleFunc("/vk_login", a.GetHandlers().OAuth.Login1stStageRetrieveCode)
-	apiRouter.HandleFunc("/callback", a.GetHandlers().OAuth.Login2ndStageRetrieveTokenGetData)
+	//apiRouter.HandleFunc("/vk_login", a.GetHandlers().OAuth.Login1stStageRetrieveCode)
+	//apiRouter.HandleFunc("/callback", a.GetHandlers().OAuth.Login2ndStageRetrieveTokenGetData)
 	gameservice.AddGameServicePaths(gameRouter)
 
 	return http.ListenAndServe(":"+params.Port, router)
 }
 
 func StopApp() {
-	fmt.Println("Stopping server...")
+	//fmt.Println("Stopping server...")
+	logger.LogTrace("Stopping server...")
 	if err := db.Close(); err != nil {
-		fmt.Println(err.Error())
+		//fmt.Println(err.Error())
+		logger.LogErr("%s", err)
 	}
 }
