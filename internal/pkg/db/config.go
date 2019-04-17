@@ -7,11 +7,11 @@ var port = "3306"
 var username = "colors"
 var password = "colors"
 
-var authDbName = "colors_auth"
-var authUsersTable = "users"
+var AuthDbName = "colors_auth"
+var AuthUsersTable = "users"
 
-var coreDbName = "colors_core"
-var coreUsersTable = "users"
+var CoreDbName = "colors_core"
+var CoreUsersTable = "users"
 
 func init() {
 	// На реальном сервере будет переменная окружения PRODUCTION=on. Меняем параметры на параметры реальной DB.

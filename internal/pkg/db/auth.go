@@ -13,11 +13,11 @@ type AuthData struct {
 	Id       int64  `json:"id"`
 	Email    string `json:"email"`
 	Username string `json:"username"`
-	PassHash string `json:"pass_hash"`
+	Password string `json:"pass_hash"`
 }
 
 func AuthCreate(data AuthData) (id int64, err error) {
-	id, err = isExists(authDbName, authUsersTable, "email = ? OR username = ?", data.Email, data.Username)
+	id, err = isExists(AuthDbName, AuthUsersTable, "email = ? OR username = ?", data.Email, data.Username)
 	if err != nil {
 		return
 	}
@@ -25,27 +25,27 @@ func AuthCreate(data AuthData) (id int64, err error) {
 		return id, models.AlreadyExists
 	}
 
-	return insert(authDbName, authUsersTable, "username, email, pass_hash", "?, ?, ?",
-		data.Username, data.Email, data.PassHash)
+	return insert(AuthDbName, AuthUsersTable, "username, email, pass_hash", "?, ?, ?",
+		data.Username, data.Email, data.Password)
 }
 
 // For future use
 //
 // func AuthFindByUsername(username string) (data AuthData, err error) {
-// 	row, err := findRowBy(authDbName, authUsersTable, "id, username, email, pass_hash", "username = ?", username)
+// 	row, err := findRowBy(AuthDbName, AuthUsersTable, "id, username, email, pass_hash", "username = ?", username)
 // 	if err != nil {
 // 		return
 // 	}
-// 	err = row.Scan(&data.Id, &data.Username, &data.Email, &data.PassHash)
+// 	err = row.Scan(&data.Id, &data.Username, &data.Email, &data.Password)
 // 	return
 // }
 
 func AuthFindByEmailAndPassHash(email string, passHash string) (data AuthData, err error) {
-	row, err := findRowBy(authDbName, authUsersTable, "id, username, email, pass_hash", "email = ? AND pass_hash = ?", email, passHash)
+	row, err := findRowBy(AuthDbName, AuthUsersTable, "id, username, email, pass_hash", "email = ? AND pass_hash = ?", email, passHash)
 	if err != nil {
 		return
 	}
-	err = row.Scan(&data.Id, &data.Username, &data.Email, &data.PassHash)
+	err = row.Scan(&data.Id, &data.Username, &data.Email, &data.Password)
 	if err == sql.ErrNoRows {
 		return data, models.NotFound
 	}
@@ -53,11 +53,11 @@ func AuthFindByEmailAndPassHash(email string, passHash string) (data AuthData, e
 }
 
 func AuthFindByUsernameAndPassHash(username string, passHash string) (data AuthData, err error) {
-	row, err := findRowBy(authDbName, authUsersTable, "id, username, email, pass_hash", "username = ? AND pass_hash = ?", username, passHash)
+	row, err := findRowBy(AuthDbName, AuthUsersTable, "id, username, email, pass_hash", "username = ? AND pass_hash = ?", username, passHash)
 	if err != nil {
 		return
 	}
-	err = row.Scan(&data.Id, &data.Username, &data.Email, &data.PassHash)
+	err = row.Scan(&data.Id, &data.Username, &data.Email, &data.Password)
 	if err == sql.ErrNoRows {
 		return data, models.NotFound
 	}
@@ -65,7 +65,7 @@ func AuthFindByUsernameAndPassHash(username string, passHash string) (data AuthD
 }
 
 func AuthUpdateData(data AuthData) error {
-	id, err := isExists(authDbName, authUsersTable, "id = ?", data.Id)
+	id, err := isExists(AuthDbName, AuthUsersTable, "id = ?", data.Id)
 	if err != nil {
 		return err
 	}
@@ -73,7 +73,7 @@ func AuthUpdateData(data AuthData) error {
 		return models.NotFound
 	}
 
-	_, err = updateBy(authDbName, authUsersTable, "username = ?, email = ?", "id = ?", data.Username, data.Email, data.Id)
+	_, err = updateBy(AuthDbName, AuthUsersTable, "username = ?, email = ?", "id = ?", data.Username, data.Email, data.Id)
 	if mysqlError, ok := err.(*mysql.MySQLError); ok {
 		if mysqlError.Number == 1062 {
 			return models.AlreadyExists
@@ -83,7 +83,7 @@ func AuthUpdateData(data AuthData) error {
 }
 
 func AuthUpdatePassword(id int64, passHash string) error {
-	id, err := isExists(authDbName, authUsersTable, "id = ?", id)
+	id, err := isExists(AuthDbName, AuthUsersTable, "id = ?", id)
 	if err != nil {
 		return err
 	}
@@ -91,12 +91,12 @@ func AuthUpdatePassword(id int64, passHash string) error {
 		return models.NotFound
 	}
 
-	_, err = updateBy(authDbName, authUsersTable, "pass_hash = ?", "id = ?", passHash, id)
+	_, err = updateBy(AuthDbName, AuthUsersTable, "pass_hash = ?", "id = ?", passHash, id)
 	return err
 }
 
 func AuthRemove(id int64, passHash string) error {
-	id, err := isExists(authDbName, authUsersTable, "id = ?", id)
+	id, err := isExists(AuthDbName, AuthUsersTable, "id = ?", id)
 	if err != nil {
 		return err
 	}
@@ -104,7 +104,7 @@ func AuthRemove(id int64, passHash string) error {
 		return models.NotFound
 	}
 
-	count, err := removeBy(authDbName, authUsersTable, "id = ? AND pass_hash = ?", id, passHash)
+	count, err := removeBy(AuthDbName, AuthUsersTable, "id = ? AND pass_hash = ?", id, passHash)
 	if err != nil {
 		return err
 	}
@@ -115,5 +115,5 @@ func AuthRemove(id int64, passHash string) error {
 }
 
 func AuthTruncate() error {
-	return truncate(authDbName, authUsersTable)
+	return truncate(AuthDbName, AuthUsersTable)
 }
