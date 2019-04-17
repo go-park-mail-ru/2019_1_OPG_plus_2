@@ -76,6 +76,10 @@ func (r *Room) Run() {
 				return
 			}
 		}
+		m, err := r.CheckReady()
+		if err == nil {
+			r.broadcastMsg(m)
+		}
 	}
 }
 
@@ -172,8 +176,16 @@ func (r *Room) performRegisterLogic(message Message) ([]byte, error) {
 		r.gameModel.ready = true
 	}
 
+	return message.msg, nil
+}
+
+func (r *Room) CheckReady() ([]byte, error) {
+	if r.gameModel.IsRunning() {
+		return nil, fmt.Errorf("game is running")
+	}
 	if r.gameModel.IsReady() {
 		r.gameModel.Init()
+		r.gameModel.running = true
 		var dat = NewBroadcastEventMessage("ready", map[string]interface{}{
 			"players_num": r.currentPlayersNum,
 			"players":     r.gameModel.players,
@@ -182,6 +194,5 @@ func (r *Room) performRegisterLogic(message Message) ([]byte, error) {
 		m, _ := json.Marshal(&dat)
 		return m, nil
 	}
-
-	return message.msg, nil
+	return nil, fmt.Errorf("not ready yet")
 }

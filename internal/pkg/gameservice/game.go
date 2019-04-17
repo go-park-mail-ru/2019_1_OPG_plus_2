@@ -48,8 +48,10 @@ type GameModel struct {
 
 	field     *FieldModel
 	players   []string
-	ready     bool
 	whoseTurn int
+
+	ready   bool
+	running bool
 }
 
 func NewGameModel(room *Room) *GameModel {
@@ -69,6 +71,10 @@ func (g *GameModel) DoTurn(a GameMessage) error {
 
 func (g *GameModel) IsReady() bool {
 	return g.ready
+}
+
+func (g *GameModel) IsRunning() bool {
+	return g.running
 }
 
 func (g *GameModel) Init() {
