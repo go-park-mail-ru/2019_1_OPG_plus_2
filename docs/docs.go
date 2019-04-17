@@ -47,7 +47,7 @@ var doc = `{
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal Server ErrorLogger",
                         "schema": {
                             "type": "object",
                             "$ref": "#/definitions/models.MessageAnswer"
@@ -101,7 +101,7 @@ var doc = `{
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal Server ErrorLogger",
                         "schema": {
                             "type": "object",
                             "$ref": "#/definitions/models.MessageAnswer"
@@ -184,7 +184,7 @@ var doc = `{
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal Server ErrorLogger",
                         "schema": {
                             "type": "object",
                             "$ref": "#/definitions/models.MessageAnswer"
@@ -267,7 +267,7 @@ var doc = `{
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal Server ErrorLogger",
                         "schema": {
                             "type": "object",
                             "$ref": "#/definitions/models.MessageAnswer"
@@ -329,7 +329,7 @@ var doc = `{
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal Server ErrorLogger",
                         "schema": {
                             "type": "object",
                             "$ref": "#/definitions/models.MessageAnswer"
@@ -348,7 +348,7 @@ var doc = `{
                 "summary": "Deletes user and user of client",
                 "parameters": [
                     {
-                        "description": "Info required to remove current user",
+                        "description": "InfoLogger required to remove current user",
                         "name": "remove_data",
                         "in": "body",
                         "required": true,
@@ -381,7 +381,7 @@ var doc = `{
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal Server ErrorLogger",
                         "schema": {
                             "type": "object",
                             "$ref": "#/definitions/models.MessageAnswer"
@@ -434,7 +434,7 @@ var doc = `{
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal Server ErrorLogger",
                         "schema": {
                             "type": "object",
                             "$ref": "#/definitions/models.MessageAnswer"
@@ -478,7 +478,7 @@ var doc = `{
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal Server ErrorLogger",
                         "schema": {
                             "type": "object",
                             "$ref": "#/definitions/models.MessageAnswer"
@@ -672,7 +672,7 @@ type swaggerInfo struct {
 	Description string
 }
 
-// SwaggerInfo holds exported Swagger Info so clients can modify it
+// SwaggerInfo holds exported Swagger InfoLogger so clients can modify it
 var SwaggerInfo swaggerInfo
 
 type s struct{}
