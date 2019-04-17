@@ -8,8 +8,7 @@ go:
 services: docker
 
 env:
-  - GO111MODULE=on
-  - USE_DOCKER_DB=ON
+  - GO111MODULE=on USE_DOCKER_DB=ON
 
 install: true
 
