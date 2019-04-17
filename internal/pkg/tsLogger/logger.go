@@ -1,12 +1,9 @@
 package tsLogger
 
 import (
-	"fmt"
 	"io"
 	"log"
-	"net/http"
 	"os"
-	"time"
 )
 
 var Logger = NewLogger()
@@ -103,21 +100,4 @@ func (l *TSLogger) SetLoggers(
 	l.RequestBenchLogger = log.New(reqHandle,
 		"REQ: ",
 		log.Ldate|log.Ltime)
-}
-
-func (l *TSLogger) RequestLoggingMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		start := time.Now()
-
-		sw := NewStatusWriter(w)
-		next.ServeHTTP(sw, r)
-
-		l.LogReq(fmt.Sprintf(
-			"%v %s %s %s",
-			sw.Status,
-			r.Method,
-			r.RequestURI,
-			time.Since(start),
-		))
-	})
 }
