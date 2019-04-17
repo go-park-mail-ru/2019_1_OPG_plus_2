@@ -154,7 +154,7 @@ func (*UserHandlers) UpdateUser(w http.ResponseWriter, r *http.Request) {
 // @description This method deletes all information about User, making a query, including profile, game stats and authorization info
 // @tags User
 // @produce json
-// @param remove_data body models.RemoveUserData true "Info required to remove current User"
+// @param remove_data body models.RemoveUserData true "InfoLogger required to remove current User"
 // @success 200 {object} models.MessageAnswer
 // @failure 400 {object} models.MessageAnswer
 // @failure 401 {object} models.MessageAnswer

@@ -31,15 +31,15 @@ type BroadcastEventMessage struct {
 
 type RegisterMessage GenericMessage
 
-func NewBroadcastEventMessage(e_type string, e_data interface{}) *BroadcastEventMessage {
+func NewBroadcastEventMessage(eType string, eData interface{}) *BroadcastEventMessage {
 	return &BroadcastEventMessage{
 		GenericMessage: GenericMessage{
 			User:  "SERVICE",
 			MType: "event",
 		},
 		Data: EventData{
-			EventType: e_type,
-			EventData: e_data,
+			EventType: eType,
+			EventData: eData,
 		},
 	}
 }

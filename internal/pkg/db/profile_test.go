@@ -47,7 +47,7 @@ func TestProfileCreate(t *testing.T) {
 	for _, profile := range profiles {
 		err := ProfileCreate(profile)
 		if err != nil {
-			t.Errorf("Unknown Error: %v", err)
+			t.Errorf("Unknown ErrorLogger: %v", err)
 		}
 	}
 }
@@ -56,7 +56,7 @@ func TestProfileCreateAlreadyExists(t *testing.T) {
 	for _, profile := range profiles {
 		err := ProfileCreate(profile)
 		if err != models.AlreadyExists {
-			t.Errorf("Wrong Error:\n\tGot: %v\n\tExpected: %v\n", err, models.AlreadyExists)
+			t.Errorf("Wrong ErrorLogger:\n\tGot: %v\n\tExpected: %v\n", err, models.AlreadyExists)
 		}
 	}
 }
@@ -65,7 +65,7 @@ func TestProfileFindById(t *testing.T) {
 	for _, profile := range profiles {
 		data, err := ProfileFindById(profile.Id)
 		if err != nil {
-			t.Errorf("Unknown Error: %v", err)
+			t.Errorf("Unknown ErrorLogger: %v", err)
 			continue
 		}
 		if !reflect.DeepEqual(profile, data) {
@@ -77,7 +77,7 @@ func TestProfileFindById(t *testing.T) {
 func TestProfileFindByIdIncorrectId(t *testing.T) {
 	_, err := ProfileFindById(0)
 	if err != models.NotFound {
-		t.Errorf("Wrong Error:\n\tGot: %v\n\tExpected: %v\n", err, models.NotFound)
+		t.Errorf("Wrong ErrorLogger:\n\tGot: %v\n\tExpected: %v\n", err, models.NotFound)
 	}
 }
 
@@ -89,7 +89,7 @@ func TestProfileUpdateData(t *testing.T) {
 		profile.Score = profile.Win * 100
 		err := ProfileUpdateData(profile)
 		if err != nil {
-			t.Errorf("Unknown Error: %v", err)
+			t.Errorf("Unknown ErrorLogger: %v", err)
 			continue
 		}
 		profiles[i] = profile
@@ -104,7 +104,7 @@ func TestProfileUpdateIncorrectId(t *testing.T) {
 	profile.Id = 0
 	err := ProfileUpdateData(profile)
 	if err != models.NotFound {
-		t.Errorf("Wrong Error:\n\tGot: %v\n\tExpected: %v\n", err, models.NotFound)
+		t.Errorf("Wrong ErrorLogger:\n\tGot: %v\n\tExpected: %v\n", err, models.NotFound)
 	}
 
 	// Test after updating
@@ -116,7 +116,7 @@ func TestProfileUpdateAvatar(t *testing.T) {
 		profile.Avatar += "_new"
 		err := ProfileUpdateAvatar(profile.Id, profile.Avatar)
 		if err != nil {
-			t.Errorf("Unknown Error: %v", err)
+			t.Errorf("Unknown ErrorLogger: %v", err)
 			continue
 		}
 		profiles[i] = profile
@@ -129,9 +129,9 @@ func TestProfileUpdateAvatar(t *testing.T) {
 func TestProfileUpdateAvatarIncorrectId(t *testing.T) {
 	err := ProfileUpdateAvatar(0, "new_avatar")
 	if err != models.NotFound {
-		t.Errorf("Wrong Error:\n\tGot: %v\n\tExpected: %v\n", err, models.NotFound)
+		t.Errorf("Wrong ErrorLogger:\n\tGot: %v\n\tExpected: %v\n", err, models.NotFound)
 	}
-	
+
 	// Test after updating
 	TestProfileFindById(t)
 }
@@ -139,7 +139,7 @@ func TestProfileUpdateAvatarIncorrectId(t *testing.T) {
 func TestProfileRemoveIncorrectId(t *testing.T) {
 	err := ProfileRemove(0)
 	if err != models.NotFound {
-		t.Errorf("Wrong Error:\n\tGot: %v\n\tExpected: %v\n", err, models.NotFound)
+		t.Errorf("Wrong ErrorLogger:\n\tGot: %v\n\tExpected: %v\n", err, models.NotFound)
 	}
 
 	// Test after updating
@@ -150,7 +150,7 @@ func TestProfileRemove(t *testing.T) {
 	for _, profile := range profiles {
 		err := ProfileRemove(profile.Id)
 		if err != nil {
-			t.Errorf("Unknown Error: %v", err)
+			t.Errorf("Unknown ErrorLogger: %v", err)
 		}
 	}
 }
@@ -159,7 +159,7 @@ func TestProfileRemoveAlreadyRemoved(t *testing.T) {
 	for _, profile := range profiles {
 		err := ProfileRemove(profile.Id)
 		if err != models.NotFound {
-			t.Errorf("Wrong Error:\n\tGot: %v\n\tExpected: %v\n", err, models.NotFound)
+			t.Errorf("Wrong ErrorLogger:\n\tGot: %v\n\tExpected: %v\n", err, models.NotFound)
 		}
 	}
 }

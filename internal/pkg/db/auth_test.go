@@ -37,7 +37,7 @@ func TestAuthCreate(t *testing.T) {
 	for i, auth := range auths {
 		id, err := AuthCreate(auth)
 		if err != nil {
-			t.Errorf("Unknown Error: %v", err)
+			t.Errorf("Unknown ErrorLogger: %v", err)
 			continue
 		}
 		auths[i].Id = id
@@ -48,7 +48,7 @@ func TestAuthCreateAlreadyExists(t *testing.T) {
 	for _, auth := range auths {
 		_, err := AuthCreate(auth)
 		if err != models.AlreadyExists {
-			t.Errorf("Wrong Error:\n\tGot: %v\n\tExpected: %v\n", err, models.AlreadyExists)
+			t.Errorf("Wrong ErrorLogger:\n\tGot: %v\n\tExpected: %v\n", err, models.AlreadyExists)
 		}
 	}
 }
@@ -57,7 +57,7 @@ func TestAuthFindByEmailAndPassHash(t *testing.T) {
 	for _, auth := range auths {
 		data, err := AuthFindByEmailAndPassHash(auth.Email, auth.PassHash)
 		if err != nil {
-			t.Errorf("Unknown Error: %v", err)
+			t.Errorf("Unknown ErrorLogger: %v", err)
 			continue
 		}
 		if !reflect.DeepEqual(auth, data) {
@@ -70,7 +70,7 @@ func TestAuthFindByEmailAndPassHashIncorrectEmail(t *testing.T) {
 	for _, auth := range auths {
 		_, err := AuthFindByEmailAndPassHash(auth.Email+"salt", auth.PassHash)
 		if err != models.NotFound {
-			t.Errorf("Wrong Error:\n\tGot: %v\n\tExpected: %v\n", err, models.NotFound)
+			t.Errorf("Wrong ErrorLogger:\n\tGot: %v\n\tExpected: %v\n", err, models.NotFound)
 		}
 	}
 }
@@ -79,7 +79,7 @@ func TestAuthFindByEmailAndPassHashIncorrectPassHash(t *testing.T) {
 	for _, auth := range auths {
 		_, err := AuthFindByEmailAndPassHash(auth.Email, auth.PassHash+"salt")
 		if err != models.NotFound {
-			t.Errorf("Wrong Error:\n\tGot: %v\n\tExpected: %v\n", err, models.NotFound)
+			t.Errorf("Wrong ErrorLogger:\n\tGot: %v\n\tExpected: %v\n", err, models.NotFound)
 		}
 	}
 }
@@ -88,7 +88,7 @@ func TestAuthFindByNicknameAndPassHash(t *testing.T) {
 	for _, auth := range auths {
 		data, err := AuthFindByUsernameAndPassHash(auth.Username, auth.PassHash)
 		if err != nil {
-			t.Errorf("Unknown Error: %v", err)
+			t.Errorf("Unknown ErrorLogger: %v", err)
 			continue
 		}
 		if !reflect.DeepEqual(auth, data) {
@@ -101,7 +101,7 @@ func TestAuthFindByUsernameAndPassHashIncorrectUsername(t *testing.T) {
 	for _, auth := range auths {
 		_, err := AuthFindByUsernameAndPassHash(auth.Username+"salt", auth.PassHash)
 		if err != models.NotFound {
-			t.Errorf("Wrong Error:\n\tGot: %v\n\tExpected: %v\n", err, models.NotFound)
+			t.Errorf("Wrong ErrorLogger:\n\tGot: %v\n\tExpected: %v\n", err, models.NotFound)
 		}
 	}
 }
@@ -110,7 +110,7 @@ func TestAuthFindByUsernameAndPassHashIncorrectPassHash(t *testing.T) {
 	for _, auth := range auths {
 		_, err := AuthFindByUsernameAndPassHash(auth.Username, auth.PassHash+"salt")
 		if err != models.NotFound {
-			t.Errorf("Wrong Error:\n\tGot: %v\n\tExpected: %v\n", err, models.NotFound)
+			t.Errorf("Wrong ErrorLogger:\n\tGot: %v\n\tExpected: %v\n", err, models.NotFound)
 		}
 	}
 }
@@ -121,7 +121,7 @@ func TestAuthUpdateData(t *testing.T) {
 		auth.Email += "_new"
 		err := AuthUpdateData(auth)
 		if err != nil {
-			t.Errorf("Unknown Error: %v", err)
+			t.Errorf("Unknown ErrorLogger: %v", err)
 			continue
 		}
 		auths[i] = auth
@@ -142,7 +142,7 @@ func TestAuthUpdateAlreadyExists(t *testing.T) {
 		auth.Id = firstId
 		err := AuthUpdateData(auth)
 		if err != models.AlreadyExists {
-			t.Errorf("Wrong Error:\n\tGot: %v\n\tExpected: %v\n", err, models.AlreadyExists)
+			t.Errorf("Wrong ErrorLogger:\n\tGot: %v\n\tExpected: %v\n", err, models.AlreadyExists)
 		}
 	}
 
@@ -156,7 +156,7 @@ func TestAuthUpdateIncorrectId(t *testing.T) {
 	auth.Id = 0
 	err := AuthUpdateData(auth)
 	if err != models.NotFound {
-		t.Errorf("Wrong Error:\n\tGot: %v\n\tExpected: %v\n", err, models.NotFound)
+		t.Errorf("Wrong ErrorLogger:\n\tGot: %v\n\tExpected: %v\n", err, models.NotFound)
 	}
 
 	// Test after updating
@@ -169,7 +169,7 @@ func TestAuthUpdatePassword(t *testing.T) {
 		auth.PassHash += "_new"
 		err := AuthUpdatePassword(auth.Id, auth.PassHash)
 		if err != nil {
-			t.Errorf("Unknown Error: %v", err)
+			t.Errorf("Unknown ErrorLogger: %v", err)
 			continue
 		}
 		auths[i] = auth
@@ -183,7 +183,7 @@ func TestAuthUpdatePassword(t *testing.T) {
 func TestAuthUpdatePasswordIncorrectId(t *testing.T) {
 	err := AuthUpdatePassword(0, "new_pass_hash")
 	if err != models.NotFound {
-		t.Errorf("Wrong Error:\n\tGot: %v\n\tExpected: %v\n", err, models.NotFound)
+		t.Errorf("Wrong ErrorLogger:\n\tGot: %v\n\tExpected: %v\n", err, models.NotFound)
 	}
 
 	// Test after updating
@@ -195,7 +195,7 @@ func TestAuthRemoveIncorrectId(t *testing.T) {
 	for _, auth := range auths {
 		err := AuthRemove(0, auth.PassHash)
 		if err != models.NotFound {
-			t.Errorf("Wrong Error:\n\tGot: %v\n\tExpected: %v\n", err, models.NotFound)
+			t.Errorf("Wrong ErrorLogger:\n\tGot: %v\n\tExpected: %v\n", err, models.NotFound)
 		}
 	}
 
@@ -208,7 +208,7 @@ func TestAuthRemove(t *testing.T) {
 	for _, auth := range auths {
 		err := AuthRemove(auth.Id, auth.PassHash)
 		if err != nil {
-			t.Errorf("Unknown Error: %v", err)
+			t.Errorf("Unknown ErrorLogger: %v", err)
 		}
 	}
 }
@@ -217,7 +217,7 @@ func TestAuthRemoveAlreadyRemoved(t *testing.T) {
 	for _, auth := range auths {
 		err := AuthRemove(auth.Id, auth.PassHash)
 		if err != models.NotFound {
-			t.Errorf("Wrong Error:\n\tGot: %v\n\tExpected: %v\n", err, models.NotFound)
+			t.Errorf("Wrong ErrorLogger:\n\tGot: %v\n\tExpected: %v\n", err, models.NotFound)
 		}
 	}
 }

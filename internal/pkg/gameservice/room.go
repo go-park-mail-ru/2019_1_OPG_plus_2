@@ -1,6 +1,7 @@
 package gameservice
 
 import (
+	"2019_1_OPG_plus_2/internal/pkg/tsLogger"
 	"encoding/json"
 	"fmt"
 )
@@ -97,6 +98,7 @@ func (r *Room) broadcastMsg(message []byte) {
 func (r *Room) handleMessage(message Message) ([]byte, error) {
 	var msg GenericMessage
 	err := json.Unmarshal(message.msg, &msg)
+	tsLogger.Logger.LogInfo(msg)
 	if err != nil {
 		return nil, fmt.Errorf("JSON parsing: " + err.Error())
 	}

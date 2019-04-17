@@ -2,6 +2,7 @@ package server
 
 import (
 	"2019_1_OPG_plus_2/internal/pkg/gameservice"
+	"2019_1_OPG_plus_2/internal/pkg/tsLogger"
 	"fmt"
 	"net/http"
 
@@ -27,6 +28,8 @@ func StartApp(params Params) error {
 	if err := db.Open(); err != nil {
 		fmt.Println(err.Error())
 	}
+	SingletonLogger := tsLogger.Logger
+	SingletonLogger.Run()
 
 	a.SetStorages(user.NewStorage(), auth.NewStorage())
 	a.SetHandlers(controllers.NewUserHandlers(), controllers.NewAuthHandlers(), controllers.NewVkAuthHandlers())
@@ -35,6 +38,7 @@ func StartApp(params Params) error {
 	apiRouter := router.PathPrefix("/api").Subrouter()
 
 	router.Use(middleware.CorsMiddleware)
+	router.Use(middleware.RequestLoggingMiddleware)
 	router.Use(middleware.PanicMiddleware)
 
 	router.HandleFunc("/", controllers.MainHandler)
