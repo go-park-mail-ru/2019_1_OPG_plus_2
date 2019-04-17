@@ -101,7 +101,7 @@ func (r *Room) broadcastMsg(message []byte) {
 func (r *Room) handleMessage(message Message) ([]byte, error) {
 	var msg GenericMessage
 	err := json.Unmarshal(message.msg, &msg)
-	tsLogger.Logger.LogInfo("%+v", msg)
+	tsLogger.Logger.LogInfo("ROOM %d: %+v", r.id, msg)
 	if err != nil {
 		return nil, fmt.Errorf("JSON parsing: " + err.Error())
 	}
@@ -137,6 +137,9 @@ func (r *Room) performGameLogic(message Message) ([]byte, error) {
 	err := json.Unmarshal(message.msg, &gameAction)
 	if err != nil {
 		return nil, err
+	}
+	if gameAction.User != r.gameModel.players[r.gameModel.whoseTurn] {
+		return nil, fmt.Errorf("it's not your turn")
 	}
 
 	err = r.gameModel.DoTurn(gameAction)

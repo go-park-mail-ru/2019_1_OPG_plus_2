@@ -36,11 +36,8 @@ func (h *Hub) run() {
 		go room.Run()
 	}
 
-	for {
-		select {
-		case <-ticker.C:
-			tsLogger.Logger.LogInfo("HUB INFO: %+v", h.rooms)
-		}
+	for range ticker.C {
+		tsLogger.Logger.LogInfo("HUB INFO: %+v", h.rooms)
 	}
 }
 
