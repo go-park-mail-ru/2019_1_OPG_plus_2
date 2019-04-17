@@ -9,8 +9,7 @@ func testsInitial() {
 	authDbName = "colors_auth_test"
 	coreDbName = "colors_core_test"
 
-	if err := Open(); err != nil {
+	if err := Open(); err != nil && err != AlreadyInit {
 		log.Fatal(err.Error())
 	}
 }
-

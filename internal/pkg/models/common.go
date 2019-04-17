@@ -7,9 +7,11 @@ import (
 	"net/http"
 )
 
-var FieldsError = errors.New("incorrect fields")
-var NotFound = errors.New("not found")
-var AlreadyExists = errors.New("already exists")
+var (
+	FieldsError   = errors.New("incorrect fields")
+	NotFound      = errors.New("not found")
+	AlreadyExists = errors.New("already exists")
+)
 
 type InputModel interface {
 	Check() []string

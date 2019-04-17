@@ -8,7 +8,7 @@ import (
 	"2019_1_OPG_plus_2/internal/pkg/models"
 )
 
-var users = []AuthData{
+var auths = []AuthData{
 	{
 		Username: "username_1",
 		Email:    "mail_1@mail.ru",
@@ -33,192 +33,189 @@ func init() {
 	}
 }
 
-func TestCreate(t *testing.T) {
-	for i, user := range users {
-		id, err := AuthCreate(user)
+func TestAuthCreate(t *testing.T) {
+	for i, auth := range auths {
+		id, err := AuthCreate(auth)
 		if err != nil {
 			t.Errorf("Unknown Error: %v", err)
 			continue
 		}
-		users[i].Id = id
+		auths[i].Id = id
 	}
 }
 
-func TestCreateAlreadyExists(t *testing.T) {
-	for _, user := range users {
-		_, err := AuthCreate(user)
+func TestAuthCreateAlreadyExists(t *testing.T) {
+	for _, auth := range auths {
+		_, err := AuthCreate(auth)
 		if err != models.AlreadyExists {
 			t.Errorf("Wrong Error:\n\tGot: %v\n\tExpected: %v\n", err, models.AlreadyExists)
 		}
 	}
 }
 
-func TestFindByEmailAndPassHash(t *testing.T) {
-	for _, user := range users {
-		data, err := AuthFindByEmailAndPassHash(user.Email, user.PassHash)
+func TestAuthFindByEmailAndPassHash(t *testing.T) {
+	for _, auth := range auths {
+		data, err := AuthFindByEmailAndPassHash(auth.Email, auth.PassHash)
 		if err != nil {
 			t.Errorf("Unknown Error: %v", err)
 			continue
 		}
-		if !reflect.DeepEqual(user, data) {
-			t.Errorf("Wrong Data:\n\tGot: %v\n\tExpected: %v\n", data, user)
+		if !reflect.DeepEqual(auth, data) {
+			t.Errorf("Wrong Data:\n\tGot: %v\n\tExpected: %v\n", data, auth)
 		}
 	}
 }
 
-func TestFindByEmailAndPassHashIncorrectEmail(t *testing.T) {
-	for _, user := range users {
-		_, err := AuthFindByEmailAndPassHash(user.Email+"salt", user.PassHash)
+func TestAuthFindByEmailAndPassHashIncorrectEmail(t *testing.T) {
+	for _, auth := range auths {
+		_, err := AuthFindByEmailAndPassHash(auth.Email+"salt", auth.PassHash)
 		if err != models.NotFound {
 			t.Errorf("Wrong Error:\n\tGot: %v\n\tExpected: %v\n", err, models.NotFound)
 		}
 	}
 }
 
-func TestFindByEmailAndPassHashIncorrectPassHash(t *testing.T) {
-	for _, user := range users {
-		_, err := AuthFindByEmailAndPassHash(user.Email, user.PassHash+"salt")
+func TestAuthFindByEmailAndPassHashIncorrectPassHash(t *testing.T) {
+	for _, auth := range auths {
+		_, err := AuthFindByEmailAndPassHash(auth.Email, auth.PassHash+"salt")
 		if err != models.NotFound {
 			t.Errorf("Wrong Error:\n\tGot: %v\n\tExpected: %v\n", err, models.NotFound)
 		}
 	}
 }
 
-func TestFindByNicknameAndPassHash(t *testing.T) {
-	for _, user := range users {
-		data, err := AuthFindByUsernameAndPassHash(user.Username, user.PassHash)
+func TestAuthFindByNicknameAndPassHash(t *testing.T) {
+	for _, auth := range auths {
+		data, err := AuthFindByUsernameAndPassHash(auth.Username, auth.PassHash)
 		if err != nil {
 			t.Errorf("Unknown Error: %v", err)
 			continue
 		}
-		if !reflect.DeepEqual(user, data) {
-			t.Errorf("Wrong Data:\n\tGot: %v\n\tExpected: %v\n", data, user)
+		if !reflect.DeepEqual(auth, data) {
+			t.Errorf("Wrong Data:\n\tGot: %v\n\tExpected: %v\n", data, auth)
 		}
 	}
 }
 
-func TestFindByUsernameAndPassHashIncorrectUsername(t *testing.T) {
-	for _, user := range users {
-		_, err := AuthFindByUsernameAndPassHash(user.Username+"salt", user.PassHash)
+func TestAuthFindByUsernameAndPassHashIncorrectUsername(t *testing.T) {
+	for _, auth := range auths {
+		_, err := AuthFindByUsernameAndPassHash(auth.Username+"salt", auth.PassHash)
 		if err != models.NotFound {
 			t.Errorf("Wrong Error:\n\tGot: %v\n\tExpected: %v\n", err, models.NotFound)
 		}
 	}
 }
 
-func TestFindByUsernameAndPassHashIncorrectPassHash(t *testing.T) {
-	for _, user := range users {
-		_, err := AuthFindByUsernameAndPassHash(user.Username, user.PassHash+"salt")
+func TestAuthFindByUsernameAndPassHashIncorrectPassHash(t *testing.T) {
+	for _, auth := range auths {
+		_, err := AuthFindByUsernameAndPassHash(auth.Username, auth.PassHash+"salt")
 		if err != models.NotFound {
 			t.Errorf("Wrong Error:\n\tGot: %v\n\tExpected: %v\n", err, models.NotFound)
 		}
 	}
 }
 
-func TestUpdateData(t *testing.T) {
-	for i, user := range users {
-		user.Username += "_new"
-		user.Email += "_new"
-		err := AuthUpdateData(user)
+func TestAuthUpdateData(t *testing.T) {
+	for i, auth := range auths {
+		auth.Username += "_new"
+		auth.Email += "_new"
+		err := AuthUpdateData(auth)
 		if err != nil {
 			t.Errorf("Unknown Error: %v", err)
 			continue
 		}
-		users[i] = user
+		auths[i] = auth
 	}
 
 	// Test after updating
-	TestFindByEmailAndPassHash(t)
-	TestFindByNicknameAndPassHash(t)
+	TestAuthFindByEmailAndPassHash(t)
+	TestAuthFindByNicknameAndPassHash(t)
 }
 
-func TestUpdateAlreadyExists(t *testing.T) {
-	firstId := users[0].Id
-	for i, user := range users {
+func TestAuthUpdateAlreadyExists(t *testing.T) {
+	firstId := auths[0].Id
+	for i, auth := range auths {
 		if i == 0 {
 			continue
 		}
 
-		user.Id = firstId
-		err := AuthUpdateData(user)
+		auth.Id = firstId
+		err := AuthUpdateData(auth)
 		if err != models.AlreadyExists {
 			t.Errorf("Wrong Error:\n\tGot: %v\n\tExpected: %v\n", err, models.AlreadyExists)
 		}
 	}
 
 	// Test after updating
-	TestFindByEmailAndPassHash(t)
-	TestFindByNicknameAndPassHash(t)
+	TestAuthFindByEmailAndPassHash(t)
+	TestAuthFindByNicknameAndPassHash(t)
 }
 
-func TestUpdateIncorrectId(t *testing.T) {
-	for _, user := range users {
-		user.Id = 0
-		err := AuthUpdateData(user)
-		if err != models.NotFound {
-			t.Errorf("Wrong Error:\n\tGot: %v\n\tExpected: %v\n", err, models.NotFound)
-		}
+func TestAuthUpdateIncorrectId(t *testing.T) {
+	auth := auths[0]
+	auth.Id = 0
+	err := AuthUpdateData(auth)
+	if err != models.NotFound {
+		t.Errorf("Wrong Error:\n\tGot: %v\n\tExpected: %v\n", err, models.NotFound)
 	}
 
 	// Test after updating
-	TestFindByEmailAndPassHash(t)
-	TestFindByNicknameAndPassHash(t)
+	TestAuthFindByEmailAndPassHash(t)
+	TestAuthFindByNicknameAndPassHash(t)
 }
 
-func TestUpdatePassword(t *testing.T) {
-	for i, user := range users {
-		user.PassHash += "_new"
-		err := AuthUpdatePassword(user.Id, user.PassHash)
+func TestAuthUpdatePassword(t *testing.T) {
+	for i, auth := range auths {
+		auth.PassHash += "_new"
+		err := AuthUpdatePassword(auth.Id, auth.PassHash)
 		if err != nil {
 			t.Errorf("Unknown Error: %v", err)
 			continue
 		}
-		users[i] = user
+		auths[i] = auth
 	}
 
 	// Test after updating
-	TestFindByEmailAndPassHash(t)
-	TestFindByNicknameAndPassHash(t)
+	TestAuthFindByEmailAndPassHash(t)
+	TestAuthFindByNicknameAndPassHash(t)
 }
 
-func TestUpdatePasswordIncorrectId(t *testing.T) {
-	for _, user := range users {
-		err := AuthUpdatePassword(0, user.PassHash)
+func TestAuthUpdatePasswordIncorrectId(t *testing.T) {
+	err := AuthUpdatePassword(0, "new_pass_hash")
+	if err != models.NotFound {
+		t.Errorf("Wrong Error:\n\tGot: %v\n\tExpected: %v\n", err, models.NotFound)
+	}
+
+	// Test after updating
+	TestAuthFindByEmailAndPassHash(t)
+	TestAuthFindByNicknameAndPassHash(t)
+}
+
+func TestAuthRemoveIncorrectId(t *testing.T) {
+	for _, auth := range auths {
+		err := AuthRemove(0, auth.PassHash)
 		if err != models.NotFound {
 			t.Errorf("Wrong Error:\n\tGot: %v\n\tExpected: %v\n", err, models.NotFound)
 		}
 	}
 
 	// Test after updating
-	TestFindByEmailAndPassHash(t)
-	TestFindByNicknameAndPassHash(t)
+	TestAuthFindByEmailAndPassHash(t)
+	TestAuthFindByNicknameAndPassHash(t)
 }
 
-func TestRemoveIncorrectId(t *testing.T) {
-	for _, user := range users {
-		err := AuthRemove(0, user.PassHash)
-		if err != models.NotFound {
-			t.Errorf("Wrong Error:\n\tGot: %v\n\tExpected: %v\n", err, models.NotFound)
-		}
-	}
-
-	// Test after updating
-	TestFindByEmailAndPassHash(t)
-	TestFindByNicknameAndPassHash(t)
-}
-
-func TestRemove(t *testing.T) {
-	for _, user := range users {
-		err := AuthRemove(user.Id, user.PassHash)
+func TestAuthRemove(t *testing.T) {
+	for _, auth := range auths {
+		err := AuthRemove(auth.Id, auth.PassHash)
 		if err != nil {
 			t.Errorf("Unknown Error: %v", err)
 		}
 	}
 }
 
-func TestRemoveAlreadyRemoved(t *testing.T) {
-	for _, user := range users {
-		err := AuthRemove(user.Id, user.PassHash)
+func TestAuthRemoveAlreadyRemoved(t *testing.T) {
+	for _, auth := range auths {
+		err := AuthRemove(auth.Id, auth.PassHash)
 		if err != models.NotFound {
 			t.Errorf("Wrong Error:\n\tGot: %v\n\tExpected: %v\n", err, models.NotFound)
 		}

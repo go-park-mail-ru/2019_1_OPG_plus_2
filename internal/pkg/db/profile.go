@@ -1,6 +1,8 @@
 package db
 
 import (
+	"database/sql"
+
 	"2019_1_OPG_plus_2/internal/pkg/models"
 )
 
@@ -26,33 +28,32 @@ func ProfileCreate(data ProfileData) (err error) {
 	return
 }
 
-// For future use
-//
-// func ProfileFindById(id int64) (data ProfileData, err error) {
-// 	row, err := findRowBy(coreDbName, coreUsersTable, "avatar, score, games, win, lose", "id = ?", id)
-// 	if err != nil {
-// 		return
-// 	}
-// 	data.Id = id
-// 	err = row.Scan(&data.Avatar, &data.Score, &data.Games, &data.Win, &data.Lose)
-// 	return
-// }
+func ProfileFindById(id int64) (data ProfileData, err error) {
+	row, err := findRowBy(coreDbName, coreUsersTable, "avatar, score, games, win, lose", "id = ?", id)
+	if err != nil {
+		return
+	}
+	data.Id = id
+	err = row.Scan(&data.Avatar, &data.Score, &data.Games, &data.Win, &data.Lose)
+	if err == sql.ErrNoRows {
+		return data, models.NotFound
+	}
+	return
+}
 
-// For future use
-//
-// func ProfileUpdateData(data ProfileData) error {
-// 	id, err := isExists(coreDbName, coreUsersTable, "id = ?", data.Id)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	if id == 0 {
-// 		return models.NotFound
-// 	}
-//
-// 	_, err = updateBy(coreDbName, coreUsersTable, "score = ?, games = ?, win = ?, lose = ?", "id = ?",
-// 		data.Score, data.Games, data.Win, data.Lose, data.Id)
-// 	return err
-// }
+func ProfileUpdateData(data ProfileData) error {
+	id, err := isExists(coreDbName, coreUsersTable, "id = ?", data.Id)
+	if err != nil {
+		return err
+	}
+	if id == 0 {
+		return models.NotFound
+	}
+
+	_, err = updateBy(coreDbName, coreUsersTable, "score = ?, games = ?, win = ?, lose = ?", "id = ?",
+		data.Score, data.Games, data.Win, data.Lose, data.Id)
+	return err
+}
 
 func ProfileUpdateAvatar(id int64, avatar string) error {
 	id, err := isExists(coreDbName, coreUsersTable, "id = ?", id)
@@ -78,4 +79,8 @@ func ProfileRemove(id int64) error {
 
 	_, err = removeBy(coreDbName, coreUsersTable, "id = ?", id)
 	return err
+}
+
+func ProfileTruncate() error {
+	return truncate(coreDbName, coreUsersTable)
 }
