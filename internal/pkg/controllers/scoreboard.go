@@ -1,11 +1,14 @@
 package controllers
 
 import (
-	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/db"
-	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/pkg/models"
 	"net/http"
 	"strconv"
+
+	"2019_1_OPG_plus_2/internal/pkg/db"
+	"2019_1_OPG_plus_2/internal/pkg/models"
 )
+
+const pageSize = 10
 
 // GetScoreboard godoc
 // @title Get scoreboard page
@@ -14,9 +17,10 @@ import (
 // @tags scoreboard
 // @produce json
 // @param limit query int false "Entries per page"
-// @param offset query int false "Entries from the first position"
+// @param page query int false "Number of page"
 // @success 200 {array} models.ScoreboardUserData
-// @router /profiles/score [get]
+// @failure 500 {object} models.MessageAnswer
+// @router /users [get]
 func GetScoreboard(w http.ResponseWriter, r *http.Request) {
 	limit, err := strconv.ParseInt(r.URL.Query().Get("limit"), 10, 64)
 	if err != nil || limit < 1 {
@@ -28,11 +32,14 @@ func GetScoreboard(w http.ResponseWriter, r *http.Request) {
 		page = 1
 	}
 
-	usersData, err := db.GetScoreboard(limit, (page-1)*limit)
+	users, count, err := db.GetScoreboard(limit, (page-1)*limit)
 	if err != nil {
-		models.SendMessage(w, http.StatusInternalServerError, err.Error())
+		models.Send(w, http.StatusInternalServerError, models.GetDeveloperErrorAnswer(err.Error()))
 		return
 	}
 
-	models.SendMessageWithData(w, http.StatusOK, "users found", usersData)
+	models.Send(w, http.StatusOK, models.GetScoreboardAnswer(models.ScoreboardData{
+		Users: users,
+		Count: count,
+	}))
 }

@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/go-park-mail-ru/2019_1_OPG_plus_2/internal/app/server"
 	"os"
+
+	"2019_1_OPG_plus_2/internal/app/server"
 )
 
 // @title Colors service API by OPG+2
@@ -13,7 +14,7 @@ import (
 // @contact.name @DanikNik
 // @contact.email nikolsky.dan@gmail.com
 
-// @host localhost:8001
+// @host localhost:8002
 // @BasePath /api
 
 func main() {

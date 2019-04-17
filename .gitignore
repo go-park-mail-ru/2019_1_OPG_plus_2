@@ -37,5 +37,6 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
-# Configs
-config.go
+
+static/*
+tmp/

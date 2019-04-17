@@ -1,86 +1,119 @@
 package db
 
 import (
-    "fmt"
+	"database/sql"
+	"fmt"
+
+	"github.com/go-sql-driver/mysql"
+
+	"2019_1_OPG_plus_2/internal/pkg/models"
 )
 
 type AuthData struct {
-    Id       int64  `json:"id"`
-    Email    string `json:"email"`
-    Username string `json:"username"`
-    PassHash string `json:"pass_hash"`
+	Id       int64  `json:"id"`
+	Email    string `json:"email"`
+	Username string `json:"username"`
+	Password string `json:"pass_hash"`
 }
 
 func AuthCreate(data AuthData) (id int64, err error) {
-    id, err = isExists(authDbName, authUsersTable, "email = ? OR username = ?", data.Email, data.Username)
-    if err != nil {
-        return
-    }
-    if id != 0 {
-        return id, fmt.Errorf("user already exists")
-    }
+	id, err = isExists(AuthDbName, AuthUsersTable, "email = ? OR username = ?", data.Email, data.Username)
+	if err != nil {
+		return
+	}
+	if id != 0 {
+		return id, models.AlreadyExists
+	}
 
-    return insert(authDbName, authUsersTable,"username, email, pass_hash", "?, ?, ?",
-        data.Username, data.Email, data.PassHash)
+	return insert(AuthDbName, AuthUsersTable, "username, email, pass_hash", "?, ?, ?",
+		data.Username, data.Email, data.Password)
 }
 
-func AuthFindById(id int64) (data AuthData, err error) {
-    row, err := findRowBy(authDbName, authUsersTable, "id, username, email, pass_hash", "id = ?", id)
-    if err != nil {
-        return
-    }
-    err = row.Scan(&data.Id, &data.Username, &data.Email, &data.PassHash)
-    return
-}
+// For future use
+//
+// func AuthFindByUsername(username string) (data AuthData, err error) {
+// 	row, err := findRowBy(AuthDbName, AuthUsersTable, "id, username, email, pass_hash", "username = ?", username)
+// 	if err != nil {
+// 		return
+// 	}
+// 	err = row.Scan(&data.Id, &data.Username, &data.Email, &data.Password)
+// 	return
+// }
 
 func AuthFindByEmailAndPassHash(email string, passHash string) (data AuthData, err error) {
-    row, err := findRowBy(authDbName, authUsersTable, "id, username, email, pass_hash", "email = ? AND pass_hash = ?", email, passHash)
-    if err != nil {
-        return
-    }
-    err = row.Scan(&data.Id, &data.Username, &data.Email, &data.PassHash)
-    return
+	row, err := findRowBy(AuthDbName, AuthUsersTable, "id, username, email, pass_hash", "email = ? AND pass_hash = ?", email, passHash)
+	if err != nil {
+		return
+	}
+	err = row.Scan(&data.Id, &data.Username, &data.Email, &data.Password)
+	if err == sql.ErrNoRows {
+		return data, models.NotFound
+	}
+	return
 }
 
-func AuthFindByNicknameAndPassHash(username string, passHash string) (data AuthData, err error) {
-    row, err := findRowBy(authDbName, authUsersTable, "id, username, email, pass_hash", "username = ? AND pass_hash = ?", username, passHash)
-    if err != nil {
-        return
-    }
-    err = row.Scan(&data.Id, &data.Username, &data.Email, &data.PassHash)
-    return
+func AuthFindByUsernameAndPassHash(username string, passHash string) (data AuthData, err error) {
+	row, err := findRowBy(AuthDbName, AuthUsersTable, "id, username, email, pass_hash", "username = ? AND pass_hash = ?", username, passHash)
+	if err != nil {
+		return
+	}
+	err = row.Scan(&data.Id, &data.Username, &data.Email, &data.Password)
+	if err == sql.ErrNoRows {
+		return data, models.NotFound
+	}
+	return
 }
 
 func AuthUpdateData(data AuthData) error {
-    count, err := updateBy(authDbName, authUsersTable,"username = ?, email = ?", "id = ?",
-        data.Username, data.Email, data.Id)
-    if err != nil {
-        return err
-    }
-    if count == 0 {
-        return fmt.Errorf("user not found")
-    }
-    return nil
+	id, err := isExists(AuthDbName, AuthUsersTable, "id = ?", data.Id)
+	if err != nil {
+		return err
+	}
+	if id == 0 {
+		return models.NotFound
+	}
+
+	_, err = updateBy(AuthDbName, AuthUsersTable, "username = ?, email = ?", "id = ?", data.Username, data.Email, data.Id)
+	if mysqlError, ok := err.(*mysql.MySQLError); ok {
+		if mysqlError.Number == 1062 {
+			return models.AlreadyExists
+		}
+	}
+	return err
 }
 
 func AuthUpdatePassword(id int64, passHash string) error {
-    count, err := updateBy(authDbName, authUsersTable,"pass_hash = ?", "id = ?", passHash, id)
-    if err != nil {
-        return err
-    }
-    if count == 0 {
-        return fmt.Errorf("user not found")
-    }
-    return nil
+	id, err := isExists(AuthDbName, AuthUsersTable, "id = ?", id)
+	if err != nil {
+		return err
+	}
+	if id == 0 {
+		return models.NotFound
+	}
+
+	_, err = updateBy(AuthDbName, AuthUsersTable, "pass_hash = ?", "id = ?", passHash, id)
+	return err
 }
 
 func AuthRemove(id int64, passHash string) error {
-    count, err := removeBy(authDbName, authUsersTable,"id = ? AND pass_hash = ?", id, passHash)
-    if err != nil {
-        return err
-    }
-    if count == 0 {
-        return fmt.Errorf("incorrect password")
-    }
-    return nil
+	id, err := isExists(AuthDbName, AuthUsersTable, "id = ?", id)
+	if err != nil {
+		return err
+	}
+	if id == 0 {
+		return models.NotFound
+	}
+
+	count, err := removeBy(AuthDbName, AuthUsersTable, "id = ? AND pass_hash = ?", id, passHash)
+	if err != nil {
+		return err
+	}
+	if count == 0 {
+		return fmt.Errorf("incorrect password")
+	}
+	return nil
+}
+
+func AuthTruncate() error {
+	return truncate(AuthDbName, AuthUsersTable)
 }

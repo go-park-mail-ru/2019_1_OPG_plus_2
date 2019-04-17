@@ -1,19 +1,12 @@
 {
-    "swagger": "2.0",
     "info": {
-        "description": "Game based on filling field with color cells",
-        "title": "Colors service API by OPG+2",
-        "contact": {
-            "name": "@DanikNik",
-            "email": "nikolsky.dan@gmail.com"
-        },
+        "contact": {},
         "license": {
-            "name": "Apache 2.0"
+            "name": ""
         },
-        "version": "1.0"
+        "title": "",
+        "version": ""
     },
-    "host": "localhost:8001",
-    "basePath": "/api",
     "paths": {
         "/avatar": {
             "post": {
@@ -34,58 +27,75 @@
                         "description": "OK",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     }
                 }
             }
         },
-        "/profiles/score": {
-            "get": {
-                "description": "This method provides client with scoreboard limited with {limit} entries per page and offset of {offset} from the first position",
+        "/password": {
+            "put": {
+                "description": "This method updates users password, requiring password and confirmation. User data is pulled from jwt-token",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "scoreboard"
+                    "auth"
                 ],
-                "summary": "Produces scoreboard page with {limit} and {offset}",
+                "summary": "Updates user password",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "Entries per page",
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Entries from the first position",
-                        "name": "offset",
-                        "in": "query"
+                        "description": "New password info",
+                        "name": "update_data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.UpdatePasswordData"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.ScoreboardUserData"
-                            }
+                            "type": "object",
+                            "$ref": "#/definitions/models.MessageAnswer"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.IncorrectFieldsAnswer"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.MessageAnswer"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     }
                 }
@@ -106,14 +116,14 @@
                         "description": "OK",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     }
                 }
@@ -147,28 +157,28 @@
                         "description": "OK",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.IncorrectFieldsAnswer"
                         }
                     },
-                    "401": {
-                        "description": "Unauthorized",
+                    "405": {
+                        "description": "Method Not Allowed",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     }
                 }
@@ -182,31 +192,19 @@
                     "auth"
                 ],
                 "summary": "Logs user out",
-                "parameters": [
-                    {
-                        "description": "Credentials",
-                        "name": "credentials",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.SignInData"
-                        }
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     },
-                    "401": {
-                        "description": "Unauthorized",
+                    "405": {
+                        "description": "Method Not Allowed",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     }
                 }
@@ -214,7 +212,7 @@
         },
         "/user": {
             "put": {
-                "description": "This method updates info in user and auth-db record of user, who is making a query",
+                "description": "This method updates info in profile and auth-db record of user, who is making a query",
                 "consumes": [
                     "application/json"
                 ],
@@ -227,13 +225,13 @@
                 "summary": "Updates client's user",
                 "parameters": [
                     {
-                        "description": "User new user data",
+                        "description": "User new profile data",
                         "name": "profile_data",
                         "in": "body",
                         "required": true,
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.SingUpData"
+                            "$ref": "#/definitions/models.UpdateUserData"
                         }
                     }
                 ],
@@ -242,21 +240,28 @@
                         "description": "OK",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.MessageAnswer"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     }
                 }
@@ -290,27 +295,41 @@
                         "description": "OK",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.IncorrectFieldsAnswer"
+                        }
+                    },
+                    "405": {
+                        "description": "Method Not Allowed",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.MessageAnswer"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     }
                 }
             },
             "delete": {
-                "description": "This method deletes all information about user, making a query, including user, game stats and authorization info",
+                "description": "This method deletes all information about user, making a query, including profile, game stats and authorization info",
                 "produces": [
                     "application/json"
                 ],
@@ -318,19 +337,45 @@
                     "user"
                 ],
                 "summary": "Deletes user and user of client",
+                "parameters": [
+                    {
+                        "description": "Info required to remove current user",
+                        "name": "remove_data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.RemoveUserData"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.MessageAnswer"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.MessageAnswer"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     }
                 }
@@ -348,11 +393,11 @@
                 "tags": [
                     "user"
                 ],
-                "summary": "Produces user user info",
+                "summary": "Produces user profile info",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Profile ID",
+                        "description": "ProfileData ID, if none, returned logged in user",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -363,21 +408,72 @@
                         "description": "OK",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.UserData"
+                            "$ref": "#/definitions/models.UserDataAnswerMessage"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.AnswerMessage"
+                            "$ref": "#/definitions/models.MessageAnswer"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.MessageAnswer"
+                        }
+                    }
+                }
+            }
+        },
+        "/users": {
+            "get": {
+                "description": "This method provides client with scoreboard limited with {limit} entries per page and offset of {offset} from the first position",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "scoreboard"
+                ],
+                "summary": "Produces scoreboard page with {limit} and {offset}",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Entries per page",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of page",
+                        "name": "page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.ScoreboardUserData"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.MessageAnswer"
                         }
                     }
                 }
@@ -385,9 +481,19 @@
         }
     },
     "definitions": {
-        "models.AnswerMessage": {
+        "models.IncorrectFieldsAnswer": {
             "type": "object",
             "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "[email",
+                        " username]"
+                    ]
+                },
                 "message": {
                     "type": "string",
                     "example": "Query processed successfully"
@@ -398,9 +504,35 @@
                 }
             }
         },
+        "models.MessageAnswer": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "ok"
+                },
+                "status": {
+                    "type": "integer",
+                    "example": 200
+                }
+            }
+        },
+        "models.RemoveUserData": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string",
+                    "example": "SecretPass1!"
+                }
+            }
+        },
         "models.ScoreboardUserData": {
             "type": "object",
             "properties": {
+                "avatar": {
+                    "type": "string",
+                    "example": "\u003csome avatar url\u003e"
+                },
                 "id": {
                     "type": "integer",
                     "example": 1
@@ -431,10 +563,6 @@
         "models.SingUpData": {
             "type": "object",
             "properties": {
-                "avatar": {
-                    "type": "string",
-                    "example": "\u003csome avatar url\u003e"
-                },
                 "email": {
                     "type": "string",
                     "example": "user_test@test.com"
@@ -442,6 +570,32 @@
                 "password": {
                     "type": "string",
                     "example": "SecretPass1!"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "user_test"
+                }
+            }
+        },
+        "models.UpdatePasswordData": {
+            "type": "object",
+            "properties": {
+                "new_password": {
+                    "type": "string",
+                    "example": "SecretPass2!"
+                },
+                "password_confirm": {
+                    "type": "string",
+                    "example": "SecretPass2!"
+                }
+            }
+        },
+        "models.UpdateUserData": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "user_test@test.com"
                 },
                 "username": {
                     "type": "string",
@@ -481,6 +635,24 @@
                     "type": "integer"
                 }
             }
+        },
+        "models.UserDataAnswerMessage": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object",
+                    "$ref": "#/definitions/models.UserData"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "ok"
+                },
+                "status": {
+                    "type": "integer",
+                    "example": 200
+                }
+            }
         }
-    }
+    },
+    "swagger": "2.0"
 }

@@ -1,7 +1,13 @@
-basePath: /api
 definitions:
-  models.AnswerMessage:
+  models.IncorrectFieldsAnswer:
     properties:
+      data:
+        example:
+        - '[email'
+        - ' username]'
+        items:
+          type: string
+        type: array
       message:
         example: Query processed successfully
         type: string
@@ -9,8 +15,26 @@ definitions:
         example: 200
         type: integer
     type: object
+  models.MessageAnswer:
+    properties:
+      message:
+        example: ok
+        type: string
+      status:
+        example: 200
+        type: integer
+    type: object
+  models.RemoveUserData:
+    properties:
+      password:
+        example: SecretPass1!
+        type: string
+    type: object
   models.ScoreboardUserData:
     properties:
+      avatar:
+        example: <some avatar url>
+        type: string
       id:
         example: 1
         type: integer
@@ -32,14 +56,29 @@ definitions:
     type: object
   models.SingUpData:
     properties:
-      avatar:
-        example: <some avatar url>
-        type: string
       email:
         example: user_test@test.com
         type: string
       password:
         example: SecretPass1!
+        type: string
+      username:
+        example: user_test
+        type: string
+    type: object
+  models.UpdatePasswordData:
+    properties:
+      new_password:
+        example: SecretPass2!
+        type: string
+      password_confirm:
+        example: SecretPass2!
+        type: string
+    type: object
+  models.UpdateUserData:
+    properties:
+      email:
+        example: user_test@test.com
         type: string
       username:
         example: user_test
@@ -68,16 +107,21 @@ definitions:
       win:
         type: integer
     type: object
-host: localhost:8001
+  models.UserDataAnswerMessage:
+    properties:
+      data:
+        $ref: '#/definitions/models.UserData'
+        type: object
+      message:
+        example: ok
+        type: string
+      status:
+        example: 200
+        type: integer
+    type: object
 info:
-  contact:
-    email: nikolsky.dan@gmail.com
-    name: '@DanikNik'
-  description: Game based on filling field with color cells
-  license:
-    name: Apache 2.0
-  title: Colors service API by OPG+2
-  version: "1.0"
+  contact: {}
+  license: {}
 paths:
   /avatar:
     post:
@@ -92,56 +136,32 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
       summary: Saves new avatar image of client's user
       tags:
       - user
-  /profiles/score:
-    get:
-      description: This method provides client with scoreboard limited with {limit}
-        entries per page and offset of {offset} from the first position
+  /password:
+    put:
+      description: This method updates users password, requiring password and confirmation.
+        User data is pulled from jwt-token
       parameters:
-      - description: Entries per page
-        in: query
-        name: limit
-        type: integer
-      - description: Entries from the first position
-        in: query
-        name: offset
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.ScoreboardUserData'
-            type: array
-      summary: Produces scoreboard page with {limit} and {offset}
-      tags:
-      - scoreboard
-  /session:
-    delete:
-      description: This method logs user out and deletes cookie
-      parameters:
-      - description: Credentials
+      - description: New password info
         in: body
-        name: credentials
+        name: update_data
         required: true
         schema:
-          $ref: '#/definitions/models.SignInData'
+          $ref: '#/definitions/models.UpdatePasswordData'
           type: object
       produces:
       - application/json
@@ -149,12 +169,41 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.IncorrectFieldsAnswer'
             type: object
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.MessageAnswer'
+            type: object
+      summary: Updates user password
+      tags:
+      - auth
+  /session:
+    delete:
+      description: This method logs user out and deletes cookie
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.MessageAnswer'
+            type: object
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
       summary: Logs user out
       tags:
@@ -167,12 +216,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
       summary: Checks user session
       tags:
@@ -195,22 +244,22 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.IncorrectFieldsAnswer'
             type: object
-        "401":
-          description: Unauthorized
+        "405":
+          description: Method Not Allowed
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
       summary: Grants client access
       tags:
@@ -218,19 +267,37 @@ paths:
   /user:
     delete:
       description: This method deletes all information about user, making a query,
-        including user, game stats and authorization info
+        including profile, game stats and authorization info
+      parameters:
+      - description: Info required to remove current user
+        in: body
+        name: remove_data
+        required: true
+        schema:
+          $ref: '#/definitions/models.RemoveUserData'
+          type: object
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.MessageAnswer'
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
       summary: Deletes user and user of client
       tags:
@@ -254,17 +321,27 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.IncorrectFieldsAnswer'
+            type: object
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/models.MessageAnswer'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
       summary: Registers user
       tags:
@@ -272,15 +349,15 @@ paths:
     put:
       consumes:
       - application/json
-      description: This method updates info in user and auth-db record of user, who
-        is making a query
+      description: This method updates info in profile and auth-db record of user,
+        who is making a query
       parameters:
-      - description: User new user data
+      - description: User new profile data
         in: body
         name: profile_data
         required: true
         schema:
-          $ref: '#/definitions/models.SingUpData'
+          $ref: '#/definitions/models.UpdateUserData'
           type: object
       produces:
       - application/json
@@ -288,17 +365,22 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
       summary: Updates client's user
       tags:
@@ -309,10 +391,9 @@ paths:
       - application/json
       description: This method provides client with user data, matching required ID
       parameters:
-      - description: Profile ID
+      - description: ProfileData ID, if none, returned logged in user
         in: path
         name: id
-        required: true
         type: integer
       produces:
       - application/json
@@ -320,19 +401,53 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.UserData'
+            $ref: '#/definitions/models.UserDataAnswerMessage'
             type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/models.AnswerMessage'
+            $ref: '#/definitions/models.MessageAnswer'
             type: object
-      summary: Produces user user info
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.MessageAnswer'
+            type: object
+      summary: Produces user profile info
       tags:
       - user
-swagger: "2.0"
+  /users:
+    get:
+      description: This method provides client with scoreboard limited with {limit}
+        entries per page and offset of {offset} from the first position
+      parameters:
+      - description: Entries per page
+        in: query
+        name: limit
+        type: integer
+      - description: Number of page
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.ScoreboardUserData'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.MessageAnswer'
+            type: object
+      summary: Produces scoreboard page with {limit} and {offset}
+      tags:
+      - scoreboard
