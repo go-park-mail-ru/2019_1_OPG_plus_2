@@ -34,7 +34,7 @@ type testCase struct {
 	expMessage    interface{}
 }
 
-func testInitial() {
+func testsInitial() {
 	a.SetStorages(a.NewMockCoreStorage(), a.NewMockAuthStorage())
 	a.SetHandlers(NewUserHandlers(), NewAuthHandlers(), NewVkAuthHandlers())
 }

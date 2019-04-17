@@ -2,7 +2,6 @@ package auth
 
 import (
 	"crypto/sha256"
-	"database/sql"
 	"fmt"
 	"net/http"
 	"time"
@@ -71,7 +70,7 @@ func (*Storage) SignIn(signInData models.SignInData) (data models.JwtData, err e
 	if isEmail {
 		userData, err = db.AuthFindByEmailAndPassHash(signInData.Login, passHash)
 		if err != nil {
-			if err == sql.ErrNoRows {
+			if err == models.NotFound {
 				return data, models.FieldsError, append(incorrectFields, "password")
 			}
 			return
@@ -80,9 +79,9 @@ func (*Storage) SignIn(signInData models.SignInData) (data models.JwtData, err e
 
 	isUsername := !isEmail && models.CheckUsername(signInData.Login)
 	if isUsername {
-		userData, err = db.AuthFindByNicknameAndPassHash(signInData.Login, passHash)
+		userData, err = db.AuthFindByUsernameAndPassHash(signInData.Login, passHash)
 		if err != nil {
-			if err == sql.ErrNoRows {
+			if err == models.NotFound {
 				return data, models.FieldsError, append(incorrectFields, "password")
 			}
 			return

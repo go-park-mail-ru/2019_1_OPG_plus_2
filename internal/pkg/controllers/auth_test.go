@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	testInitial()
+	testsInitial()
 }
 
 func TestIsAuth(t *testing.T) {
@@ -59,7 +59,7 @@ func TestIsAuth(t *testing.T) {
 	}
 }
 
-func TestSignInCorrect(t *testing.T) {
+func TestSignIn(t *testing.T) {
 	tCases := []testCase{
 		{
 			handler: a.GetHandlers().Auth.SignIn,
@@ -174,7 +174,7 @@ func TestSignInCorrect(t *testing.T) {
 	}
 }
 
-func TestSignOutCorrect(t *testing.T) {
+func TestSignOut(t *testing.T) {
 	tCases := []testCase{
 		{
 			handler: a.GetHandlers().Auth.SignOut,
@@ -221,7 +221,7 @@ func TestSignOutCorrect(t *testing.T) {
 	}
 }
 
-func TestUpdatePasswordCorrect(t *testing.T) {
+func TestUpdatePassword(t *testing.T) {
 	tCases := []testCase{
 		{
 			handler: a.GetHandlers().Auth.UpdatePassword,

@@ -2,16 +2,21 @@ package db
 
 import (
 	"database/sql"
-	"fmt"
+	"errors"
 
 	_ "github.com/go-sql-driver/mysql"
+)
+
+var (
+	NotInit     = errors.New("db wasn't initialized")
+	AlreadyInit = errors.New("db already initialized")
 )
 
 var dbObj *sql.DB
 
 func Open() (err error) {
 	if dbObj != nil {
-		return fmt.Errorf("db already initialized")
+		return AlreadyInit
 	}
 	dbObj, err = sql.Open("mysql", username+":"+password+"@tcp("+host+":"+port+")/")
 	if err != nil {
@@ -27,7 +32,7 @@ func Close() error {
 
 func QueryRow(query string, args ...interface{}) (*sql.Row, error) {
 	if dbObj == nil {
-		return nil, fmt.Errorf("db wasn't initialized")
+		return nil, NotInit
 	}
 
 	return dbObj.QueryRow(query, args...), nil
@@ -35,7 +40,7 @@ func QueryRow(query string, args ...interface{}) (*sql.Row, error) {
 
 func Query(query string, args ...interface{}) (*sql.Rows, error) {
 	if dbObj == nil {
-		return nil, fmt.Errorf("db wasn't initialized")
+		return nil, NotInit
 	}
 
 	return dbObj.Query(query, args...)
@@ -44,7 +49,7 @@ func Query(query string, args ...interface{}) (*sql.Rows, error) {
 func Exec(query string, args ...interface{}) (sql.Result, error) {
 	if dbObj == nil {
 		var emptyResult sql.Result
-		return emptyResult, fmt.Errorf("db wasn't initialized")
+		return emptyResult, NotInit
 	}
 
 	return dbObj.Exec(query, args...)
@@ -85,7 +90,7 @@ func findRowBy(dbName string, tableName string, cols string, where string, args 
 //
 // func findRowsBy(dbName string, tableName string, cols string, where string, args ...interface{}) (*sql.Rows, error) {
 // 	if dbObj == nil {
-// 		return nil, fmt.Errorf("db wasn't initialized")
+// 		return nil, NotInit
 // 	}
 //
 // 	if where == "" {
@@ -96,7 +101,7 @@ func findRowBy(dbName string, tableName string, cols string, where string, args 
 
 func updateBy(dbName string, tableName string, set string, where string, args ...interface{}) (int64, error) {
 	if dbObj == nil {
-		return 0, fmt.Errorf("db wasn't initialized")
+		return 0, NotInit
 	}
 
 	if where == "" {
@@ -112,7 +117,7 @@ func updateBy(dbName string, tableName string, set string, where string, args ..
 
 func removeBy(dbName string, tableName string, where string, args ...interface{}) (int64, error) {
 	if dbObj == nil {
-		return 0, fmt.Errorf("db wasn't initialized")
+		return 0, NotInit
 	}
 
 	if where == "" {
@@ -124,4 +129,16 @@ func removeBy(dbName string, tableName string, where string, args ...interface{}
 	}
 
 	return result.RowsAffected()
+}
+
+func truncate(dbName string, tableName string) error {
+	if dbObj == nil {
+		return NotInit
+	}
+
+	_, err := Exec("TRUNCATE TABLE " + dbName + "." + tableName)
+	if err != nil {
+		return err
+	}
+	return nil
 }

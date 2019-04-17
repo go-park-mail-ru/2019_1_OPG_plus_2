@@ -1,8 +1,6 @@
 package user
 
 import (
-	"database/sql"
-
 	"2019_1_OPG_plus_2/internal/pkg/adapters"
 
 	"2019_1_OPG_plus_2/internal/pkg/db"
@@ -32,11 +30,7 @@ func (*Storage) CreateUser(signUpData models.SignUpData) (models.JwtData, error,
 	return jwtData, err, fields
 }
 func (*Storage) GetUser(id int64) (models.UserData, error) {
-	userData, err := db.GetUser(id)
-	if err == sql.ErrNoRows {
-		return userData, models.NotFound
-	}
-	return userData, err
+	return db.GetUser(id)
 }
 func (*Storage) UpdateUser(id int64, updateData models.UpdateUserData) (models.JwtData, error, []string) {
 	return adapters.GetStorages().Auth.UpdateAuth(id, updateData)
