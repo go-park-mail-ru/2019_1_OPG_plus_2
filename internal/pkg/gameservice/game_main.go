@@ -52,7 +52,7 @@ func AddGameServicePaths(router *mux.Router) *mux.Router {
 			fmt.Println("could not parse ", id)
 			return
 		}
-		hub.closer <- int(id)
+		hub.closeRoom(int(id))
 
 		_, _ = fmt.Fprint(w, "Room ", id, " closing")
 	}).Methods("DELETE")

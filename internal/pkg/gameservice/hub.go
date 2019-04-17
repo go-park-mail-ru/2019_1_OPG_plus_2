@@ -2,13 +2,11 @@ package gameservice
 
 import (
 	"fmt"
-	"sync"
 )
 
 type Hub struct {
 	rooms  map[int]*Room
 	closer chan int
-	lock   *sync.RWMutex
 }
 
 func NewHub() *Hub {
