@@ -29,7 +29,7 @@ func AddGameServicePaths(router *mux.Router) *mux.Router {
 	router.HandleFunc("/{id}", func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
 		if err != nil {
-			tsLogger.Logger.LogWarn("could not parse ", id)
+			tsLogger.Logger.LogWarn("could not parse %d", id)
 			return
 		}
 		if hub.rooms[int(id)] == nil {
@@ -42,7 +42,7 @@ func AddGameServicePaths(router *mux.Router) *mux.Router {
 	router.HandleFunc("/{id}/room", func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
 		if err != nil {
-			tsLogger.Logger.LogWarn("could not parse ", id)
+			tsLogger.Logger.LogWarn("could not parse %d", id)
 			return
 		}
 		err = serveClientConnection(hub.rooms[int(id)], w, r)
@@ -57,7 +57,7 @@ func AddGameServicePaths(router *mux.Router) *mux.Router {
 	router.HandleFunc("/{id}", func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
 		if err != nil {
-			tsLogger.Logger.LogWarn("could not parse ", id)
+			tsLogger.Logger.LogWarn("could not parse %d", id)
 			return
 		}
 		tsLogger.Logger.LogTrace("CLOSING ROOM %d", id)
