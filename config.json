@@ -47,24 +47,20 @@
   },
   "logging": {
     "trace": {
-      "mode": "prompt",
-      "file": ""
+      "mode": "prompt"
     },
     "info": {
-      "mode": "prompt",
-      "file": ""
+      "mode": "suppress"
     },
     "warn": {
-      "mode": "prompt",
-      "file": ""
+      "mode": "prompt"
     },
     "err": {
-      "mode": "prompt",
-      "file": ""
+      "mode": "file",
+      "file": "err.log"
     },
     "access": {
-      "mode": "prompt",
-      "file": ""
+      "mode": "prompt"
     }
   }
 }

@@ -4,8 +4,17 @@ import (
 	"fmt"
 	"github.com/spf13/viper"
 	"io"
+	"io/ioutil"
 	"os"
 )
+
+var permittedLevels = []string{
+	"trace",
+	"info",
+	"warn",
+	"err",
+	"access",
+}
 
 var CONFIG = viper.New()
 
@@ -17,6 +26,7 @@ var (
 )
 
 func init() {
+
 	CONFIG.SetConfigName("config")             // name of config file (without extension)
 	CONFIG.AddConfigPath("/etc/colors-game/")  // path to look for the config file in
 	CONFIG.AddConfigPath("$HOME/.colors-game") // call multiple times to add many search paths
@@ -35,8 +45,28 @@ func init() {
 	parseLoggerConfig()
 }
 
-func parseLoggerConfig() {
-	//logConf := reflect
+type OAuthConfig struct {
+	AppId     string `json:"app_id, string"`
+	AppKey    string `json:"app_key, string"`
+	AppSecret string `json:"app_secret, string"`
+}
+
+func parseVkConfig() {
+	// iterate through fields
+	VkOAuth.AppId = CONFIG.GetString("oauth.vk.app_id")
+	VkOAuth.AppKey = CONFIG.GetString("oauth.vk.app_key")
+	VkOAuth.AppSecret = CONFIG.GetString("oauth.vk.app_secret")
+}
+
+type DbConfig struct {
+	AuthDbName     string `json:"auth_db_name"`
+	AuthUsersTable string `json:"auth_users_table"`
+	CoreDbName     string `json:"core_db_name"`
+	CoreUsersTable string `json:"core_users_table"`
+	Host           string `json:"host"`
+	Port           string `json:"port"`
+	Username       string `json:"username"`
+	Password       string `json:"password"`
 }
 
 func parseDbConfig() {
@@ -69,46 +99,67 @@ func parseDbConfig() {
 		Db.Username = conf["username"]
 		Db.Password = conf["password"]
 	}
-
-	fmt.Println(conf)
-}
-
-func parseVkConfig() {
-	// iterate through fields
-	VkOAuth.AppId = CONFIG.GetString("oauth.vk.app_id")
-	VkOAuth.AppKey = CONFIG.GetString("oauth.vk.app_key")
-	VkOAuth.AppSecret = CONFIG.GetString("oauth.vk.app_secret")
-}
-
-func parseAuthConfig() {
-	Auth.Secret = CONFIG.GetString("auth.secret")
-}
-
-type OAuthConfig struct {
-	AppId     string `json:"app_id, string"`
-	AppKey    string `json:"app_key, string"`
-	AppSecret string `json:"app_secret, string"`
-}
-
-type DbConfig struct {
-	AuthDbName     string `json:"auth_db_name"`
-	AuthUsersTable string `json:"auth_users_table"`
-	CoreDbName     string `json:"core_db_name"`
-	CoreUsersTable string `json:"core_users_table"`
-	Host           string `json:"host"`
-	Port           string `json:"port"`
-	Username       string `json:"username"`
-	Password       string `json:"password"`
 }
 
 type AuthConfig struct {
 	Secret string `json:"secret"`
 }
 
+func parseAuthConfig() {
+	Auth.Secret = CONFIG.GetString("auth.secret")
+}
+
 type LoggerConfig struct {
-	Trace  io.Writer
-	Info   io.Writer
-	Warn   io.Writer
-	Err    io.Writer
-	Access io.Writer
+	Levels map[string]io.Writer
+	Files  []*os.File
+}
+
+func parseLoggerConfig() {
+	Logger = LoggerConfig{
+		Levels: map[string]io.Writer{
+			"trace":  os.Stdout,
+			"info":   os.Stdout,
+			"warn":   os.Stdout,
+			"err":    os.Stdout,
+			"access": os.Stdout,
+		},
+	}
+
+	conf := CONFIG.GetStringMap("logging")
+	for k, v := range conf {
+		vm := v.(map[string]interface{})
+		err := checkLevel(k)
+		if err != nil {
+			panic(err)
+		}
+
+		switch vm["mode"] {
+		case "prompt":
+			Logger.Levels[k] = os.Stdout
+		case "suppress":
+			Logger.Levels[k] = ioutil.Discard
+		case "file":
+			f, err := os.OpenFile(vm["file"].(string), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+			if err != nil {
+				panic("error opening file: " + err.Error())
+			}
+			Logger.Levels[k] = f
+			Logger.Files = append(Logger.Files, f)
+		}
+	}
+
+}
+
+func checkLevel(l string) error {
+	ok := false
+	for _, pl := range permittedLevels {
+		if l == pl {
+			ok = true
+		}
+	}
+
+	if !ok {
+		return fmt.Errorf("logging level is not permited")
+	}
+	return nil
 }
