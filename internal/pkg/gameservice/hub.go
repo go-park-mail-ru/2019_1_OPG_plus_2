@@ -26,18 +26,32 @@ func (h *Hub) AttachRooms(rooms ...*Room) error {
 		}
 		h.rooms[room.id] = room
 		go room.Run()
+		tsLogger.Logger.LogTrace("CREATING ROOM %d", room.id)
 	}
 	return nil
 }
 
 func (h *Hub) run() {
 	ticker := time.NewTicker(time.Second * 5)
+	defer ticker.Stop()
 	for _, room := range h.rooms {
 		go room.Run()
 	}
 
+	activeConns := func() int {
+		cnt := 0
+		for _, room := range h.rooms {
+			for _, v := range room.clients {
+				if v {
+					cnt += 1
+				}
+			}
+		}
+		return cnt
+	}
 	for range ticker.C {
-		tsLogger.Logger.LogInfo("HUB INFO: %+v", h.rooms)
+
+		tsLogger.Logger.LogInfo("HUB INFO: conns: %d, rooms : %d", activeConns(), len(h.rooms))
 	}
 }
 

@@ -14,13 +14,13 @@ type TSLogger struct {
 	infoChan    chan interface{}
 	warningChan chan interface{}
 	errorChan   chan interface{}
-	reqChan     chan interface{}
+	accChan     chan interface{}
 
-	TraceLogger        *log.Logger
-	InfoLogger         *log.Logger
-	WarningLogger      *log.Logger
-	ErrorLogger        *log.Logger
-	RequestBenchLogger *log.Logger
+	TraceLogger   *log.Logger
+	InfoLogger    *log.Logger
+	WarningLogger *log.Logger
+	ErrorLogger   *log.Logger
+	AccessLogger  *log.Logger
 }
 
 func NewLogger() *TSLogger {
@@ -29,7 +29,7 @@ func NewLogger() *TSLogger {
 		infoChan:    make(chan interface{}, 256),
 		warningChan: make(chan interface{}, 256),
 		errorChan:   make(chan interface{}, 256),
-		reqChan:     make(chan interface{}, 256),
+		accChan:     make(chan interface{}, 256),
 	}
 	l.SetLoggers(os.Stdout, os.Stdout, os.Stdout, os.Stdout, os.Stdout)
 	return l
@@ -55,9 +55,9 @@ func (l *TSLogger) LogErr(formatMessage string, values ...interface{}) {
 	l.errorChan <- msg
 }
 
-func (l *TSLogger) LogReq(formatMessage string, values ...interface{}) {
+func (l *TSLogger) LogAcc(formatMessage string, values ...interface{}) {
 	msg := fmt.Sprintf(formatMessage, values...)
-	l.reqChan <- msg
+	l.accChan <- msg
 }
 
 func (l *TSLogger) Run() {
@@ -72,8 +72,8 @@ func (l *TSLogger) Run() {
 				l.WarningLogger.Println(msg)
 			case msg := <-l.errorChan:
 				l.ErrorLogger.Println(msg)
-			case msg := <-l.reqChan:
-				l.RequestBenchLogger.Println(msg)
+			case msg := <-l.accChan:
+				l.AccessLogger.Println(msg)
 			}
 
 		}
@@ -85,7 +85,7 @@ func (l *TSLogger) SetLoggers(
 	infoHandle io.Writer,
 	warningHandle io.Writer,
 	errorHandle io.Writer,
-	reqHandle io.Writer) {
+	accHandle io.Writer) {
 
 	l.TraceLogger = log.New(traceHandle,
 		"TRACE: ",
@@ -103,7 +103,7 @@ func (l *TSLogger) SetLoggers(
 		"ERROR: ",
 		log.Ldate|log.Ltime)
 
-	l.RequestBenchLogger = log.New(reqHandle,
-		"REQ: ",
+	l.AccessLogger = log.New(accHandle,
+		"ACC: ",
 		log.Ldate|log.Ltime)
 }

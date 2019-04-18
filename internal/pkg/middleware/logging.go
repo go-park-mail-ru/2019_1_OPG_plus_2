@@ -7,14 +7,14 @@ import (
 	"time"
 )
 
-func RequestLoggingMiddleware(next http.Handler) http.Handler {
+func AccessLoggingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 
 		sw := tsLogger.NewStatusWriter(w)
 		next.ServeHTTP(sw, r)
 
-		tsLogger.Logger.LogReq(fmt.Sprintf(
+		tsLogger.Logger.LogAcc(fmt.Sprintf(
 			"%s %q %s %d",
 			r.Method,
 			r.RequestURI,

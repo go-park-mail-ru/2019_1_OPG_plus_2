@@ -78,7 +78,6 @@ func AddGameServicePaths(router *mux.Router) *mux.Router {
 			_, _ = fmt.Fprint(w, err)
 			return
 		}
-		tsLogger.Logger.LogTrace("CREATING ROOM %d", id)
 		_, _ = fmt.Fprint(w, "Room ", id, " created")
 	}).Methods("CREATE")
 
