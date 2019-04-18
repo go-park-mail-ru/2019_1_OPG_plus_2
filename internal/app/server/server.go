@@ -50,7 +50,7 @@ func StartApp(params Params) error {
 
 	apiRouter.Use(middleware.AuthMiddleware)
 	apiRouter.Use(middleware.ApplyJsonContentType)
-	apiRouter.Use(middleware.RequestLoggingMiddleware)
+	apiRouter.Use(middleware.AccessLoggingMiddleware)
 
 	apiRouter.HandleFunc("/", controllers.IndexApiHandler)
 
