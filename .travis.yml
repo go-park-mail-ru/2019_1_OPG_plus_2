@@ -8,7 +8,7 @@ go:
 services: docker
 
 env:
-  - GO111MODULE=on USE_DOCKER_DB=on
+  - GO111MODULE=on COLORS_SERVICE_USE_MODE=ISE_DOCKER_DB
 
 install: true
 
