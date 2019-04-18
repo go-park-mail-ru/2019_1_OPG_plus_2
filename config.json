@@ -56,8 +56,7 @@
       "mode": "prompt"
     },
     "err": {
-      "mode": "file",
-      "file": "err.log"
+      "mode": "prompt"
     },
     "access": {
       "mode": "prompt"
