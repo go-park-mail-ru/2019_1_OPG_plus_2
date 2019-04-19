@@ -40,7 +40,9 @@
         "username": "DB_USERNAME",
         "password": "DB_PASSWORD"
       }
-    }
+    },
+    "auth_test_db": "colors_auth_test",
+    "core_test_db": "colors_core_test"
   },
   "auth": {
     "secret": "this_is_key_will_be_used_in_production"
@@ -50,7 +52,8 @@
       "mode": "prompt"
     },
     "info": {
-      "mode": "suppress"
+      "mode": "file",
+      "file": "info.log"
     },
     "warn": {
       "mode": "prompt"

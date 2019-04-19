@@ -8,7 +8,7 @@ go:
 services: docker
 
 env:
-  - GO111MODULE=on COLORS_SERVICE_USE_MODE=USE_DOCKER_DB
+  - GO111MODULE=on COLORS_SERVICE_USE_MODE=USE_DOCKER_DB COLORS_CONFIG_PATH="$GOPATH/src/github.com/go-park-mail-ru/2019_1_OPG_plus_2/"
 
 install: true
 

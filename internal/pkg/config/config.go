@@ -31,8 +31,9 @@ func init() {
 	CONFIG.AddConfigPath("/etc/colors-game/")  // path to look for the config file in
 	CONFIG.AddConfigPath("$HOME/.colors-game") // call multiple times to add many search paths
 	CONFIG.AddConfigPath(".")                  // optionally look for config in the working directory
-	err := CONFIG.ReadInConfig()               // Find and read the config file
-	if err != nil {                            // Handle errors reading the config file
+	CONFIG.AddConfigPath(os.Getenv("COLORS_CONFIG_PATH"))
+	err := CONFIG.ReadInConfig() // Find and read the config file
+	if err != nil {              // Handle errors reading the config file
 		panic(fmt.Errorf("Fatal error config file: %s \n", err))
 	}
 
@@ -43,6 +44,8 @@ func init() {
 	parseDbConfig()
 
 	parseLoggerConfig()
+
+	fmt.Printf("%+v", Db)
 }
 
 type OAuthConfig struct {
@@ -67,6 +70,8 @@ type DbConfig struct {
 	Port           string `json:"port"`
 	Username       string `json:"username"`
 	Password       string `json:"password"`
+	AuthTestDb     string `json:"auth_test_db"`
+	CoreTestDb     string `json:"core_test_db"`
 }
 
 func parseDbConfig() {
@@ -75,12 +80,15 @@ func parseDbConfig() {
 	Db.CoreDbName = CONFIG.GetString("db.core_db_name")
 	Db.CoreUsersTable = CONFIG.GetString("db.core_users_table")
 
+	Db.AuthTestDb = CONFIG.GetString("db.auth_test_db")
+	Db.CoreTestDb = CONFIG.GetString("db.core_test_db")
+
 	var keyPrefix string
 	switch os.Getenv("COLORS_SERVICE_USE_MODE") {
 	case "PRODUCTION":
 		keyPrefix = "db.envs.production"
-	case "IN_DOCKER":
-		keyPrefix = "db.envs.in_docker"
+	case "IN_DOCKER_NET":
+		keyPrefix = "db.envs.in_docker_net"
 	case "USE_DOCKER_DB":
 		keyPrefix = "db.envs.use_docker_db"
 	default:
