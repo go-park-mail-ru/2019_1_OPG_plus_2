@@ -61,8 +61,7 @@
       "mode": "prompt"
     },
     "access": {
-      "mode": "file",
-      "file": "access.log"
+      "mode": "prompt"
     }
   }
 }
