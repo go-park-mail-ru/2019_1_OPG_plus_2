@@ -70,7 +70,7 @@ func (*AuthHandlers) SignIn(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		models.Send(w, http.StatusInternalServerError, models.GetDeveloperErrorAnswer(err.Error()))
-		tsLogger.Logger.LogErr(fmt.Sprintf("DEV ERR: %q ==> %e", r.RequestURI, err))
+		tsLogger.Logger.LogErr(fmt.Sprintf("DEV ERR: %q ==> %v", r.RequestURI, err))
 		return
 	}
 
@@ -132,7 +132,7 @@ func (*AuthHandlers) UpdatePassword(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		models.Send(w, http.StatusInternalServerError, models.GetDeveloperErrorAnswer(err.Error()))
-		tsLogger.Logger.LogErr(fmt.Sprintf("DEV ERR: %q ==> %e", r.RequestURI, err))
+		tsLogger.Logger.LogErr(fmt.Sprintf("DEV ERR: %q ==> %v", r.RequestURI, err))
 		return
 	}
 

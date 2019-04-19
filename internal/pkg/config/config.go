@@ -44,8 +44,6 @@ func init() {
 	parseDbConfig()
 
 	parseLoggerConfig()
-
-	fmt.Printf("%+v", Db)
 }
 
 type OAuthConfig struct {

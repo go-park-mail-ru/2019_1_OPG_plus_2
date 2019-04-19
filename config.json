@@ -7,9 +7,9 @@
     }
   },
   "db": {
-    "auth_db_name": "colors-auth",
+    "auth_db_name": "colors_auth",
     "auth_users_table": "users",
-    "core_db_name": "colors-core",
+    "core_db_name": "colors_core",
     "core_users_table": "users",
     "envs": {
       "default": {
@@ -52,8 +52,7 @@
       "mode": "prompt"
     },
     "info": {
-      "mode": "file",
-      "file": "info.log"
+      "mode": "suppress"
     },
     "warn": {
       "mode": "prompt"
@@ -62,7 +61,8 @@
       "mode": "prompt"
     },
     "access": {
-      "mode": "prompt"
+      "mode": "file",
+      "file": "access.log"
     }
   }
 }
