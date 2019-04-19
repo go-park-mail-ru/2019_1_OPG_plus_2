@@ -1,13 +1,14 @@
 package tsLogger
 
 import (
+	"2019_1_OPG_plus_2/internal/pkg/config"
 	"fmt"
 	"io"
 	"log"
-	"os"
 )
 
 var Logger = NewLogger()
+var levels = config.Logger.Levels
 
 type TSLogger struct {
 	traceChan   chan interface{}
@@ -31,7 +32,7 @@ func NewLogger() *TSLogger {
 		errorChan:   make(chan interface{}, 256),
 		accChan:     make(chan interface{}, 256),
 	}
-	l.SetLoggers(os.Stdout, os.Stdout, os.Stdout, os.Stdout, os.Stdout)
+	l.SetLoggers(levels["trace"], levels["info"], levels["warn"], levels["err"], levels["access"])
 	return l
 }
 
@@ -62,6 +63,15 @@ func (l *TSLogger) LogAcc(formatMessage string, values ...interface{}) {
 
 func (l *TSLogger) Run() {
 	go func() {
+		defer func() {
+			for _, f := range config.Logger.Files {
+				err := f.Close()
+				if err != nil {
+					panic(err)
+				}
+			}
+		}()
+
 		for {
 			select {
 			case msg := <-l.traceChan:
@@ -75,7 +85,6 @@ func (l *TSLogger) Run() {
 			case msg := <-l.accChan:
 				l.AccessLogger.Println(msg)
 			}
-
 		}
 	}()
 }

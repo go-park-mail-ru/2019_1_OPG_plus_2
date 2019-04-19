@@ -1,0 +1,67 @@
+{
+  "oauth": {
+    "vk": {
+      "app_id": "6924682",
+      "app_key": "UE7pR5HINrm6zsM3S29I",
+      "app_secret": "70ed7b1c70ed7b1c70ed7b1cee7084d296770ed70ed7b1c2c4e3f65fc4e4f266a56dfb8"
+    }
+  },
+  "db": {
+    "auth_db_name": "colors_auth",
+    "auth_users_table": "users",
+    "core_db_name": "colors_core",
+    "core_users_table": "users",
+    "envs": {
+      "default": {
+        "env": false,
+        "host": "",
+        "port": "3306",
+        "username": "colors",
+        "password": "colors"
+      },
+      "IN_DOCKER_NET": {
+        "env": false,
+        "host": "colors-db",
+        "port": "3306",
+        "username": "root",
+        "password": "root"
+      },
+      "USE_DOCKER_DB": {
+        "env": false,
+        "host": "",
+        "port": "12345",
+        "username": "root",
+        "password": "root"
+      },
+      "PRODUCTION": {
+        "env": true,
+        "host": "DB_HOST",
+        "port": "DB_PORT",
+        "username": "DB_USERNAME",
+        "password": "DB_PASSWORD"
+      }
+    },
+    "auth_test_db": "colors_auth_test",
+    "core_test_db": "colors_core_test"
+  },
+  "auth": {
+    "secret": "this_is_key_will_be_used_in_production"
+  },
+  "logging": {
+    "trace": {
+      "mode": "prompt"
+    },
+    "info": {
+      "mode": "suppress"
+    },
+    "warn": {
+      "mode": "prompt"
+    },
+    "err": {
+      "mode": "prompt"
+    },
+    "access": {
+      "mode": "prompt"
+    }
+  }
+}

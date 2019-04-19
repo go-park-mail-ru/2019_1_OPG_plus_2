@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"2019_1_OPG_plus_2/internal/pkg/config"
+	"fmt"
 	"log"
 	"testing"
 
@@ -30,9 +32,25 @@ var authData = []db.AuthData{
 
 func init() {
 	// Базы для тестов
-	db.AuthDbName = "colors_auth_test"
-	db.CoreDbName = "colors_core_test"
+	db.AuthDbName = config.Db.AuthTestDb
+	db.CoreDbName = config.Db.CoreTestDb
 	a.SetStorages(user.NewStorage(), NewStorage())
+	fmt.Println()
+	fmt.Println()
+	fmt.Println()
+	fmt.Println()
+	fmt.Println()
+	fmt.Println()
+	fmt.Println()
+	fmt.Println()
+	fmt.Println()
+	fmt.Println()
+	fmt.Println()
+	fmt.Println()
+	fmt.Println()
+	fmt.Println()
+	fmt.Println()
+	fmt.Println()
 
 	if err := db.Open(); err != nil && err != db.AlreadyInit {
 		log.Fatal(err.Error())
@@ -69,7 +87,7 @@ func TestSignUp(t *testing.T) {
 func TestSignInByUsername(t *testing.T) {
 	for _, data := range authData {
 		jwt, err, fields := a.GetStorages().Auth.SignIn(models.SignInData{
-			Login: data.Username,
+			Login:    data.Username,
 			Password: data.Password,
 		})
 		if err != nil {
@@ -90,7 +108,7 @@ func TestSignInByUsername(t *testing.T) {
 func TestSignInByEmail(t *testing.T) {
 	for _, data := range authData {
 		jwt, err, fields := a.GetStorages().Auth.SignIn(models.SignInData{
-			Login: data.Email,
+			Login:    data.Email,
 			Password: data.Password,
 		})
 		if err != nil {
@@ -114,7 +132,7 @@ func TestUpdateAuth(t *testing.T) {
 		data.Email += "s"
 		jwt, err, fields := a.GetStorages().Auth.UpdateAuth(data.Id, models.UpdateUserData{
 			Username: data.Username,
-			Email: data.Email,
+			Email:    data.Email,
 		})
 
 		if err != nil {
@@ -138,7 +156,7 @@ func TestUpdatePassword(t *testing.T) {
 	for i, data := range authData {
 		data.Password += "_pass"
 		err, fields := a.GetStorages().Auth.UpdatePassword(data.Id, models.UpdatePasswordData{
-			NewPassword: data.Password,
+			NewPassword:     data.Password,
 			PasswordConfirm: data.Password,
 		})
 
