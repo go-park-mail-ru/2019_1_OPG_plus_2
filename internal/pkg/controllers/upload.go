@@ -14,7 +14,7 @@ import (
 
 const mByte = 1 << 20
 
-var StaticPath, _ = filepath.Abs("./static")
+var StaticPath, _ = filepath.Abs("./upload")
 var fileVault = fileStorage.NewLocalFileStorage(StaticPath)
 
 func isImage(header textproto.MIMEHeader) bool {
