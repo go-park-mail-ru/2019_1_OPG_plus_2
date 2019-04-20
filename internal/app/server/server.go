@@ -71,8 +71,8 @@ func StartApp(params Params) error {
 
 	gameRouter := router.PathPrefix("/game").Subrouter()
 
-	router.PathPrefix("/static").Handler(http.StripPrefix(
-		"/static",
+	router.PathPrefix("/upload").Handler(http.StripPrefix(
+		"/upload",
 		http.FileServer(http.Dir(controllers.StaticPath)),
 	))
 

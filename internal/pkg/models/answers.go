@@ -30,7 +30,7 @@ type ScoreboardAnswer struct {
 type UploadAvatarAnswer struct {
 	Status  int    `json:"status, int" example:"108"`
 	Message string `json:"message, string" example:"avatar uploaded"`
-	Data    string `json:"data" example:"/static/1.jpg"`
+	Data    string `json:"data" example:"/upload/1.jpg"`
 }
 
 /* SUCCESS ANSWERS */

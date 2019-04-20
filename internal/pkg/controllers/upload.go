@@ -67,7 +67,7 @@ func UploadAvatar(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	url := "/static/" + newName + "." + ext
+	url := "/upload/" + newName + "." + ext
 	err = db.ProfileUpdateAvatar(jwtData(r).Id, url)
 	if err != nil {
 		models.Send(w, http.StatusInternalServerError, models.GetDeveloperErrorAnswer(err.Error()))
