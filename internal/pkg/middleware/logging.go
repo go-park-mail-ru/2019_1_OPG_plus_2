@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"2019_1_OPG_plus_2/internal/pkg/tsLogger"
-	"fmt"
 	"net/http"
 	"time"
 )
@@ -14,12 +13,12 @@ func AccessLoggingMiddleware(next http.Handler) http.Handler {
 		sw := tsLogger.NewStatusWriter(w)
 		next.ServeHTTP(sw, r)
 
-		tsLogger.Logger.LogAcc(fmt.Sprintf(
+		tsLogger.LogAcc(
 			"%s %q %s %d",
+			sw.Status,
 			r.Method,
 			r.RequestURI,
 			time.Since(start),
-			sw.Status,
-		))
+		)
 	})
 }

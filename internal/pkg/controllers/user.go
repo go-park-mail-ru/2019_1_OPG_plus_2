@@ -3,7 +3,6 @@ package controllers
 import (
 	"2019_1_OPG_plus_2/internal/pkg/tsLogger"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -56,7 +55,7 @@ func (*UserHandlers) CreateUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		models.Send(w, http.StatusInternalServerError, models.GetDeveloperErrorAnswer(err.Error()))
-		tsLogger.Logger.LogErr(fmt.Sprintf("DEV ERR: %q ==> %e", r.RequestURI, err))
+		tsLogger.LogErr("DEV ERR: %q ==> %v", r.RequestURI, err)
 		return
 	}
 
@@ -104,7 +103,7 @@ func (*UserHandlers) GetUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		models.Send(w, http.StatusInternalServerError, models.GetDeveloperErrorAnswer(err.Error()))
-		tsLogger.Logger.LogErr(fmt.Sprintf("DEV ERR: %q ==> %e", r.RequestURI, err))
+		tsLogger.LogErr("DEV ERR: %q ==> %v", r.RequestURI, err)
 		return
 	}
 
@@ -145,7 +144,7 @@ func (*UserHandlers) UpdateUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		models.Send(w, http.StatusInternalServerError, models.GetDeveloperErrorAnswer(err.Error()))
-		tsLogger.Logger.LogErr(fmt.Sprintf("DEV ERR: %q ==> %e", r.RequestURI, err))
+		tsLogger.LogErr("DEV ERR: %q ==> %v", r.RequestURI, err)
 		return
 	}
 
@@ -186,7 +185,7 @@ func (*UserHandlers) RemoveUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		models.Send(w, http.StatusInternalServerError, models.GetDeveloperErrorAnswer(err.Error()))
-		tsLogger.Logger.LogErr(fmt.Sprintf("DEV ERR: %q ==> %e", r.RequestURI, err))
+		tsLogger.LogErr("DEV ERR: %q ==> %v", r.RequestURI, err)
 		return
 	}
 

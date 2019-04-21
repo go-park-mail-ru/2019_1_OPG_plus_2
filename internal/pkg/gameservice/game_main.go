@@ -21,15 +21,15 @@ func AddGameServicePaths(router *mux.Router) *mux.Router {
 	hub := NewHub()
 	err := hub.AttachRooms(newRoom(hub, 0))
 	if err != nil {
-		tsLogger.Logger.LogErr("ROOM ATTACHMENT ERROR: %v", hub.rooms)
+		tsLogger.LogErr("ROOM ATTACHMENT ERROR: %v", hub.rooms)
 		panic("WTF")
 	}
-	tsLogger.Logger.LogTrace("INITIAL ROOM CREATED")
+	tsLogger.LogTrace("INITIAL ROOM CREATED")
 
 	router.HandleFunc("/{id}", func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
 		if err != nil {
-			tsLogger.Logger.LogWarn("could not parse %d", id)
+			tsLogger.LogWarn("could not parse %d", id)
 			return
 		}
 		if hub.rooms[int(id)] == nil {
@@ -42,25 +42,25 @@ func AddGameServicePaths(router *mux.Router) *mux.Router {
 	router.HandleFunc("/{id}/room", func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
 		if err != nil {
-			tsLogger.Logger.LogWarn("could not parse %d", id)
+			tsLogger.LogWarn("could not parse %d", id)
 			return
 		}
 		err = serveClientConnection(hub.rooms[int(id)], w, r)
 		if err != nil {
-			tsLogger.Logger.LogErr("CONNECTION FAILED")
+			tsLogger.LogErr("CONNECTION FAILED")
 			_, _ = fmt.Fprintln(w, err)
 			return
 		}
-		tsLogger.Logger.LogTrace("CONNECTION TO %q", r.RequestURI)
+		tsLogger.LogTrace("CONNECTION TO %q", r.RequestURI)
 	})
 
 	router.HandleFunc("/{id}", func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
 		if err != nil {
-			tsLogger.Logger.LogWarn("could not parse %d", id)
+			tsLogger.LogWarn("could not parse %d", id)
 			return
 		}
-		tsLogger.Logger.LogTrace("CLOSING ROOM %d", id)
+		tsLogger.LogTrace("CLOSING ROOM %d", id)
 		hub.closeRoom(int(id))
 
 		_, _ = fmt.Fprint(w, "Room ", id, " closing")
@@ -69,7 +69,7 @@ func AddGameServicePaths(router *mux.Router) *mux.Router {
 	router.HandleFunc("/{id}/", func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
 		if err != nil {
-			tsLogger.Logger.LogWarn("could not parse %d", id)
+			tsLogger.LogWarn("could not parse %d", id)
 			return
 		}
 
@@ -90,7 +90,7 @@ func AddGameServicePaths(router *mux.Router) *mux.Router {
 func serveClientConnection(room *Room, w http.ResponseWriter, r *http.Request) error {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		tsLogger.Logger.LogErr("CONNECTION UPGRADE ERROR: %s", err)
+		tsLogger.LogErr("CONNECTION UPGRADE ERROR: %s", err)
 		return err
 	}
 	client := NewClient(room, conn)
