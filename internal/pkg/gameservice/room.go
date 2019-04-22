@@ -101,7 +101,7 @@ func (r *Room) broadcastMsg(message []byte) {
 func (r *Room) handleMessage(message Message) ([]byte, error) {
 	var msg GenericMessage
 	err := json.Unmarshal(message.msg, &msg)
-	tsLogger.Logger.LogInfo("ROOM %d: %+v", r.id, msg)
+	tsLogger.LogInfo("ROOM %d: %+v", r.id, msg)
 	if err != nil {
 		return nil, fmt.Errorf("JSON parsing: " + err.Error())
 	}

@@ -1,16 +1,247 @@
 {
+    "swagger": "2.0",
     "info": {
-        "contact": {},
-        "license": {
-            "name": ""
+        "description": "Game based on filling field with color cells",
+        "title": "Colors service API by OPG+2",
+        "contact": {
+            "name": "@DanikNik",
+            "email": "nikolsky.dan@gmail.com"
         },
-        "title": "",
-        "version": ""
+        "license": {
+            "name": "Apache 2.0"
+        },
+        "version": "1.0"
     },
+    "host": "localhost:8002",
+    "basePath": "/api",
     "paths": {
+        "/User": {
+            "put": {
+                "description": "This method updates info in profile and Auth-db record of User, who is making a query",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Updates client's User",
+                "parameters": [
+                    {
+                        "description": "User new profile data",
+                        "name": "profile_data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.UpdateUserData"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.MessageAnswer"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.MessageAnswer"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.MessageAnswer"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.MessageAnswer"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "This method creates records about new User in Auth-bd and User-db and then sends cookie to User in order to identify",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Registers User",
+                "parameters": [
+                    {
+                        "description": "User data",
+                        "name": "profile_data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.SignUpData"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.MessageAnswer"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.MessageAnswer"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.IncorrectFieldsAnswer"
+                        }
+                    },
+                    "405": {
+                        "description": "Method Not Allowed",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.MessageAnswer"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.MessageAnswer"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "This method deletes all information about User, making a query, including profile, game stats and authorization info",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Deletes User and User of client",
+                "parameters": [
+                    {
+                        "description": "InfoLogger required to remove current User",
+                        "name": "remove_data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.RemoveUserData"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.MessageAnswer"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.MessageAnswer"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.MessageAnswer"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.MessageAnswer"
+                        }
+                    }
+                }
+            }
+        },
+        "/User/{id}": {
+            "get": {
+                "description": "This method provides client with User data, matching required ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Produces User profile info",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "users ID, if none, returned logged in User",
+                        "name": "id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.UserDataAnswer"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.MessageAnswer"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.MessageAnswer"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.MessageAnswer"
+                        }
+                    }
+                }
+            }
+        },
         "/avatar": {
             "post": {
-                "description": "This method saves avatar image in server storage and sets it as clients user avatar",
+                "description": "This method saves avatar image in server storage and sets it as clients User avatar",
                 "consumes": [
                     "image/png",
                     "image/jpeg"
@@ -19,15 +250,15 @@
                     "application/json"
                 ],
                 "tags": [
-                    "user"
+                    "User"
                 ],
-                "summary": "Saves new avatar image of client's user",
+                "summary": "Saves new avatar image of client's User",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.MessageAnswer"
+                            "$ref": "#/definitions/models.UploadAvatarAnswer"
                         }
                     },
                     "400": {
@@ -54,9 +285,9 @@
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "Auth"
                 ],
-                "summary": "Updates user password",
+                "summary": "Updates User password",
                 "parameters": [
                     {
                         "description": "New password info",
@@ -103,14 +334,14 @@
         },
         "/session": {
             "get": {
-                "description": "This method checks whether user is signed in or signed out",
+                "description": "This method checks whether User is signed in or signed out",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "Auth"
                 ],
-                "summary": "Checks user session",
+                "summary": "Checks User session",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -129,7 +360,7 @@
                 }
             },
             "post": {
-                "description": "This method logs user in and sets cookie",
+                "description": "This method logs User in and sets cookie",
                 "consumes": [
                     "application/json"
                 ],
@@ -137,7 +368,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "Auth"
                 ],
                 "summary": "Grants client access",
                 "parameters": [
@@ -184,14 +415,14 @@
                 }
             },
             "delete": {
-                "description": "This method logs user out and deletes cookie",
+                "description": "This method logs User out and deletes cookie",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "Auth"
                 ],
-                "summary": "Logs user out",
+                "summary": "Logs User out",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -202,231 +433,6 @@
                     },
                     "405": {
                         "description": "Method Not Allowed",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.MessageAnswer"
-                        }
-                    }
-                }
-            }
-        },
-        "/user": {
-            "put": {
-                "description": "This method updates info in profile and auth-db record of user, who is making a query",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user"
-                ],
-                "summary": "Updates client's user",
-                "parameters": [
-                    {
-                        "description": "User new profile data",
-                        "name": "profile_data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.UpdateUserData"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.MessageAnswer"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.MessageAnswer"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.MessageAnswer"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.MessageAnswer"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "This method creates records about new user in auth-bd and user-db and then sends cookie to user in order to identify",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user"
-                ],
-                "summary": "Registers user",
-                "parameters": [
-                    {
-                        "description": "User data",
-                        "name": "profile_data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.SingUpData"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.MessageAnswer"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.MessageAnswer"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.IncorrectFieldsAnswer"
-                        }
-                    },
-                    "405": {
-                        "description": "Method Not Allowed",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.MessageAnswer"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.MessageAnswer"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "This method deletes all information about user, making a query, including profile, game stats and authorization info",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user"
-                ],
-                "summary": "Deletes user and user of client",
-                "parameters": [
-                    {
-                        "description": "Info required to remove current user",
-                        "name": "remove_data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.RemoveUserData"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.MessageAnswer"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.MessageAnswer"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.MessageAnswer"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.MessageAnswer"
-                        }
-                    }
-                }
-            }
-        },
-        "/user/{id}": {
-            "get": {
-                "description": "This method provides client with user data, matching required ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user"
-                ],
-                "summary": "Produces user profile info",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "ProfileData ID, if none, returned logged in user",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.UserDataAnswerMessage"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.MessageAnswer"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.MessageAnswer"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
                         "schema": {
                             "type": "object",
                             "$ref": "#/definitions/models.MessageAnswer"
@@ -496,11 +502,11 @@
                 },
                 "message": {
                     "type": "string",
-                    "example": "Query processed successfully"
+                    "example": "incorrect fields"
                 },
                 "status": {
                     "type": "integer",
-                    "example": 200
+                    "example": 204
                 }
             }
         },
@@ -513,7 +519,7 @@
                 },
                 "status": {
                     "type": "integer",
-                    "example": 200
+                    "example": 100
                 }
             }
         },
@@ -560,7 +566,7 @@
                 }
             }
         },
-        "models.SingUpData": {
+        "models.SignUpData": {
             "type": "object",
             "properties": {
                 "email": {
@@ -603,6 +609,23 @@
                 }
             }
         },
+        "models.UploadAvatarAnswer": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "string",
+                    "example": "/static/1.jpg"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "avatar uploaded"
+                },
+                "status": {
+                    "type": "integer",
+                    "example": 108
+                }
+            }
+        },
         "models.UserData": {
             "type": "object",
             "properties": {
@@ -636,7 +659,7 @@
                 }
             }
         },
-        "models.UserDataAnswerMessage": {
+        "models.UserDataAnswer": {
             "type": "object",
             "properties": {
                 "data": {
@@ -645,14 +668,13 @@
                 },
                 "message": {
                     "type": "string",
-                    "example": "ok"
+                    "example": "user found"
                 },
                 "status": {
                     "type": "integer",
-                    "example": 200
+                    "example": 105
                 }
             }
         }
-    },
-    "swagger": "2.0"
+    }
 }

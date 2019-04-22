@@ -14,6 +14,7 @@ var permittedLevels = []string{
 	"warn",
 	"err",
 	"access",
+	"fatal",
 }
 
 var CONFIG = viper.New()
@@ -53,7 +54,6 @@ type OAuthConfig struct {
 }
 
 func parseVkConfig() {
-	// iterate through fields
 	VkOAuth.AppId = CONFIG.GetString("oauth.vk.app_id")
 	VkOAuth.AppKey = CONFIG.GetString("oauth.vk.app_key")
 	VkOAuth.AppSecret = CONFIG.GetString("oauth.vk.app_secret")
@@ -128,6 +128,7 @@ func parseLoggerConfig() {
 			"warn":   os.Stdout,
 			"err":    os.Stdout,
 			"access": os.Stdout,
+			"fatal":  os.Stdout,
 		},
 	}
 

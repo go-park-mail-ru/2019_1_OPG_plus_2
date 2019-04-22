@@ -21,19 +21,16 @@ type Params struct {
 	Port string
 }
 
-var logger = tsLogger.Logger
-
 func init() {
-	logger.Run()
+	tsLogger.Logger.Run()
 }
 
 func StartApp(params Params) error {
 	//fmt.Println("Server starting at " + params.Port)
-	logger.LogTrace("Server starting at " + params.Port)
 
 	if err := db.Open(); err != nil {
 		//fmt.Println(err.Error())
-		logger.LogErr("%v", err)
+		tsLogger.LogErr("%v", err)
 	}
 
 	a.SetStorages(user.NewStorage(), auth.NewStorage())
@@ -80,14 +77,15 @@ func StartApp(params Params) error {
 	//apiRouter.HandleFunc("/callback", a.GetHandlers().OAuth.Login2ndStageRetrieveTokenGetData)
 	gameservice.AddGameServicePaths(gameRouter)
 
+	tsLogger.LogTrace("Server starting at " + params.Port)
 	return http.ListenAndServe(":"+params.Port, router)
 }
 
 func StopApp() {
 	//fmt.Println("Stopping server...")
-	logger.LogTrace("Stopping server...")
+	tsLogger.LogTrace("Stopping server...")
 	if err := db.Close(); err != nil {
 		//fmt.Println(err.Error())
-		logger.LogErr("%s", err)
+		tsLogger.LogErr("%s", err)
 	}
 }

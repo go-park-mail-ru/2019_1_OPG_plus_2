@@ -1,9 +1,9 @@
 package main
 
 import (
-	"os"
-
 	"2019_1_OPG_plus_2/internal/app/server"
+	"2019_1_OPG_plus_2/internal/pkg/tsLogger"
+	"os"
 )
 
 // @title Colors service API by OPG+2
@@ -25,7 +25,8 @@ func main() {
 
 	err := server.StartApp(params)
 	if err != nil {
-		panic(err)
+		server.StopApp()
+		tsLogger.LogFatal("%s", err)
 	}
-	server.StopApp()
+
 }
