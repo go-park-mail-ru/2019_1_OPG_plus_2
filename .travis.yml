@@ -14,7 +14,7 @@ install: true
 
 before_script:
   - go mod tidy
-  - go get -u -fix github.com/golangci/golangci-lint/cmd/golangci-lint
+  - go get github.com/golangci/golangci-lint/cmd/golangci-lint
   - cd build && ./initial.sh && ./db_run_container.sh && cd ..
 
 script:
