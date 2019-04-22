@@ -14,11 +14,11 @@ install: true
 
 before_script:
   - go mod tidy
-  - go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
+  - go get -u -fix github.com/golangci/golangci-lint/cmd/golangci-lint
   - cd build && ./initial.sh && ./db_run_container.sh && cd ..
 
 script:
-  - go build cmd/server/main.go
+  - go build -i cmd/server/main.go
   - go test -v -race ./...
   - golangci-lint run -c .golangci.yml
 
