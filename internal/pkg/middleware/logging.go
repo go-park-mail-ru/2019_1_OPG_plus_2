@@ -14,7 +14,7 @@ func AccessLoggingMiddleware(next http.Handler) http.Handler {
 		next.ServeHTTP(sw, r)
 
 		tsLogger.LogAcc(
-			"%s %q %s %d",
+			"%d %q %s %d",
 			sw.Status,
 			r.Method,
 			r.RequestURI,

@@ -49,7 +49,7 @@
   },
   "logging": {
     "trace": {
-      "mode": "prompt",
+      "mode": "file",
       "file": "trace.log"
     },
     "info": {
