@@ -1,14 +1,31 @@
 package auth
 
 import (
+	"2019_1_OPG_plus_2/internal/pkg/tsLogger"
+	authService "2019_1_OPG_plus_2/internal/proto"
+	"context"
 	"crypto/sha256"
 	"fmt"
+	"google.golang.org/grpc"
 	"net/http"
 	"time"
 
-	"2019_1_OPG_plus_2/internal/pkg/db"
 	"2019_1_OPG_plus_2/internal/pkg/models"
 )
+
+var Manager authManager
+
+func init() {
+	conn, err := grpc.Dial("127.0.0.1:50242", grpc.WithInsecure())
+	if err != nil {
+		tsLogger.LogErr("AUTH: can not connect to service [%v]", err)
+	}
+
+	Manager = authManager{
+		Conn:       conn,
+		AuthClient: authService.NewAuthServiceClient(conn),
+	}
+}
 
 func CreateAuthCookie(data models.JwtData, lifetime time.Duration) *http.Cookie {
 	jwtStr, err := data.Marshal(lifetime, secret)
@@ -41,107 +58,51 @@ func NewStorage() *Storage {
 type Storage struct{}
 
 func (*Storage) SignUp(signUpData models.SignUpData) (models.JwtData, error, []string) {
-	incorrectFields := signUpData.Check()
-	if len(incorrectFields) > 0 {
-		return models.JwtData{}, models.FieldsError, incorrectFields
+	data := &authService.SignUpRequest{
+		Data: &authService.SignUpData{
+			Username: signUpData.Username,
+			Password: signUpData.Password,
+			Email:    signUpData.Email,
+		},
 	}
 
-	id, err := db.AuthCreate(db.AuthData{
-		Email:    signUpData.Email,
-		Username: signUpData.Username,
-		Password: PasswordHash(signUpData.Password),
-	})
+	response, err := Manager.AuthClient.SignUp(context.Background(), data)
 	if err != nil {
+		tsLogger.LogErr("AUTH: SignUp call ended in: %v", err)
 		return models.JwtData{}, err, nil
 	}
 
-	return models.JwtData{
-		Id:       id,
-		Email:    signUpData.Email,
-		Username: signUpData.Username,
-	}, nil, nil
+	var reterr error
+	if response.Error != "" {
+		reterr = fmt.Errorf(response.Error)
+	} else {
+		reterr = nil
+	}
+	responseData, err := CheckJwt(response.JwtToken)
+	if err != nil {
+		panic(err)
+	}
+
+	return responseData, reterr, response.Fields
 }
 
 func (*Storage) SignIn(signInData models.SignInData) (data models.JwtData, err error, incorrectFields []string) {
-	var userData db.AuthData
-	passHash := PasswordHash(signInData.Password)
-
-	isEmail := models.CheckEmail(signInData.Login)
-	if isEmail {
-		userData, err = db.AuthFindByEmailAndPassHash(signInData.Login, passHash)
-		if err != nil {
-			if err == models.NotFound {
-				return data, models.FieldsError, append(incorrectFields, "password")
-			}
-			return
-		}
-	}
-
-	isUsername := !isEmail && models.CheckUsername(signInData.Login)
-	if isUsername {
-		userData, err = db.AuthFindByUsernameAndPassHash(signInData.Login, passHash)
-		if err != nil {
-			if err == models.NotFound {
-				return data, models.FieldsError, append(incorrectFields, "password")
-			}
-			return
-		}
-	}
-
-	if !isEmail && !isUsername {
-		return data, models.FieldsError, append(incorrectFields, "login")
-	}
-
-	return models.JwtData{
-		Id:       userData.Id,
-		Email:    userData.Email,
-		Username: userData.Username,
-	}, nil, nil
+	return SignIn(signInData)
 }
 
 func (*Storage) UpdateAuth(id int64, userData models.UpdateUserData) (models.JwtData, error, []string) {
-	incorrectFields := userData.Check()
-	if len(incorrectFields) > 0 {
-		return models.JwtData{}, models.FieldsError, incorrectFields
-	}
-
-	err := db.AuthUpdateData(db.AuthData{
-		Id:       id,
-		Email:    userData.Email,
-		Username: userData.Username,
-	})
-	if err != nil {
-		return models.JwtData{}, err, nil
-	}
-
-	return models.JwtData{
-		Id:       id,
-		Email:    userData.Email,
-		Username: userData.Username,
-	}, nil, nil
+	return UpdateAuth(id, userData)
 }
 
 func (*Storage) UpdatePassword(id int64, passwordData models.UpdatePasswordData) (error, []string) {
-	incorrectFields := passwordData.Check()
-	if len(incorrectFields) > 0 {
-		return models.FieldsError, incorrectFields
-	}
-
-	return db.AuthUpdatePassword(id, PasswordHash(passwordData.NewPassword)), nil
+	return UpdatePassword(id, passwordData)
 }
 
 func (*Storage) RemoveAuth(id int64, removeData models.RemoveUserData) (error, []string) {
-	incorrectFields := removeData.Check()
-	if len(incorrectFields) > 0 {
-		return models.FieldsError, incorrectFields
-	}
+	return RemoveAuth(id, removeData)
+}
 
-	err := db.AuthRemove(id, PasswordHash(removeData.Password))
-	if err != nil {
-		if err.Error() == "incorrect password" {
-			return models.FieldsError, append(incorrectFields, "password")
-		}
-		return err, nil
-	}
-	return nil, nil
+type authManager struct {
+	Conn       *grpc.ClientConn
+	AuthClient authService.AuthServiceClient
 }
