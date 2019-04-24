@@ -49,27 +49,27 @@
   },
   "logging": {
     "trace": {
-      "mode": "prompt",
+      "mode": "file",
       "file": "trace.log"
     },
     "info": {
-      "mode": "suppress",
+      "mode": "file",
       "file": "info.log"
     },
     "warn": {
-      "mode": "prompt",
+      "mode": "file",
       "file": "warn.log"
     },
     "err": {
-      "mode": "prompt",
+      "mode": "file",
       "file": "err.log"
     },
     "access": {
-      "mode": "prompt",
+      "mode": "file",
       "file": "access.log"
     },
     "fatal": {
-      "mode": "prompt",
+      "mode": "file",
       "file": "fatal.log"
     }
   }
