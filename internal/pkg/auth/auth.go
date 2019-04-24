@@ -5,6 +5,7 @@ import (
 	authService "2019_1_OPG_plus_2/internal/proto"
 	"context"
 	"crypto/sha256"
+	"errors"
 	"fmt"
 	"google.golang.org/grpc"
 	"net/http"
@@ -74,7 +75,7 @@ func (*Storage) SignUp(signUpData models.SignUpData) (models.JwtData, error, []s
 
 	var reterr error
 	if response.Error != "" {
-		reterr = fmt.Errorf(response.Error)
+		reterr = errors.New(response.Error)
 	} else {
 		reterr = nil
 	}
@@ -86,8 +87,33 @@ func (*Storage) SignUp(signUpData models.SignUpData) (models.JwtData, error, []s
 	return responseData, reterr, response.Fields
 }
 
-func (*Storage) SignIn(signInData models.SignInData) (data models.JwtData, err error, incorrectFields []string) {
-	return SignIn(signInData)
+func (*Storage) SignIn(signInData models.SignInData) (models.JwtData, error, []string) {
+	data := &authService.SignInRequest{
+		Data: &authService.SignInData{
+			Password: signInData.Password,
+			Login:    signInData.Login,
+		},
+	}
+
+	response, err := Manager.AuthClient.SignIn(context.Background(), data)
+	if err != nil {
+		tsLogger.LogErr("AUTH: SignIn call ended in: %v", err)
+		return models.JwtData{}, err, nil
+	}
+
+	var reterr error
+	if response.Error != "" {
+		reterr = errors.New(response.Error)
+	} else {
+		reterr = nil
+	}
+	responseData, err := CheckJwt(response.JwtToken)
+	if err != nil {
+		panic(err)
+	}
+
+	return responseData, reterr, response.Fields
+	//return SignIn(signInData)
 }
 
 func (*Storage) UpdateAuth(id int64, userData models.UpdateUserData) (models.JwtData, error, []string) {

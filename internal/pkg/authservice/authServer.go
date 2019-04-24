@@ -4,19 +4,25 @@ import (
 	"2019_1_OPG_plus_2/internal/pkg/auth"
 	"2019_1_OPG_plus_2/internal/pkg/config"
 	"2019_1_OPG_plus_2/internal/pkg/models"
+	"2019_1_OPG_plus_2/internal/pkg/tsLogger"
 	authService "2019_1_OPG_plus_2/internal/proto"
 	"context"
 	"fmt"
 	"time"
 )
 
-type Server struct{}
-
-func NewServer() *Server {
-	return &Server{}
+type Server struct {
+	Log *tsLogger.TSLogger
 }
 
-func (*Server) SignUp(ctx context.Context, request *authService.SignUpRequest) (*authService.SignUpResponse, error) {
+func NewServer() *Server {
+	return &Server{
+		Log: tsLogger.NewLogger(),
+	}
+}
+
+func (s *Server) SignUp(ctx context.Context, request *authService.SignUpRequest) (*authService.SignUpResponse, error) {
+	s.Log.LogTrace("AUTH: call to SignUp RPC")
 	data := models.SignUpData{
 		Email:    request.Data.GetEmail(),
 		Password: request.Data.GetPassword(),
@@ -40,18 +46,42 @@ func (*Server) SignUp(ctx context.Context, request *authService.SignUpRequest) (
 	return response, nil
 }
 
-func (*Server) SignIn(context.Context, *authService.SignInRequest) (*authService.SignInResponse, error) {
+func (s *Server) SignIn(ctx context.Context, request *authService.SignInRequest) (*authService.SignInResponse, error) {
+	s.Log.LogAcc("AUTH: call to SignIn RPC")
+	data := models.SignInData{
+		Login:    request.Data.GetLogin(),
+		Password: request.Data.GetPassword(),
+	}
+
+	jwtData, err, fields := auth.SignIn(data)
+	token, er := jwtData.Marshal(30*24*time.Hour, []byte(config.Auth.Secret))
+	if er != nil {
+		panic(er)
+	}
+
+	if err == nil {
+		err = fmt.Errorf("")
+	}
+
+	response := &authService.SignInResponse{
+		Error:    err.Error(),
+		Fields:   fields,
+		JwtToken: token,
+	}
+	return response, nil
+}
+
+func (s *Server) UpdateAuth(context.Context, *authService.UpdateAuthRequest) (*authService.UpdateAuthResponse, error) {
+	s.Log.LogAcc("AUTH: call to UpdateAuth RPC")
 	panic("implement me")
 }
 
-func (*Server) UpdateAuth(context.Context, *authService.UpdateAuthRequest) (*authService.UpdateAuthResponse, error) {
+func (s *Server) UpdatePassword(context.Context, *authService.UpdatePasswordRequest) (*authService.UpdatePasswordResponse, error) {
+	s.Log.LogAcc("AUTH: call to UpdatePassword RPC")
 	panic("implement me")
 }
 
-func (*Server) UpdatePassword(context.Context, *authService.UpdatePasswordRequest) (*authService.UpdatePasswordResponse, error) {
-	panic("implement me")
-}
-
-func (*Server) RemoveAuth(context.Context, *authService.RemoveAuthRequest) (*authService.RemoveAuthResponse, error) {
+func (s *Server) RemoveAuth(context.Context, *authService.RemoveAuthRequest) (*authService.RemoveAuthResponse, error) {
+	s.Log.LogAcc("AUTH: call to RemoveAuth RPC")
 	panic("implement me")
 }
