@@ -97,9 +97,24 @@ func (s *Server) UpdateAuth(ctx context.Context, request *authService.UpdateAuth
 	return response, nil
 }
 
-func (s *Server) UpdatePassword(context.Context, *authService.UpdatePasswordRequest) (*authService.UpdatePasswordResponse, error) {
+func (s *Server) UpdatePassword(ctx context.Context, request *authService.UpdatePasswordRequest) (*authService.UpdatePasswordResponse, error) {
 	s.Log.LogAcc("AUTH: call to UpdatePassword RPC")
-	panic("implement me")
+
+	data := models.UpdatePasswordData{
+		NewPassword:     request.PasswordData.GetNewPassword(),
+		PasswordConfirm: request.PasswordData.GetPasswordConfirm(),
+	}
+
+	err, fields := auth.UpdatePassword(request.Id, data)
+	if err == nil {
+		err = fmt.Errorf("")
+	}
+
+	response := &authService.UpdatePasswordResponse{
+		Error:  err.Error(),
+		Fields: fields,
+	}
+	return response, nil
 }
 
 func (s *Server) RemoveAuth(context.Context, *authService.RemoveAuthRequest) (*authService.RemoveAuthResponse, error) {

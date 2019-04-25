@@ -17,7 +17,7 @@ import (
 var Manager authManager
 
 func init() {
-	conn, err := grpc.Dial("localhost:50242", grpc.WithInsecure())
+	conn, err := grpc.Dial("127.0.0.1:50242", grpc.WithInsecure())
 	if err != nil {
 		tsLogger.LogErr("AUTH: can not connect to service [%v]", err)
 	}
@@ -146,7 +146,27 @@ func (*Storage) UpdateAuth(id int64, userData models.UpdateUserData) (models.Jwt
 }
 
 func (*Storage) UpdatePassword(id int64, passwordData models.UpdatePasswordData) (error, []string) {
-	return UpdatePassword(id, passwordData)
+	data := &authService.UpdatePasswordRequest{
+		Id: id,
+		PasswordData: &authService.UpdatePasswordData{
+			NewPassword:     passwordData.NewPassword,
+			PasswordConfirm: passwordData.PasswordConfirm,
+		},
+	}
+	response, err := Manager.AuthClient.UpdatePassword(context.Background(), data)
+	if err != nil {
+		tsLogger.LogErr("AUTH: UpdatePassword call ended in: %v", err)
+		return err, nil
+	}
+
+	var reterr error
+	if response.Error != "" {
+		reterr = errors.New(response.Error)
+	} else {
+		reterr = nil
+	}
+
+	return reterr, response.Fields
 }
 
 func (*Storage) RemoveAuth(id int64, removeData models.RemoveUserData) (error, []string) {
