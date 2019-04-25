@@ -22,6 +22,3 @@ script:
   - go build -i cmd/auth/auth_server.go
   - go test -v -race ./...
   - golangci-lint run -c .golangci.yml
-
-after_script:
-  - cd build && ./clear_up_containers.sh & cd ..
