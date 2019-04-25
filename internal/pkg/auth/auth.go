@@ -17,7 +17,7 @@ import (
 var Manager authManager
 
 func init() {
-	conn, err := grpc.Dial("colors-back-auth:50242", grpc.WithInsecure())
+	conn, err := grpc.Dial("localhost:50242", grpc.WithInsecure())
 	if err != nil {
 		tsLogger.LogErr("AUTH: can not connect to service [%v]", err)
 	}
@@ -117,7 +117,32 @@ func (*Storage) SignIn(signInData models.SignInData) (models.JwtData, error, []s
 }
 
 func (*Storage) UpdateAuth(id int64, userData models.UpdateUserData) (models.JwtData, error, []string) {
-	return UpdateAuth(id, userData)
+	data := &authService.UpdateAuthRequest{
+		Id: id,
+		UserData: &authService.UpdateUserData{
+			Email:    userData.Email,
+			Username: userData.Username,
+		},
+	}
+
+	response, err := Manager.AuthClient.UpdateAuth(context.Background(), data)
+	if err != nil {
+		tsLogger.LogErr("AUTH: UpdateAuth call ended in: %v", err)
+		return models.JwtData{}, err, nil
+	}
+
+	var reterr error
+	if response.Error != "" {
+		reterr = errors.New(response.Error)
+	} else {
+		reterr = nil
+	}
+	responseData, err := CheckJwt(response.JwtToken)
+	if err != nil {
+		panic(err)
+	}
+
+	return responseData, reterr, response.Fields
 }
 
 func (*Storage) UpdatePassword(id int64, passwordData models.UpdatePasswordData) (error, []string) {

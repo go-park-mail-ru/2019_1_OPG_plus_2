@@ -71,9 +71,30 @@ func (s *Server) SignIn(ctx context.Context, request *authService.SignInRequest)
 	return response, nil
 }
 
-func (s *Server) UpdateAuth(context.Context, *authService.UpdateAuthRequest) (*authService.UpdateAuthResponse, error) {
+func (s *Server) UpdateAuth(ctx context.Context, request *authService.UpdateAuthRequest) (*authService.UpdateAuthResponse, error) {
 	s.Log.LogAcc("AUTH: call to UpdateAuth RPC")
-	panic("implement me")
+
+	data := models.UpdateUserData{
+		Username: request.UserData.GetUsername(),
+		Email:    request.UserData.GetEmail(),
+	}
+
+	jwtData, err, fields := auth.UpdateAuth(request.Id, data)
+	token, er := jwtData.Marshal(30*24*time.Hour, []byte(config.Auth.Secret))
+	if er != nil {
+		panic(er)
+	}
+
+	if err == nil {
+		err = fmt.Errorf("")
+	}
+
+	response := &authService.UpdateAuthResponse{
+		Error:    err.Error(),
+		Fields:   fields,
+		JwtToken: token,
+	}
+	return response, nil
 }
 
 func (s *Server) UpdatePassword(context.Context, *authService.UpdatePasswordRequest) (*authService.UpdatePasswordResponse, error) {
