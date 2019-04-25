@@ -170,7 +170,28 @@ func (*Storage) UpdatePassword(id int64, passwordData models.UpdatePasswordData)
 }
 
 func (*Storage) RemoveAuth(id int64, removeData models.RemoveUserData) (error, []string) {
-	return RemoveAuth(id, removeData)
+	data := &authService.RemoveAuthRequest{
+		Id: id,
+		RemoveData: &authService.RemoveUserData{
+			Password: removeData.Password,
+		},
+	}
+
+	response, err := Manager.AuthClient.RemoveAuth(context.Background(), data)
+	if err != nil {
+		tsLogger.LogErr("AUTH: RemoveAuth call ended in: %v", err)
+		return err, nil
+	}
+
+	var reterr error
+	if response.Error != "" {
+		reterr = errors.New(response.Error)
+	} else {
+		reterr = nil
+	}
+
+	return reterr, response.Fields
+	//return RemoveAuth(id, removeData)
 }
 
 type authManager struct {

@@ -182,8 +182,8 @@ func TestRemoveAuthAlreadyRemoved(t *testing.T) {
 			Password: data.Password,
 		})
 
-		if err != models.NotFound {
-			t.Errorf("Wrong Error:\n\tGot: %v\n\tExpected: %v\n", err, models.NotFound)
+		if err.Error() != models.NotFound.Error() {
+			t.Errorf("Wrong Error:\n\tGot: %q\n\tExpected: %q\n", err, models.NotFound)
 			continue
 		}
 		if len(fields) != 0 {

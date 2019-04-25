@@ -117,7 +117,21 @@ func (s *Server) UpdatePassword(ctx context.Context, request *authService.Update
 	return response, nil
 }
 
-func (s *Server) RemoveAuth(context.Context, *authService.RemoveAuthRequest) (*authService.RemoveAuthResponse, error) {
+func (s *Server) RemoveAuth(ctx context.Context, request *authService.RemoveAuthRequest) (*authService.RemoveAuthResponse, error) {
 	s.Log.LogAcc("AUTH: call to RemoveAuth RPC")
-	panic("implement me")
+
+	data := models.RemoveUserData{
+		Password: request.RemoveData.GetPassword(),
+	}
+
+	err, fields := auth.RemoveAuth(request.Id, data)
+	if err == nil {
+		err = fmt.Errorf("")
+	}
+
+	response := &authService.RemoveAuthResponse{
+		Error:  err.Error(),
+		Fields: fields,
+	}
+	return response, nil
 }
