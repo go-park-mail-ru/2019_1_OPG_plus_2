@@ -13,7 +13,7 @@ func (c *ChatService) ConnectToRoom(w http.ResponseWriter, r *http.Request) {
 		c.Log.LogWarn("could not parse %d", id)
 		return
 	}
-	err = serveClientConnection(c.Hub.rooms[int(id)], w, r)
+	err = c.serveClientConnection(c.Hub.rooms[int(id)], w, r)
 	if err != nil {
 		c.Log.LogErr("CONNECTION FAILED")
 		_, _ = fmt.Fprintln(w, err)

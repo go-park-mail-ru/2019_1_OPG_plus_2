@@ -9,12 +9,13 @@ type ChatService struct {
 
 func NewChatService(hub *Hub, log *tsLogger.TSLogger) *ChatService {
 	s := &ChatService{Hub: hub, Log: log}
+	s.Hub.Log = log
 	err := s.Hub.AttachRooms(newRoom(hub, 0))
+	s.Log.Run()
 	if err != nil {
-		tsLogger.LogErr("ROOM ATTACHMENT ERROR: %v", s.Hub.rooms)
+		s.Log.LogErr("CHAT: ROOM ATTACHMENT ERROR: %v", s.Hub.rooms)
 		panic("WTF")
 	}
-	s.Log.LogTrace("INITIAL ROOM CREATED")
-	s.Hub.Log = log
+	s.Log.LogTrace("CHAT: INITIAL ROOM 0 CREATED")
 	return s
 }

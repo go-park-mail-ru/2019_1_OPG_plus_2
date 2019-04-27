@@ -4,7 +4,6 @@ import (
 	"2019_1_OPG_plus_2/internal/pkg/db"
 	"2019_1_OPG_plus_2/internal/pkg/middleware"
 	"2019_1_OPG_plus_2/internal/pkg/models"
-	"2019_1_OPG_plus_2/internal/pkg/tsLogger"
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
@@ -25,7 +24,7 @@ func (s *ChatService) AddChatServicePaths(router *mux.Router) *mux.Router {
 		const pageSize = 10
 		id, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
 		if err != nil {
-			tsLogger.LogWarn("could not parse %d", id)
+			s.Log.LogWarn("CHAT: could not parse %d", id)
 			return
 		}
 		if s.Hub.rooms[int(id)] == nil {
@@ -70,7 +69,7 @@ func (s *ChatService) AddChatServicePaths(router *mux.Router) *mux.Router {
 func (s *ChatService) serveClientConnection(room *ChatRoom, w http.ResponseWriter, r *http.Request) error {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		s.Log.LogErr("CONNECTION UPGRADE ERROR: %s", err)
+		s.Log.LogErr("CHAT: CONNECTION UPGRADE ERROR: %s", err)
 		return err
 	}
 	client := NewClient(room, conn)

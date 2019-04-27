@@ -18,7 +18,6 @@ var Params = struct {
 func Start() (*chatservice.ChatService, error) {
 
 	service := chatservice.NewChatService(chatservice.NewHub(), tsLogger.NewLogger())
-	service.Log.Run()
 
 	if err := db.Open(); err != nil {
 		service.Log.LogErr("%v", err)

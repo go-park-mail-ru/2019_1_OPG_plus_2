@@ -91,11 +91,13 @@ func (c *Client) writing() {
 			if !ok {
 				// The room closed the channel.
 				_ = c.conn.WriteMessage(websocket.CloseMessage, []byte{})
+				c.Log.LogTrace("CHAT: Connection closed")
 				return
 			}
 
 			w, err := c.conn.NextWriter(websocket.TextMessage)
 			if err != nil {
+				c.Log.LogErr("CHAT: Connection closed: %v", err)
 				return
 			}
 			_, _ = w.Write(message)
@@ -108,12 +110,13 @@ func (c *Client) writing() {
 			}
 
 			if err := w.Close(); err != nil {
+				c.Log.LogErr("CHAT: Connection closed: %v", err)
 				return
 			}
 		case <-ticker.C:
 			_ = c.conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
-				c.Log.LogErr("CHAT: %v", err)
+				c.Log.LogErr("CHAT: Connection closed: %v", err)
 				return
 			}
 		}

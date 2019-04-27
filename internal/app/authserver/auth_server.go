@@ -26,14 +26,14 @@ func Start() error {
 
 	lis, err := net.Listen("tcp", ":"+config.Auth.Port)
 	if err != nil {
-		serv.Log.LogFatal("cant listen port: %s", err)
+		serv.Log.LogFatal("AUTH: cant listen port: %s", err)
 	}
 
 	server := grpc.NewServer()
 
 	authService.RegisterAuthServiceServer(server, serv)
 
-	serv.Log.LogTrace("starting server at %v:%v", config.Auth.ServiceLocation, config.Auth.Port)
+	serv.Log.LogTrace("AUTH: starting server at %v:%v", config.Auth.ServiceLocation, config.Auth.Port)
 	return server.Serve(lis)
 }
 

@@ -112,7 +112,7 @@ func (r *ChatRoom) handleMessage(message Message) ([]byte, error) {
 func (r *ChatRoom) performChatLogic(message Message) ([]byte, error) {
 	var chatMessage ChatMessage
 	err := json.Unmarshal(message.msg, &chatMessage)
-	r.Log.LogInfo("ROOM %d: %+v", r.id, chatMessage)
+	r.Log.LogInfo("CHAT: ROOM %d: %+v", r.id, chatMessage)
 	if err != nil {
 		return nil, fmt.Errorf("JSON parsing error")
 	}

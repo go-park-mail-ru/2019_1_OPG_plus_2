@@ -22,12 +22,12 @@ func NewHub() *Hub {
 func (h *Hub) AttachRooms(rooms ...*ChatRoom) error {
 	for _, room := range rooms {
 		if h.rooms[room.id] != nil {
-			h.Log.LogErr("ROOM %d EXISTS", room.id)
-			return fmt.Errorf("ROOM %d EXISTS", room.id)
+			h.Log.LogErr("CHAT: ROOM %d EXISTS", room.id)
+			return fmt.Errorf("CHAT: ROOM %d EXISTS", room.id)
 		}
 		h.rooms[room.id] = room
 		go room.Run()
-		h.Log.LogTrace("CREATING ROOM %d", room.id)
+		h.Log.LogTrace("CHAT: CREATING ROOM %d", room.id)
 	}
 	return nil
 }
@@ -52,7 +52,7 @@ func (h *Hub) Run() {
 	}
 	for range ticker.C {
 
-		h.Log.LogInfo("HUB INFO: conns: %d, rooms : %d", activeConns(), len(h.rooms))
+		h.Log.LogInfo("CHAT: HUB INFO: conns: %d, rooms : %d", activeConns(), len(h.rooms))
 	}
 }
 
