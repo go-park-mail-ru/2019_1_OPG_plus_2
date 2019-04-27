@@ -14,6 +14,10 @@ var (
 
 var dbObj *sql.DB
 
+func Ping() error {
+	return dbObj.Ping()
+}
+
 func Open() (err error) {
 	if dbObj != nil {
 		return AlreadyInit
