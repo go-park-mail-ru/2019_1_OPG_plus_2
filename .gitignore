@@ -37,6 +37,10 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
+*.log
 
 static/*
+upload/*
 tmp/
+
+!upload/.gitkeep
