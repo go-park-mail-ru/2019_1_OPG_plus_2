@@ -11,6 +11,9 @@
     "auth_users_table": "users",
     "core_db_name": "colors_core",
     "core_users_table": "users",
+    "chat_db_name": "colors_chat",
+    "chat_messages_table": "messages",
+    "chat_types_table": "types",
     "envs": {
       "default": {
         "env": false,
@@ -53,7 +56,7 @@
       "file": "trace.log"
     },
     "info": {
-      "mode": "prompt",
+      "mode": "suppress",
       "file": "info.log"
     },
     "warn": {

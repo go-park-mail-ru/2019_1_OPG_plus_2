@@ -103,7 +103,7 @@ var UserRemovedAnswer = MessageAnswer{
 // func GetUserErrorAnswer(error string) *MessageAnswer {
 // 	return &MessageAnswer{
 // 		Status:  200,
-// 		Message: error,
+// 		ChatMessage: error,
 // 	}
 // }
 

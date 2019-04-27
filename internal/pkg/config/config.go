@@ -2,10 +2,11 @@ package config
 
 import (
 	"fmt"
-	"github.com/spf13/viper"
 	"io"
 	"io/ioutil"
 	"os"
+
+	"github.com/spf13/viper"
 )
 
 var permittedLevels = []string{
@@ -35,7 +36,7 @@ func init() {
 	CONFIG.AddConfigPath("/home/daniknik/go/src/2019_1_OPG_plus_2/") // optionally look for config in the working directory
 	CONFIG.AddConfigPath(os.Getenv("COLORS_CONFIG_PATH"))
 	err := CONFIG.ReadInConfig() // Find and read the config file
-	if err != nil {              // Handle errors reading the config file
+	if err != nil { // Handle errors reading the config file
 		panic(fmt.Errorf("Fatal error config file: %s \n", err))
 	}
 
@@ -61,16 +62,20 @@ func parseVkConfig() {
 }
 
 type DbConfig struct {
-	AuthDbName     string `json:"auth_db_name"`
-	AuthUsersTable string `json:"auth_users_table"`
-	CoreDbName     string `json:"core_db_name"`
-	CoreUsersTable string `json:"core_users_table"`
-	Host           string `json:"host"`
-	Port           string `json:"port"`
-	Username       string `json:"username"`
-	Password       string `json:"password"`
-	AuthTestDb     string `json:"auth_test_db"`
-	CoreTestDb     string `json:"core_test_db"`
+	AuthDbName        string `json:"auth_db_name"`
+	AuthUsersTable    string `json:"auth_users_table"`
+	CoreDbName        string `json:"core_db_name"`
+	CoreUsersTable    string `json:"core_users_table"`
+	ChatDbName        string `json:"chat_db_name"`
+	ChatMessagesTable string `json:"chat_messages_table"`
+	ChatTypesTable    string `json:"chat_types_table"`
+	Host              string `json:"host"`
+	Port              string `json:"port"`
+	Username          string `json:"username"`
+	Password          string `json:"password"`
+	AuthTestDb        string `json:"auth_test_db"`
+	CoreTestDb        string `json:"core_test_db"`
+	ChatTestDb        string `json:"chat_test_db"`
 }
 
 func parseDbConfig() {
@@ -78,9 +83,13 @@ func parseDbConfig() {
 	Db.AuthUsersTable = CONFIG.GetString("db.auth_users_table")
 	Db.CoreDbName = CONFIG.GetString("db.core_db_name")
 	Db.CoreUsersTable = CONFIG.GetString("db.core_users_table")
+	Db.ChatDbName = CONFIG.GetString("db.chat_db_name")
+	Db.ChatMessagesTable = CONFIG.GetString("db.chat_messages_table")
+	Db.ChatTypesTable = CONFIG.GetString("db.chat_types_table")
 
 	Db.AuthTestDb = CONFIG.GetString("db.auth_test_db")
 	Db.CoreTestDb = CONFIG.GetString("db.core_test_db")
+	Db.ChatTestDb = CONFIG.GetString("db.chat_test_db")
 
 	var keyPrefix string
 	switch os.Getenv("COLORS_SERVICE_USE_MODE") {
