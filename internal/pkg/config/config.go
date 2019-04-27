@@ -36,7 +36,7 @@ func init() {
 	CONFIG.AddConfigPath("/home/daniknik/go/src/2019_1_OPG_plus_2/") // optionally look for config in the working directory
 	CONFIG.AddConfigPath(os.Getenv("COLORS_CONFIG_PATH"))
 	err := CONFIG.ReadInConfig() // Find and read the config file
-	if err != nil { // Handle errors reading the config file
+	if err != nil {              // Handle errors reading the config file
 		panic(fmt.Errorf("Fatal error config file: %s \n", err))
 	}
 
@@ -118,11 +118,25 @@ func parseDbConfig() {
 }
 
 type AuthConfig struct {
-	Secret string `json:"secret"`
+	Secret          string `json:"secret"`
+	ServiceLocation string `json:"service_location"`
+	Port            string `json:"port"`
 }
 
 func parseAuthConfig() {
 	Auth.Secret = CONFIG.GetString("auth.secret")
+
+	var keyPrefix string
+	switch os.Getenv("COLORS_SERVICE_USE_MODE") {
+	case "IN_DOCKER_NET":
+		keyPrefix = "auth.envs.in_docker_net"
+	default:
+		keyPrefix = "auth.envs.default"
+	}
+
+	conf := CONFIG.GetStringMapString(keyPrefix)
+	Auth.Port = conf["port"]
+	Auth.ServiceLocation = conf["service_location"]
 }
 
 type LoggerConfig struct {

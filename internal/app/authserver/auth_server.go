@@ -24,7 +24,7 @@ func Start() error {
 		serv.Log.LogErr("%v", err)
 	}
 
-	lis, err := net.Listen("tcp", ":50242")
+	lis, err := net.Listen("tcp", ":"+config.Auth.Port)
 	if err != nil {
 		serv.Log.LogFatal("cant listen port: %s", err)
 	}
@@ -33,7 +33,7 @@ func Start() error {
 
 	authService.RegisterAuthServiceServer(server, serv)
 
-	serv.Log.LogTrace("starting server at :50242")
+	serv.Log.LogTrace("starting server at %v:%v", config.Auth.ServiceLocation, config.Auth.Port)
 	return server.Serve(lis)
 }
 
