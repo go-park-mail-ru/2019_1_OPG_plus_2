@@ -21,19 +21,19 @@ func NewUserHandlers() *UserHandlers {
 type UserHandlers struct{}
 
 // CreateUser godoc
-// @title Create User
-// @summary Registers User
-// @description This method creates records about new User in Auth-bd and User-db and then sends cookie to User in order to identify
-// @tags User
+// @title Create user
+// @summary Registers user
+// @description This method creates records about new user in Auth-bd and user-db and then sends cookie to user in order to identify
+// @tags user
 // @accept json
 // @produce json
-// @param profile_data body models.SignUpData true "User data"
+// @param profile_data body models.SignUpData true "user data"
 // @success 200 {object} models.MessageAnswer
 // @failure 400 {object} models.MessageAnswer
 // @failure 401 {object} models.IncorrectFieldsAnswer
 // @failure 405 {object} models.MessageAnswer
 // @failure 500 {object} models.MessageAnswer
-// @router /User [post]
+// @router /user [post]
 func (*UserHandlers) CreateUser(w http.ResponseWriter, r *http.Request) {
 	if isAuth(r) {
 		models.Send(w, http.StatusMethodNotAllowed, models.AlreadySignedInAnswer)
@@ -64,18 +64,18 @@ func (*UserHandlers) CreateUser(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetUser godoc
-// @title Get User
-// @summary Produces User profile info
-// @description This method provides client with User data, matching required ID
-// @tags User
+// @title Get user
+// @summary Produces user profile info
+// @description This method provides client with user data, matching required ID
+// @tags user
 // @accept json
 // @produce json
-// @param id path int false "users ID, if none, returned logged in User"
+// @param id path int false "users ID, if none, returned logged in user"
 // @success 200 {object} models.UserDataAnswer
 // @failure 400 {object} models.MessageAnswer
 // @failure 404 {object} models.MessageAnswer
 // @failure 500 {object} models.MessageAnswer
-// @router /User/{id} [get]
+// @router /user/{id} [get]
 func (*UserHandlers) GetUser(w http.ResponseWriter, r *http.Request) {
 	var id int64
 	var err error
@@ -111,18 +111,18 @@ func (*UserHandlers) GetUser(w http.ResponseWriter, r *http.Request) {
 }
 
 // UpdateUser godoc
-// @title Update User
-// @summary Updates client's User
-// @description This method updates info in profile and Auth-db record of User, who is making a query
-// @tags User
+// @title Update user
+// @summary Updates client's user
+// @description This method updates info in profile and Auth-db record of user, who is making a query
+// @tags user
 // @accept json
 // @produce json
-// @param profile_data body models.UpdateUserData true "User new profile data"
+// @param profile_data body models.UpdateUserData true "user new profile data"
 // @success 200 {object} models.MessageAnswer
 // @failure 400 {object} models.MessageAnswer
 // @failure 401 {object} models.MessageAnswer
 // @failure 500 {object} models.MessageAnswer
-// @router /User [put]
+// @router /user [put]
 func (*UserHandlers) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	if !isAuth(r) {
 		models.Send(w, http.StatusUnauthorized, models.NotSignedInAnswer)
@@ -153,17 +153,17 @@ func (*UserHandlers) UpdateUser(w http.ResponseWriter, r *http.Request) {
 }
 
 // RemoveUser godoc
-// @title Delete User
-// @summary Deletes User and User of client
-// @description This method deletes all information about User, making a query, including profile, game stats and authorization info
-// @tags User
+// @title Delete user
+// @summary Deletes user and profile of client
+// @description This method deletes all information about user, making a query, including profile, game stats and authorization info
+// @tags user
 // @produce json
-// @param remove_data body models.RemoveUserData true "InfoLogger required to remove current User"
+// @param remove_data body models.RemoveUserData true "Info required to remove current user"
 // @success 200 {object} models.MessageAnswer
 // @failure 400 {object} models.MessageAnswer
 // @failure 401 {object} models.MessageAnswer
 // @failure 500 {object} models.MessageAnswer
-// @router /User [delete]
+// @router /user [delete]
 func (*UserHandlers) RemoveUser(w http.ResponseWriter, r *http.Request) {
 	if !isAuth(r) {
 		models.Send(w, http.StatusUnauthorized, models.NotSignedInAnswer)

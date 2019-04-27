@@ -14,13 +14,14 @@ func (t JSONTime) MarshalJSON() ([]byte, error) {
 }
 
 type GenericMessage struct {
-	User  string `json:"user, string"`
-	MType string `json:"type, string"`
+	Username string `json:"username, string"`
+	MType    string `json:"type, string"`
 }
 
 type ChatMessage struct {
 	GenericMessage
-	Content string `json:"content, string"`
+	Content  string `json:"content, string"`
+	RandomId int64  `json:"random_id, number"`
 }
 
 type EventData struct {
@@ -36,8 +37,8 @@ type BroadcastEventMessage struct {
 func NewBroadcastEventMessage(eType string, eData interface{}) *BroadcastEventMessage {
 	return &BroadcastEventMessage{
 		GenericMessage: GenericMessage{
-			User:  "SERVICE",
-			MType: "event",
+			Username: "SERVICE",
+			MType:    "event",
 		},
 		Data: EventData{
 			EventType: eType,

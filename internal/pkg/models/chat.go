@@ -8,12 +8,13 @@ import (
 type JSONTime time.Time
 
 func (t JSONTime) MarshalJSON() ([]byte, error) {
-	stamp := fmt.Sprintf("\"%s\"", time.Time(t).Format("Mon Jan _2"))
+	stamp := fmt.Sprintf("\"%s\"", time.Time(t).Format(time.RFC3339))
 	return []byte(stamp), nil
 }
 
 type ChatMessage struct {
-	Id       int64    `json:"id, string" example:"1"`
+	Id       int64    `json:"id, number" example:"1"`
+	RandomId int64    `json:"random_id, number " example:"1"`
 	Username string   `json:"username, string"`
 	Avatar   string   `json:"avatar, string"`
 	Content  string   `json:"content, string"`

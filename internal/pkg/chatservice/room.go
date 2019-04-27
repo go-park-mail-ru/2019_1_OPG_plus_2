@@ -116,10 +116,11 @@ func (r *ChatRoom) performChatLogic(message Message) ([]byte, error) {
 	}
 
 	outMsg := models.ChatMessage{
-		Username: chatMessage.User,
+		Username: chatMessage.Username,
 		Content:  chatMessage.Content,
 		Type:     chatMessage.MType,
 		Date:     models.JSONTime(time.Now()),
+		RandomId: chatMessage.RandomId,
 	}
 	outMsg, err = db.CreateMessage(outMsg)
 	if err != nil {

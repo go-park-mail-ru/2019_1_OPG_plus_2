@@ -202,7 +202,7 @@ func TestUpdateUserCorrect(t *testing.T) {
 
 		newUserData, err := a.GetStorages().User.GetUser(tCase.params.jwt.Id)
 		if err != nil {
-			t.Errorf("Test failed while getting User from storage: %e", err)
+			t.Errorf("Test failed while getting Username from storage: %e", err)
 		}
 
 		expUserData := models.UserData{
@@ -267,7 +267,7 @@ func TestUpdateUserInvalidField(t *testing.T) {
 				},
 			},
 
-			inputMessage:  []byte(`{"email": "qwerty@mail.com","User": "qwerty"}`),
+			inputMessage:  []byte(`{"email": "qwerty@mail.com","Username": "qwerty"}`),
 			outputMessage: &models.IncorrectFieldsAnswer{},
 
 			expStatus:  400,
@@ -309,7 +309,7 @@ func TestUpdateUserInvalidField(t *testing.T) {
 				},
 			},
 
-			inputMessage:  []byte(`{"email": "qwerty","User-name": "qwerty"}`),
+			inputMessage:  []byte(`{"email": "qwerty","Username-name": "qwerty"}`),
 			outputMessage: &models.IncorrectFieldsAnswer{},
 
 			expStatus:  400,
@@ -339,7 +339,7 @@ func TestUpdateUserInvalidJSON(t *testing.T) {
 				},
 			},
 
-			inputMessage:  []byte(`{"email": "qwerty@mail.com","User": "qwerty"`), // no closing parentheses in JSON
+			inputMessage:  []byte(`{"email": "qwerty@mail.com","Username": "qwerty"`), // no closing parentheses in JSON
 			outputMessage: &models.MessageAnswer{},
 
 			expStatus:  500,
@@ -510,13 +510,13 @@ func TestCreateUserCorrect(t *testing.T) {
 	for _, tCase := range tCases {
 		w, _ := test(t, &tCase)
 
-		// checking if User is actually created
+		// checking if Username is actually created
 
-		// getting data field from cookie set to User
+		// getting data field from cookie set to user
 		rawJwtData := strings.Split(w.Result().Cookies()[0].Value, ".")[1]
 		parsedCookie, _ := base64.StdEncoding.DecodeString(rawJwtData)
 
-		// parsing data of User stored in cache into struct
+		// parsing data of user stored in cache into struct
 		var storedUserData models.JwtData
 		_ = json.Unmarshal(parsedCookie, &storedUserData)
 
