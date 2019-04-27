@@ -18,7 +18,7 @@ var upgrader = websocket.Upgrader{
 }
 
 func (s *ChatService) AddChatServicePaths(router *mux.Router) *mux.Router {
-	router.HandleFunc("/{id}", func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("/chat/{id}", func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
 		if err != nil {
 			tsLogger.LogWarn("could not parse %d", id)
@@ -31,11 +31,11 @@ func (s *ChatService) AddChatServicePaths(router *mux.Router) *mux.Router {
 		http.ServeFile(w, r, "home.html")
 	}).Methods("GET")
 
-	router.HandleFunc("/{id}/room", s.ConnectToRoom)
+	router.HandleFunc("/chat/{id}/room", s.ConnectToRoom)
 
-	router.HandleFunc("/{id}", s.DeleteRoom).Methods("DELETE")
+	router.HandleFunc("/chat/{id}", s.DeleteRoom).Methods("DELETE")
 
-	router.HandleFunc("/{id}", s.CreateRoom).Methods("CREATE")
+	router.HandleFunc("/chat/{id}", s.CreateRoom).Methods("CREATE")
 	return router
 }
 
