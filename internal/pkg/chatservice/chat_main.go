@@ -67,16 +67,16 @@ func (s *ChatService) AddChatServicePaths(router *mux.Router) *mux.Router {
 	return router
 }
 
-func serveClientConnection(room *ChatRoom, w http.ResponseWriter, r *http.Request) error {
+func (s *ChatService) serveClientConnection(room *ChatRoom, w http.ResponseWriter, r *http.Request) error {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		tsLogger.LogErr("CONNECTION UPGRADE ERROR: %s", err)
+		s.Log.LogErr("CONNECTION UPGRADE ERROR: %s", err)
 		return err
 	}
 	client := NewClient(room, conn)
 	client.room.register <- client
 
-	go client.writePump()
-	go client.readPump()
+	go client.writing()
+	go client.reading()
 	return nil
 }

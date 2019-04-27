@@ -8,6 +8,7 @@ import (
 
 type Hub struct {
 	rooms  map[int]*ChatRoom
+	Log    *tsLogger.TSLogger
 	closer chan int
 }
 
@@ -21,12 +22,12 @@ func NewHub() *Hub {
 func (h *Hub) AttachRooms(rooms ...*ChatRoom) error {
 	for _, room := range rooms {
 		if h.rooms[room.id] != nil {
-			tsLogger.LogErr("ROOM %d EXISTS", room.id)
+			h.Log.LogErr("ROOM %d EXISTS", room.id)
 			return fmt.Errorf("ROOM %d EXISTS", room.id)
 		}
 		h.rooms[room.id] = room
 		go room.Run()
-		tsLogger.LogTrace("CREATING ROOM %d", room.id)
+		h.Log.LogTrace("CREATING ROOM %d", room.id)
 	}
 	return nil
 }
@@ -51,11 +52,12 @@ func (h *Hub) Run() {
 	}
 	for range ticker.C {
 
-		tsLogger.LogInfo("HUB INFO: conns: %d, rooms : %d", activeConns(), len(h.rooms))
+		h.Log.LogInfo("HUB INFO: conns: %d, rooms : %d", activeConns(), len(h.rooms))
 	}
 }
 
 func (h *Hub) closeRoom(id int) {
 	h.closer <- int(id)
 	delete(h.rooms, int(id))
+	h.Log.LogTrace("CHAT: HUB: Closing room %d", id)
 }

@@ -29,6 +29,7 @@ type ChatRoom struct {
 	unregister        chan *Client
 	currentPlayersNum int
 	win               bool
+	Log               *tsLogger.TSLogger
 }
 
 func newRoom(hub *Hub, id int) *ChatRoom {
@@ -40,6 +41,7 @@ func newRoom(hub *Hub, id int) *ChatRoom {
 		unregister:        make(chan *Client),
 		clients:           make(map[*Client]bool),
 		currentPlayersNum: 0,
+		Log:               hub.Log,
 	}
 	return r
 }
@@ -93,7 +95,6 @@ func (r *ChatRoom) broadcastMsg(message []byte) {
 func (r *ChatRoom) handleMessage(message Message) ([]byte, error) {
 	var msg GenericMessage
 	err := json.Unmarshal(message.msg, &msg)
-	tsLogger.LogInfo("ROOM %d: %+v", r.id, msg)
 	if err != nil {
 		return nil, fmt.Errorf("JSON parsing: %v", err)
 	}
@@ -111,6 +112,7 @@ func (r *ChatRoom) handleMessage(message Message) ([]byte, error) {
 func (r *ChatRoom) performChatLogic(message Message) ([]byte, error) {
 	var chatMessage ChatMessage
 	err := json.Unmarshal(message.msg, &chatMessage)
+	r.Log.LogInfo("ROOM %d: %+v", r.id, chatMessage)
 	if err != nil {
 		return nil, fmt.Errorf("JSON parsing error")
 	}

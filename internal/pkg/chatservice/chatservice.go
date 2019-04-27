@@ -15,5 +15,6 @@ func NewChatService(hub *Hub, log *tsLogger.TSLogger) *ChatService {
 		panic("WTF")
 	}
 	s.Log.LogTrace("INITIAL ROOM CREATED")
+	s.Hub.Log = log
 	return s
 }

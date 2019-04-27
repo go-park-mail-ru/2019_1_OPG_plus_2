@@ -1,6 +1,7 @@
 package chatservice
 
 import (
+	"2019_1_OPG_plus_2/internal/pkg/tsLogger"
 	"bytes"
 	"github.com/gorilla/websocket"
 	"log"
@@ -27,23 +28,23 @@ var (
 )
 
 type Client struct {
-	room       *ChatRoom
-	conn       *websocket.Conn
-	registered bool
+	room *ChatRoom
+	conn *websocket.Conn
 	// channel from which messages are sent via WS to browser or whatever
 	send chan []byte
+	Log  *tsLogger.TSLogger
 }
 
 func NewClient(room *ChatRoom, conn *websocket.Conn) *Client {
 	return &Client{
-		room:       room,
-		conn:       conn,
-		send:       make(chan []byte, 256),
-		registered: false,
+		room: room,
+		conn: conn,
+		send: make(chan []byte, 256),
+		Log:  room.Log,
 	}
 }
 
-func (c *Client) readPump() {
+func (c *Client) reading() {
 	defer func() {
 		c.room.unregister <- c
 		_ = c.conn.Close()
@@ -71,16 +72,17 @@ func (c *Client) readPump() {
 	}
 }
 
-// writePump pumps messages from the room to the websocket connection.
+// writing pumps messages from the room to the websocket connection.
 //
-// A goroutine running writePump is started for each connection. The
+// A goroutine running writing is started for each connection. The
 // application ensures that there is at most one writer to a connection by
 // executing all writes from this goroutine.
-func (c *Client) writePump() {
+func (c *Client) writing() {
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
 		ticker.Stop()
 		_ = c.conn.Close()
+		c.Log.LogTrace("CHAT: Connection closed")
 	}()
 	for {
 		select {
@@ -111,6 +113,7 @@ func (c *Client) writePump() {
 		case <-ticker.C:
 			_ = c.conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
+				c.Log.LogErr("CHAT: %v", err)
 				return
 			}
 		}
