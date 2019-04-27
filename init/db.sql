@@ -112,6 +112,6 @@ VALUES (1, '', 400, 10, 4, 6),
 
 INSERT INTO colors_chat.types (id, type, description)
 VALUES (1, 'text', 'Text message.'),
-       (2, 'stiker', 'Sticker message.');
+       (2, 'sticker', 'Sticker message.');
 
 COMMIT;

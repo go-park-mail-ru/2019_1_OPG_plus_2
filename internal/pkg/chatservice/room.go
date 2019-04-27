@@ -1,9 +1,12 @@
 package chatservice
 
 import (
+	"2019_1_OPG_plus_2/internal/pkg/db"
+	"2019_1_OPG_plus_2/internal/pkg/models"
 	"2019_1_OPG_plus_2/internal/pkg/tsLogger"
 	"encoding/json"
 	"fmt"
+	"time"
 )
 
 type Message struct {
@@ -108,11 +111,24 @@ func (r *ChatRoom) handleMessage(message Message) ([]byte, error) {
 func (r *ChatRoom) performChatLogic(message Message) ([]byte, error) {
 	var chatMessage ChatMessage
 	err := json.Unmarshal(message.msg, &chatMessage)
+	if err != nil {
+		return nil, fmt.Errorf("JSON parsing error")
+	}
 
+	outMsg := models.ChatMessage{
+		Username: chatMessage.User,
+		Content:  chatMessage.Content,
+		Type:     chatMessage.MType,
+		Date:     models.JSONTime(time.Now()),
+	}
+	outMsg, err = db.CreateMessage(outMsg)
 	if err != nil {
 		return nil, err
 	}
 
+	message.msg, err = json.Marshal(&outMsg)
+	if err != nil {
+		return nil, err
+	}
 	return message.msg, nil
-
 }
