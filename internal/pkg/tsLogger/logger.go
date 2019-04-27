@@ -19,7 +19,7 @@ type logMessage struct {
 //	TraceColor   = "\033[1;36m%s\033[0m"
 //	WarningColor = "\033[1;33m%s\033[0m"
 //	ErrorColor   = "\033[1;31m%s\033[0m"
-//	DebugColor   = "\033[0;36m%s\033[0m"
+//	DebugColor   = "\033[0;35m%s\033[0m"
 //)
 
 var Logger = NewLogger()

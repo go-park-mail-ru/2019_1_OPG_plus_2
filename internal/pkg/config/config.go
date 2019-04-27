@@ -28,10 +28,11 @@ var (
 
 func init() {
 
-	CONFIG.SetConfigName("config")             // name of config file (without extension)
-	CONFIG.AddConfigPath("/etc/colors-game/")  // path to look for the config file in
-	CONFIG.AddConfigPath("$HOME/.colors-game") // call multiple times to add many search paths
-	CONFIG.AddConfigPath(".")                  // optionally look for config in the working directory
+	CONFIG.SetConfigName("config")                                   // name of config file (without extension)
+	CONFIG.AddConfigPath("/etc/colors-game/")                        // path to look for the config file in
+	CONFIG.AddConfigPath("$HOME/.colors-game")                       // call multiple times to add many search paths
+	CONFIG.AddConfigPath(".")                                        // optionally look for config in the working directory
+	CONFIG.AddConfigPath("/home/daniknik/go/src/2019_1_OPG_plus_2/") // optionally look for config in the working directory
 	CONFIG.AddConfigPath(os.Getenv("COLORS_CONFIG_PATH"))
 	err := CONFIG.ReadInConfig() // Find and read the config file
 	if err != nil {              // Handle errors reading the config file

@@ -49,11 +49,11 @@
   },
   "logging": {
     "trace": {
-      "mode": "file",
+      "mode": "prompt",
       "file": "trace.log"
     },
     "info": {
-      "mode": "suppress",
+      "mode": "prompt",
       "file": "info.log"
     },
     "warn": {

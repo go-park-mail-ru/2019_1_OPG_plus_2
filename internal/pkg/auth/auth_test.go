@@ -2,7 +2,6 @@ package auth
 
 import (
 	"2019_1_OPG_plus_2/internal/pkg/config"
-	"fmt"
 	"log"
 	"testing"
 
@@ -35,22 +34,6 @@ func init() {
 	db.AuthDbName = config.Db.AuthTestDb
 	db.CoreDbName = config.Db.CoreTestDb
 	a.SetStorages(user.NewStorage(), NewStorage())
-	fmt.Println()
-	fmt.Println()
-	fmt.Println()
-	fmt.Println()
-	fmt.Println()
-	fmt.Println()
-	fmt.Println()
-	fmt.Println()
-	fmt.Println()
-	fmt.Println()
-	fmt.Println()
-	fmt.Println()
-	fmt.Println()
-	fmt.Println()
-	fmt.Println()
-	fmt.Println()
 
 	if err := db.Open(); err != nil && err != db.AlreadyInit {
 		log.Fatal(err.Error())
@@ -199,8 +182,8 @@ func TestRemoveAuthAlreadyRemoved(t *testing.T) {
 			Password: data.Password,
 		})
 
-		if err != models.NotFound {
-			t.Errorf("Wrong Error:\n\tGot: %v\n\tExpected: %v\n", err, models.NotFound)
+		if err.Error() != models.NotFound.Error() {
+			t.Errorf("Wrong Error:\n\tGot: %q\n\tExpected: %q\n", err, models.NotFound)
 			continue
 		}
 		if len(fields) != 0 {
