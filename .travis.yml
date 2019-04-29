@@ -15,7 +15,7 @@ install: true
 before_script:
   - go mod tidy
   - curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(go env GOPATH)/bin v1.16.0
-  - cd build && ./initial.sh && ./db_run_container.sh && ./auth_run_container.sh 50242 TEST && cd ..
+  - cd build && ./initial.sh && ./db_run_container.sh && ./auth_run_container.sh -t && cd ..
 
 script:
   - go build -i cmd/server/main.go
