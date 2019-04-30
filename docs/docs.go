@@ -41,7 +41,7 @@ var doc = `{
                 "tags": [
                     "user"
                 ],
-                "summary": "Saves new avatar image of client's Username",
+                "summary": "Saves new avatar image of client's user",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -123,7 +123,7 @@ var doc = `{
         },
         "/session": {
             "get": {
-                "description": "This method checks whether Username is signed in or signed out",
+                "description": "This method checks whether user is signed in or signed out",
                 "produces": [
                     "application/json"
                 ],

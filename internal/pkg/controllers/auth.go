@@ -22,7 +22,7 @@ type AuthHandlers struct{}
 // IsAuth godoc
 // @title Check session
 // @summary Checks user session
-// @description This method checks whether Username is signed in or signed out
+// @description This method checks whether user is signed in or signed out
 // @tags Auth
 // @produce json
 // @success 200 {object} models.MessageAnswer
