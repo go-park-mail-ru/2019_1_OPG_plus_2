@@ -22,6 +22,7 @@ var corsData = CorsData{
 		"https://colors.hackallcode.ru",
 		"http://localhost:8001",
 		"http://localhost:8002",
+		"http://localhost:8003",
 		"http://127.0.0.1:8001",
 	},
 	AllowMethods: []string{
