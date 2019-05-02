@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 
-if [[ "$#" -eq 1 ]]
-then
-    port=$1
-    else
-    port=12345
-    fi
+port=12345
+while getopts 'p:' flag; do
+  case ${flag} in
+    p) port=${OPTARG};;
+  esac
+done
+
 
 echo [DATABASE] The published port of the container is ${port}
 

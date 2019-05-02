@@ -40,7 +40,6 @@ fabric.properties
 *.log
 
 static/*
+deploy_key
+tmp/*
 upload/*
-tmp/
-
-!upload/.gitkeep
