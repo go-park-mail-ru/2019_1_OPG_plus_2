@@ -12,7 +12,7 @@ deploy:
   skip_cleanup: true
   script: ./build/deploy.sh
   on:
-    branch: dev
+    branch: 50-travis-cd
 
 env:
   - GO111MODULE=on
