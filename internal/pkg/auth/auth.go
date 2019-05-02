@@ -17,7 +17,8 @@ import (
 var Manager authManager
 
 func init() {
-	conn, err := grpc.Dial("127.0.0.1:50242", grpc.WithInsecure())
+	url := serviceLocation + ":" + port
+	conn, err := grpc.Dial(url, grpc.WithInsecure())
 	if err != nil {
 		tsLogger.LogErr("AUTH: can not connect to service [%v]", err)
 	}

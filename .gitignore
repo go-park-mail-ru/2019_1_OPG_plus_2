@@ -37,7 +37,9 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
+*.log
 
 static/*
 deploy_key
 tmp/*
+upload/*

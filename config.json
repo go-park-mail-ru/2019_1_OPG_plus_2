@@ -11,6 +11,9 @@
     "auth_users_table": "users",
     "core_db_name": "colors_core",
     "core_users_table": "users",
+    "chat_db_name": "colors_chat",
+    "chat_messages_table": "messages",
+    "chat_types_table": "types",
     "envs": {
       "default": {
         "env": false,
@@ -45,32 +48,54 @@
     "core_test_db": "colors_core_test"
   },
   "auth": {
-    "secret": "this_is_key_will_be_used_in_production"
+    "secret": "this_is_key_will_be_used_in_production",
+    "envs": {
+      "IN_DOCKER_NET": {
+        "service_location": "colors-back-auth",
+        "port": "50242"
+      },
+      "default": {
+        "service_location": "127.0.0.1",
+        "port": "50242"
+      }
+    }
+  },
+  "chat": {
+    "envs": {
+      "IN_DOCKER_NET": {
+        "service_location": "colors-back-chat",
+        "port": "8003"
+      },
+      "default": {
+        "service_location": "127.0.0.1",
+        "port": "8003"
+      }
+    }
   },
   "logging": {
     "trace": {
       "mode": "file",
-      "file": "trace.log"
+      "file": ".log"
     },
     "info": {
-      "mode": "suppress",
+      "mode": "file",
       "file": "info.log"
     },
     "warn": {
       "mode": "file",
-      "file": "warn.log"
+      "file": ".log"
     },
     "err": {
       "mode": "file",
-      "file": "err.log"
+      "file": ".log"
     },
     "access": {
       "mode": "file",
-      "file": "access.log"
+      "file": ".log"
     },
     "fatal": {
       "mode": "file",
-      "file": "fatal.log"
+      "file": ".log"
     }
   }
 }
