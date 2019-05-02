@@ -9,6 +9,7 @@ services: docker
 
 deploy:
   provider: script
+  skip_cleanup: true
   script: ./build/deploy.sh
   on:
     branch: 50-travis-cd
