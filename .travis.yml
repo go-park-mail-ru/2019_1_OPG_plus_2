@@ -9,7 +9,7 @@ services: docker
 
 deploy:
   provider: script
-  script: ./deploy.sh
+  script: ./build/deploy.sh
   on:
     branch: 50-travis-cd
 
