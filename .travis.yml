@@ -9,7 +9,7 @@ services: docker
 
 deploy:
   provider: script
-  script: cd build && ./deploy.sh
+  script: ./deploy.sh
   on:
     branch: 50-travis-cd
 
@@ -20,16 +20,16 @@ env:
 
 install: true
 
-before_script:
-  - go mod tidy
-  - curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh |
-    sh -s -- -b $(go env GOPATH)/bin v1.16.0
-  - cd build && ./initial.sh && ./db_run_container.sh && ./auth_run_container.sh -t
-    && cd ..
+#before_script:
+#  - go mod tidy
+#  - curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh |
+#    sh -s -- -b $(go env GOPATH)/bin v1.16.0
+#  - cd build && ./initial.sh && ./db_run_container.sh && ./auth_run_container.sh -t
+#    && cd ..
 script:
-  - go build -i cmd/server/main.go
-  - go build -i cmd/auth/auth_server.go
-  - go test -v -race ./...
+#  - go build -i cmd/server/main.go
+#  - go build -i cmd/auth/auth_server.go
+#  - go test -v -race ./...
   - golangci-lint run -c .golangci.yml
 before_install:
   - openssl aes-256-cbc -K $encrypted_dae2c75bd644_key -iv $encrypted_dae2c75bd644_iv
