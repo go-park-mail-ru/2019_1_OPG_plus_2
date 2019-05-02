@@ -39,4 +39,5 @@ fabric.properties
 
 
 static/*
-tmp/
+deploy_key
+tmp/*

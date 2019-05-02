@@ -1,24 +1,36 @@
 sudo: false
-
 language: go
+
 cache: false
 go:
   - 1.11.x
 
 services: docker
 
+deploy:
+  provider: script
+  script: cd build && ./deploy.sh
+  on:
+    branch: 50-travis-cd
+
 env:
-  - GO111MODULE=on COLORS_SERVICE_USE_MODE=USE_DOCKER_DB COLORS_CONFIG_PATH="$GOPATH/src/github.com/go-park-mail-ru/2019_1_OPG_plus_2/"
+  - GO111MODULE=on
+    COLORS_SERVICE_USE_MODE=USE_DOCKER_DB
+    COLORS_CONFIG_PATH="$GOPATH/src/github.com/go-park-mail-ru/2019_1_OPG_plus_2/"
 
 install: true
 
 before_script:
   - go mod tidy
-  - curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(go env GOPATH)/bin v1.16.0
-  - cd build && ./initial.sh && ./db_run_container.sh && ./auth_run_container.sh -t && cd ..
-
+  - curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh |
+    sh -s -- -b $(go env GOPATH)/bin v1.16.0
+  - cd build && ./initial.sh && ./db_run_container.sh && ./auth_run_container.sh -t
+    && cd ..
 script:
   - go build -i cmd/server/main.go
   - go build -i cmd/auth/auth_server.go
   - go test -v -race ./...
   - golangci-lint run -c .golangci.yml
+before_install:
+  - openssl aes-256-cbc -K $encrypted_dae2c75bd644_key -iv $encrypted_dae2c75bd644_iv
+    -in deploy_key.enc -out ./deploy_key -d
