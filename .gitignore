@@ -40,6 +40,10 @@ fabric.properties
 *.log
 
 static/*
-deploy_key
 tmp/*
 upload/*
+
+# Deploy keys
+deploy_key
+deploy_key_development
+deploy_key_production
