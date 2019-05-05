@@ -8,11 +8,16 @@ go:
 services: docker
 
 deploy:
-  provider: script
-  skip_cleanup: true
-  script: ./build/deploy.sh
-  on:
-    branch: 50-travis-cd
+  - provider: script
+    skip_cleanup: true
+    script: ./build/deploy_development.sh
+    on:
+      branch: dev
+  - provider: script
+    skip_cleanup: true
+    script: ./build/deploy_production.sh
+    on:
+      branch: production
 
 env:
   - GO111MODULE=on
@@ -34,4 +39,6 @@ script:
   - golangci-lint run -c .golangci.yml
 before_install:
   - openssl aes-256-cbc -K $encrypted_dae2c75bd644_key -iv $encrypted_dae2c75bd644_iv
-    -in deploy_key.enc -out ./deploy_key -d
+    -in deploy_key_development.enc -out ./deploy_key_development -d
+  - openssl aes-256-cbc -K $encrypted_4df2aebce859_key -iv $encrypted_4df2aebce859_iv
+    -in deploy_key_production.enc -out ./deploy_key_production -d
