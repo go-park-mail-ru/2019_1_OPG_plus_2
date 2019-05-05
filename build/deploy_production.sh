@@ -7,6 +7,8 @@ cd back
 git checkout production
 git fetch
 cd build
-./clear_up_containers.sh && ./db_run_container.sh && ./auth_run_container.sh && ./server_run_container.sh
+./clear_up_containers.sh
+./initial.sh
+./auth_run_container.sh -m production && ./server_run_container.sh -m production
 exit
 EOF
