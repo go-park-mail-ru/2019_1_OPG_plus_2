@@ -1,8 +1,8 @@
 package auth
 
 import (
+	authproto "2019_1_OPG_plus_2/internal/pkg/proto"
 	"2019_1_OPG_plus_2/internal/pkg/tsLogger"
-	authService "2019_1_OPG_plus_2/internal/proto"
 	"context"
 	"crypto/sha256"
 	"errors"
@@ -25,7 +25,7 @@ func init() {
 
 	Manager = authManager{
 		Conn:       conn,
-		AuthClient: authService.NewAuthServiceClient(conn),
+		AuthClient: authproto.NewAuthServiceClient(conn),
 	}
 }
 
@@ -60,8 +60,8 @@ func NewStorage() *Storage {
 type Storage struct{}
 
 func (*Storage) SignUp(signUpData models.SignUpData) (models.JwtData, error, []string) {
-	data := &authService.SignUpRequest{
-		Data: &authService.SignUpData{
+	data := &authproto.SignUpRequest{
+		Data: &authproto.SignUpData{
 			Username: signUpData.Username,
 			Password: signUpData.Password,
 			Email:    signUpData.Email,
@@ -89,8 +89,8 @@ func (*Storage) SignUp(signUpData models.SignUpData) (models.JwtData, error, []s
 }
 
 func (*Storage) SignIn(signInData models.SignInData) (models.JwtData, error, []string) {
-	data := &authService.SignInRequest{
-		Data: &authService.SignInData{
+	data := &authproto.SignInRequest{
+		Data: &authproto.SignInData{
 			Password: signInData.Password,
 			Login:    signInData.Login,
 		},
@@ -118,9 +118,9 @@ func (*Storage) SignIn(signInData models.SignInData) (models.JwtData, error, []s
 }
 
 func (*Storage) UpdateAuth(id int64, userData models.UpdateUserData) (models.JwtData, error, []string) {
-	data := &authService.UpdateAuthRequest{
+	data := &authproto.UpdateAuthRequest{
 		Id: id,
-		UserData: &authService.UpdateUserData{
+		UserData: &authproto.UpdateUserData{
 			Email:    userData.Email,
 			Username: userData.Username,
 		},
@@ -147,9 +147,9 @@ func (*Storage) UpdateAuth(id int64, userData models.UpdateUserData) (models.Jwt
 }
 
 func (*Storage) UpdatePassword(id int64, passwordData models.UpdatePasswordData) (error, []string) {
-	data := &authService.UpdatePasswordRequest{
+	data := &authproto.UpdatePasswordRequest{
 		Id: id,
-		PasswordData: &authService.UpdatePasswordData{
+		PasswordData: &authproto.UpdatePasswordData{
 			NewPassword:     passwordData.NewPassword,
 			PasswordConfirm: passwordData.PasswordConfirm,
 		},
@@ -171,9 +171,9 @@ func (*Storage) UpdatePassword(id int64, passwordData models.UpdatePasswordData)
 }
 
 func (*Storage) RemoveAuth(id int64, removeData models.RemoveUserData) (error, []string) {
-	data := &authService.RemoveAuthRequest{
+	data := &authproto.RemoveAuthRequest{
 		Id: id,
-		RemoveData: &authService.RemoveUserData{
+		RemoveData: &authproto.RemoveUserData{
 			Password: removeData.Password,
 		},
 	}
@@ -196,6 +196,7 @@ func (*Storage) RemoveAuth(id int64, removeData models.RemoveUserData) (error, [
 }
 
 type authManager struct {
-	Conn       *grpc.ClientConn
-	AuthClient authService.AuthServiceClient
+	Conn         *grpc.ClientConn
+	AuthClient   authproto.AuthServiceClient
+	CookieClient authproto.CookieCheckerClient
 }

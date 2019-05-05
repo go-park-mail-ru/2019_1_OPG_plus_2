@@ -4,8 +4,8 @@ import (
 	"2019_1_OPG_plus_2/internal/pkg/auth"
 	"2019_1_OPG_plus_2/internal/pkg/config"
 	"2019_1_OPG_plus_2/internal/pkg/models"
+	authproto "2019_1_OPG_plus_2/internal/pkg/proto"
 	"2019_1_OPG_plus_2/internal/pkg/tsLogger"
-	authService "2019_1_OPG_plus_2/internal/proto"
 	"context"
 	"fmt"
 	"time"
@@ -21,7 +21,7 @@ func NewServer() *Server {
 	}
 }
 
-func (s *Server) SignUp(ctx context.Context, request *authService.SignUpRequest) (*authService.SignUpResponse, error) {
+func (s *Server) SignUp(ctx context.Context, request *authproto.SignUpRequest) (*authproto.SignUpResponse, error) {
 	s.Log.LogTrace("AUTH: call to SignUp RPC")
 	data := models.SignUpData{
 		Email:    request.Data.GetEmail(),
@@ -38,7 +38,7 @@ func (s *Server) SignUp(ctx context.Context, request *authService.SignUpRequest)
 		err = fmt.Errorf("")
 	}
 
-	response := &authService.SignUpResponse{
+	response := &authproto.SignUpResponse{
 		Error:    err.Error(),
 		Fields:   fields,
 		JwtToken: token,
@@ -46,7 +46,7 @@ func (s *Server) SignUp(ctx context.Context, request *authService.SignUpRequest)
 	return response, nil
 }
 
-func (s *Server) SignIn(ctx context.Context, request *authService.SignInRequest) (*authService.SignInResponse, error) {
+func (s *Server) SignIn(ctx context.Context, request *authproto.SignInRequest) (*authproto.SignInResponse, error) {
 	s.Log.LogAcc("AUTH: call to SignIn RPC")
 	data := models.SignInData{
 		Login:    request.Data.GetLogin(),
@@ -63,7 +63,7 @@ func (s *Server) SignIn(ctx context.Context, request *authService.SignInRequest)
 		err = fmt.Errorf("")
 	}
 
-	response := &authService.SignInResponse{
+	response := &authproto.SignInResponse{
 		Error:    err.Error(),
 		Fields:   fields,
 		JwtToken: token,
@@ -71,7 +71,7 @@ func (s *Server) SignIn(ctx context.Context, request *authService.SignInRequest)
 	return response, nil
 }
 
-func (s *Server) UpdateAuth(ctx context.Context, request *authService.UpdateAuthRequest) (*authService.UpdateAuthResponse, error) {
+func (s *Server) UpdateAuth(ctx context.Context, request *authproto.UpdateAuthRequest) (*authproto.UpdateAuthResponse, error) {
 	s.Log.LogAcc("AUTH: call to UpdateAuth RPC")
 
 	data := models.UpdateUserData{
@@ -89,7 +89,7 @@ func (s *Server) UpdateAuth(ctx context.Context, request *authService.UpdateAuth
 		err = fmt.Errorf("")
 	}
 
-	response := &authService.UpdateAuthResponse{
+	response := &authproto.UpdateAuthResponse{
 		Error:    err.Error(),
 		Fields:   fields,
 		JwtToken: token,
@@ -97,7 +97,7 @@ func (s *Server) UpdateAuth(ctx context.Context, request *authService.UpdateAuth
 	return response, nil
 }
 
-func (s *Server) UpdatePassword(ctx context.Context, request *authService.UpdatePasswordRequest) (*authService.UpdatePasswordResponse, error) {
+func (s *Server) UpdatePassword(ctx context.Context, request *authproto.UpdatePasswordRequest) (*authproto.UpdatePasswordResponse, error) {
 	s.Log.LogAcc("AUTH: call to UpdatePassword RPC")
 
 	data := models.UpdatePasswordData{
@@ -110,14 +110,14 @@ func (s *Server) UpdatePassword(ctx context.Context, request *authService.Update
 		err = fmt.Errorf("")
 	}
 
-	response := &authService.UpdatePasswordResponse{
+	response := &authproto.UpdatePasswordResponse{
 		Error:  err.Error(),
 		Fields: fields,
 	}
 	return response, nil
 }
 
-func (s *Server) RemoveAuth(ctx context.Context, request *authService.RemoveAuthRequest) (*authService.RemoveAuthResponse, error) {
+func (s *Server) RemoveAuth(ctx context.Context, request *authproto.RemoveAuthRequest) (*authproto.RemoveAuthResponse, error) {
 	s.Log.LogAcc("AUTH: call to RemoveAuth RPC")
 
 	data := models.RemoveUserData{
@@ -129,7 +129,7 @@ func (s *Server) RemoveAuth(ctx context.Context, request *authService.RemoveAuth
 		err = fmt.Errorf("")
 	}
 
-	response := &authService.RemoveAuthResponse{
+	response := &authproto.RemoveAuthResponse{
 		Error:  err.Error(),
 		Fields: fields,
 	}

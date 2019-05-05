@@ -6,7 +6,8 @@ colors_mode="IN_DOCKER_NET"
 
 while getopts 'm:tp:' flag; do
   case "${flag}" in
-    t) auth_mode="TEST";;
+    t) auth_mode="TEST"
+        echo [TESTING];;
     p) port=${OPTARG};;
     m) mode=${OPTARG}
         case ${mode} in
