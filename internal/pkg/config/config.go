@@ -91,19 +91,13 @@ func parseDbConfig() {
 	Db.CoreTestDb = CONFIG.GetString("db.core_test_db")
 	Db.ChatTestDb = CONFIG.GetString("db.chat_test_db")
 
-	var keyPrefix string
-	switch os.Getenv("COLORS_SERVICE_USE_MODE") {
-	case "PRODUCTION":
-		keyPrefix = "db.envs.production"
-	case "IN_DOCKER_NET":
-		keyPrefix = "db.envs.in_docker_net"
-	case "USE_DOCKER_DB":
-		keyPrefix = "db.envs.use_docker_db"
-	default:
-		keyPrefix = "db.envs.default"
-	}
+	keyPrefix := "db.envs." + os.Getenv("COLORS_DB")
 
 	conf := CONFIG.GetStringMapString(keyPrefix)
+
+	if len(conf) == 0 {
+		conf = CONFIG.GetStringMapString("db.envs.default")
+	}
 	if conf["env"] == "true" {
 		Db.Host = os.Getenv(conf["host"])
 		Db.Port = os.Getenv(conf["port"])
@@ -126,15 +120,11 @@ type AuthConfig struct {
 func parseAuthConfig() {
 	Auth.Secret = CONFIG.GetString("auth.secret")
 
-	var keyPrefix string
-	switch os.Getenv("COLORS_SERVICE_USE_MODE") {
-	case "IN_DOCKER_NET":
-		keyPrefix = "auth.envs.in_docker_net"
-	default:
-		keyPrefix = "auth.envs.default"
-	}
-
+	keyPrefix := "auth.envs." + os.Getenv("COLORS_SERVICE_USE_MODE")
 	conf := CONFIG.GetStringMapString(keyPrefix)
+	if len(conf) == 0 {
+		conf = CONFIG.GetStringMapString("auth.envs.default")
+	}
 	Auth.Port = conf["port"]
 	Auth.ServiceLocation = conf["service_location"]
 }
