@@ -36,7 +36,7 @@ script:
 #  - go build -i cmd/server/main.go
 #  - go build -i cmd/auth/auth_server.go
 #  - go test -v -race ./...
-  - tree
+  - ls -al
   - golangci-lint run -c .golangci.yml
 before_install:
   - openssl aes-256-cbc -K $encrypted_dae2c75bd644_key -iv $encrypted_dae2c75bd644_iv
