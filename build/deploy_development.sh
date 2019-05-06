@@ -9,7 +9,7 @@ cd go-park-mail-ru/2019_1_OPG_plus_2
 git checkout 50-travis-cd
 git pull
 cd build
-./clear_up_containers.sh
+./clear_up_containers.sh -c
 ./initial.sh
 ./db_run_container.sh && ./auth_run_container.sh && ./server_run_container.sh
 exit
