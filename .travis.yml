@@ -10,8 +10,8 @@ services: docker
 deploy:
   - provider: script
     skip_cleanup: true
-#    script: ./build/deploy_development.sh
-    script: echo "I OCHEN WANT TO DEPLOY"
+    script: sh build/deploy_development.sh
+#    script: echo "I OCHEN WANT TO DEPLOY"
     on:
       branch: 50-travis-cd
 #  - provider: script
