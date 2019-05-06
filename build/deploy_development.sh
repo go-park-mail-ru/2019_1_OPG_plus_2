@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+echo WTF WITH THIS SCRIPT
+
 ssh-keyscan -H $DEVELOPMENT_MACHINE_ADDRESS >> ~/.ssh/known_hosts
 chmod 600 ./deploy_key_development
 ssh -i ./deploy_key_development $DEVELOPMENT_MACHINE_USERNAME@$DEVELOPMENT_MACHINE_ADDRESS << EOF
