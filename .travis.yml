@@ -10,12 +10,13 @@ services: docker
 deploy:
   - provider: script
     skip_cleanup: true
-    script: ./build/deploy_development.sh
+    script: sh build/deploy_development.sh
     on:
       branch: dev
+
   - provider: script
     skip_cleanup: true
-    script: ./build/deploy_production.sh
+    script: sh build/deploy_production.sh
     on:
       branch: production
 
@@ -36,6 +37,7 @@ script:
   - go build -i cmd/server/main.go
   - go build -i cmd/auth/auth_server.go
   - go test -v -race ./...
+  - ls -al
   - golangci-lint run -c .golangci.yml
 before_install:
   - openssl aes-256-cbc -K $encrypted_dae2c75bd644_key -iv $encrypted_dae2c75bd644_iv
