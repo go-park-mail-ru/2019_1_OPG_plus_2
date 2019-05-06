@@ -11,13 +11,6 @@ cd build
 
 ./initial.sh
 ./clear_up_containers.sh -c
-
-docker run -d --name "opg-net-proxyhost" \
-  --cap-add=NET_ADMIN --cap-add=NET_RAW \
-  --restart on-failure \
-  --net=opg-net --network-alias 'proxyhost' \
-  qoomon/docker-host >> ~/docker.log
-
 ./auth_run_container.sh -m production && ./server_run_container.sh -m production
 exit
 EOF
