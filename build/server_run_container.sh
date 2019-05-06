@@ -28,6 +28,7 @@ echo [SERVER-CORE] The published port of the container is ${port}
 docker build --rm -t colors-back-core -f core.Dockerfile .. && \
 docker run -d \
     -e COLORS_SERVICE_USE_MODE=${colors_mode} \
+    -e COLORS_DB=${db_mode} \
     -e DB_HOST=${DB_HOST} \
     -e DB_PORT=${DB_PORT} \
     -e DB_USERNAME=${DB_USERNAME} \
