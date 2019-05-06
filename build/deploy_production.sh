@@ -9,7 +9,7 @@ git checkout production
 git fetch
 cd build
 ./initial.sh
-./clear_up_containers.sh
+./clear_up_containers.sh -c
 ./auth_run_container.sh -m production && ./server_run_container.sh -m production
 exit
 EOF
