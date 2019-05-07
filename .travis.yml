@@ -10,13 +10,13 @@ services: docker
 deploy:
   - provider: script
     skip_cleanup: true
-    script: sh build/deploy_development.sh
+    script: bash build/deploy_development.sh
     on:
       branch: dev
 
   - provider: script
     skip_cleanup: true
-    script: sh build/deploy_production.sh
+    script: bash build/deploy_production.sh
     on:
       branch: production
 
@@ -31,8 +31,12 @@ before_script:
   - go mod tidy
   - curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh |
     sh -s -- -b $(go env GOPATH)/bin v1.16.0
-  - cd build && ./initial.sh && ./db_run_container.sh && ./auth_run_container.sh -t
-    && cd ..
+  - cd build
+  - bash initial.sh
+  - bash run_container_cookie.sh
+  - bash run_container_db.sh
+  - bash run_container_auth.sh -t
+  - cd ..
 script:
   - go build -i cmd/server/main.go
   - go build -i cmd/auth/auth_server.go

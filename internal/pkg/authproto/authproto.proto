@@ -10,6 +10,7 @@ service AuthService {
     rpc RemoveAuth (RemoveAuthRequest) returns (RemoveAuthResponse);
 }
 
+
 // data
 
 message SignUpData {
