@@ -4,13 +4,14 @@ import (
 	"2019_1_OPG_plus_2/internal/pkg/config"
 	"2019_1_OPG_plus_2/internal/pkg/cookiecheckerproto"
 	"2019_1_OPG_plus_2/internal/pkg/cookieservice"
+	"2019_1_OPG_plus_2/internal/pkg/tsLogger"
 	"google.golang.org/grpc"
-	"log"
 	"net"
 )
 
 func Start() error {
-	serv := cookieservice.Server{}
+	serv := cookieservice.NewServer(tsLogger.NewLogger())
+	serv.Log.Run()
 
 	lis, err := net.Listen("tcp", ":"+config.Auth.CookieServicePort)
 	if err != nil {
@@ -19,7 +20,7 @@ func Start() error {
 
 	server := grpc.NewServer()
 	cookiecheckerproto.RegisterCookieCheckerServer(server, serv)
-	log.Println("Serving cookie at ", config.Auth.CookieServiceLocation, ":", config.Auth.CookieServicePort)
+	serv.Log.LogInfo("Serving cookie at %v:%v", config.Auth.CookieServiceLocation, config.Auth.CookieServicePort)
 	return server.Serve(lis)
 }
 

@@ -52,6 +52,7 @@ func CreateAuthCookie(data models.JwtData, lifetime time.Duration) *http.Cookie 
 	}
 }
 
+// RPC
 func CheckJwt(token string) (models.JwtData, error) {
 	//data := models.JwtData{}
 	//err := data.UnMarshal(token, secret)
@@ -93,6 +94,7 @@ func NewStorage() *Storage {
 
 type Storage struct{}
 
+//RPC
 func (*Storage) SignUp(signUpData models.SignUpData) (models.JwtData, error, []string) {
 	data := &authproto.SignUpRequest{
 		Data: &authproto.SignUpData{
@@ -122,6 +124,7 @@ func (*Storage) SignUp(signUpData models.SignUpData) (models.JwtData, error, []s
 	return responseData, reterr, response.Fields
 }
 
+//RPC
 func (*Storage) SignIn(signInData models.SignInData) (models.JwtData, error, []string) {
 	data := &authproto.SignInRequest{
 		Data: &authproto.SignInData{
@@ -151,6 +154,7 @@ func (*Storage) SignIn(signInData models.SignInData) (models.JwtData, error, []s
 	//return SignIn(signInData)
 }
 
+//RPC
 func (*Storage) UpdateAuth(id int64, userData models.UpdateUserData) (models.JwtData, error, []string) {
 	data := &authproto.UpdateAuthRequest{
 		Id: id,
@@ -180,6 +184,7 @@ func (*Storage) UpdateAuth(id int64, userData models.UpdateUserData) (models.Jwt
 	return responseData, reterr, response.Fields
 }
 
+//RPC
 func (*Storage) UpdatePassword(id int64, passwordData models.UpdatePasswordData) (error, []string) {
 	data := &authproto.UpdatePasswordRequest{
 		Id: id,
@@ -204,6 +209,7 @@ func (*Storage) UpdatePassword(id int64, passwordData models.UpdatePasswordData)
 	return reterr, response.Fields
 }
 
+//RPC
 func (*Storage) RemoveAuth(id int64, removeData models.RemoveUserData) (error, []string) {
 	data := &authproto.RemoveAuthRequest{
 		Id: id,

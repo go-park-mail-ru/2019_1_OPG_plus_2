@@ -36,7 +36,8 @@ func AddGameServicePaths(router *mux.Router) *mux.Router {
 			_, _ = fmt.Fprint(w, "no such room with id ", id)
 			return
 		}
-		http.ServeFile(w, r, "home.html")
+		//http.ServeFile(w, r, "home.html")
+		_, _ = fmt.Fprint(w, "IDI NAHUY")
 	}).Methods("GET")
 
 	router.HandleFunc("/{id}/room", func(w http.ResponseWriter, r *http.Request) {
