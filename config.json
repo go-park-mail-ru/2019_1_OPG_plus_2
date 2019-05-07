@@ -52,11 +52,15 @@
     "envs": {
       "IN_DOCKER_NET": {
         "service_location": "colors-back-auth",
-        "port": "50242"
+        "port": "50242",
+        "cookie_service_location": "colors-back-cookie",
+        "cookie_service_port": "50243"
       },
       "default": {
         "service_location": "127.0.0.1",
-        "port": "50242"
+        "port": "50242",
+        "cookie_service_location": "127.0.0.1",
+        "cookie_service_port": "50243"
       }
     }
   },

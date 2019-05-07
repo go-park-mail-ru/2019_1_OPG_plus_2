@@ -1,12 +1,14 @@
 package auth
 
 import (
+	"2019_1_OPG_plus_2/internal/pkg/authproto"
+	"2019_1_OPG_plus_2/internal/pkg/cookiecheckerproto"
 	"2019_1_OPG_plus_2/internal/pkg/tsLogger"
-	authService "2019_1_OPG_plus_2/internal/proto"
 	"context"
 	"crypto/sha256"
 	"errors"
 	"fmt"
+	"github.com/dgrijalva/jwt-go"
 	"google.golang.org/grpc"
 	"net/http"
 	"time"
@@ -17,15 +19,24 @@ import (
 var Manager authManager
 
 func init() {
-	url := serviceLocation + ":" + port
-	conn, err := grpc.Dial(url, grpc.WithInsecure())
+
+	authurl := serviceLocation + ":" + port
+	authconn, err := grpc.Dial(authurl, grpc.WithInsecure())
 	if err != nil {
 		tsLogger.LogErr("AUTH: can not connect to service [%v]", err)
 	}
 
+	cookieurl := cookielocation + ":" + cookieport
+	cookieconn, err := grpc.Dial(cookieurl, grpc.WithInsecure())
+	if err != nil {
+		tsLogger.LogErr("СOOKIE: can not connect to service [%v]", err)
+	}
+
 	Manager = authManager{
-		Conn:       conn,
-		AuthClient: authService.NewAuthServiceClient(conn),
+		AuthConn:     authconn,
+		CookieConn:   cookieconn,
+		AuthClient:   authproto.NewAuthServiceClient(authconn),
+		CookieClient: cookiecheckerproto.NewCookieCheckerClient(cookieconn),
 	}
 }
 
@@ -43,9 +54,35 @@ func CreateAuthCookie(data models.JwtData, lifetime time.Duration) *http.Cookie 
 	}
 }
 
+// RPC
 func CheckJwt(token string) (models.JwtData, error) {
-	data := models.JwtData{}
-	err := data.UnMarshal(token, secret)
+	//data := models.JwtData{}
+	//err := data.UnMarshal(token, secret)
+	//return data, err
+
+	req := &cookiecheckerproto.CookieRequest{
+		JwtToken: token,
+	}
+
+	res, err := Manager.CookieClient.CheckCookie(context.Background(), req)
+	if err != nil {
+		tsLogger.LogErr("AUTH: CheckCookie call ended in: %v", err)
+		return models.JwtData{}, err
+	}
+
+	data := models.JwtData{
+		Email:    res.Data.GetEmail(),
+		Id:       res.Data.GetId(),
+		Username: res.Data.GetUsername(),
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: res.Data.GetExp(),
+		},
+	}
+
+	err = errors.New(res.Error)
+	if res.Error == "" {
+		err = nil
+	}
 	return data, err
 }
 
@@ -59,9 +96,10 @@ func NewStorage() *Storage {
 
 type Storage struct{}
 
+//RPC
 func (*Storage) SignUp(signUpData models.SignUpData) (models.JwtData, error, []string) {
-	data := &authService.SignUpRequest{
-		Data: &authService.SignUpData{
+	data := &authproto.SignUpRequest{
+		Data: &authproto.SignUpData{
 			Username: signUpData.Username,
 			Password: signUpData.Password,
 			Email:    signUpData.Email,
@@ -88,9 +126,10 @@ func (*Storage) SignUp(signUpData models.SignUpData) (models.JwtData, error, []s
 	return responseData, reterr, response.Fields
 }
 
+//RPC
 func (*Storage) SignIn(signInData models.SignInData) (models.JwtData, error, []string) {
-	data := &authService.SignInRequest{
-		Data: &authService.SignInData{
+	data := &authproto.SignInRequest{
+		Data: &authproto.SignInData{
 			Password: signInData.Password,
 			Login:    signInData.Login,
 		},
@@ -117,10 +156,11 @@ func (*Storage) SignIn(signInData models.SignInData) (models.JwtData, error, []s
 	//return SignIn(signInData)
 }
 
+//RPC
 func (*Storage) UpdateAuth(id int64, userData models.UpdateUserData) (models.JwtData, error, []string) {
-	data := &authService.UpdateAuthRequest{
+	data := &authproto.UpdateAuthRequest{
 		Id: id,
-		UserData: &authService.UpdateUserData{
+		UserData: &authproto.UpdateUserData{
 			Email:    userData.Email,
 			Username: userData.Username,
 		},
@@ -146,10 +186,11 @@ func (*Storage) UpdateAuth(id int64, userData models.UpdateUserData) (models.Jwt
 	return responseData, reterr, response.Fields
 }
 
+//RPC
 func (*Storage) UpdatePassword(id int64, passwordData models.UpdatePasswordData) (error, []string) {
-	data := &authService.UpdatePasswordRequest{
+	data := &authproto.UpdatePasswordRequest{
 		Id: id,
-		PasswordData: &authService.UpdatePasswordData{
+		PasswordData: &authproto.UpdatePasswordData{
 			NewPassword:     passwordData.NewPassword,
 			PasswordConfirm: passwordData.PasswordConfirm,
 		},
@@ -170,10 +211,11 @@ func (*Storage) UpdatePassword(id int64, passwordData models.UpdatePasswordData)
 	return reterr, response.Fields
 }
 
+//RPC
 func (*Storage) RemoveAuth(id int64, removeData models.RemoveUserData) (error, []string) {
-	data := &authService.RemoveAuthRequest{
+	data := &authproto.RemoveAuthRequest{
 		Id: id,
-		RemoveData: &authService.RemoveUserData{
+		RemoveData: &authproto.RemoveUserData{
 			Password: removeData.Password,
 		},
 	}
@@ -196,6 +238,8 @@ func (*Storage) RemoveAuth(id int64, removeData models.RemoveUserData) (error, [
 }
 
 type authManager struct {
-	Conn       *grpc.ClientConn
-	AuthClient authService.AuthServiceClient
+	AuthConn     *grpc.ClientConn
+	CookieConn   *grpc.ClientConn
+	AuthClient   authproto.AuthServiceClient
+	CookieClient cookiecheckerproto.CookieCheckerClient
 }

@@ -6,5 +6,8 @@ const CookieName = "jwt"
 
 var secret = []byte(config.Auth.Secret)
 
-var serviceLocation = config.Auth.ServiceLocation
-var port = config.Auth.Port
+var serviceLocation = config.Auth.AuthServiceLocation
+var port = config.Auth.AuthPort
+
+var cookieport = config.Auth.CookieServicePort
+var cookielocation = config.Auth.CookieServiceLocation

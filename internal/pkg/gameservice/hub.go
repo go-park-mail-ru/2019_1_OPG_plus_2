@@ -32,7 +32,7 @@ func (h *Hub) AttachRooms(rooms ...*Room) error {
 }
 
 func (h *Hub) run() {
-	ticker := time.NewTicker(time.Second * 5)
+	ticker := time.NewTicker(time.Second * 20)
 	defer ticker.Stop()
 	for _, room := range h.rooms {
 		go room.Run()

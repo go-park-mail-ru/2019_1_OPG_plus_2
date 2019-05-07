@@ -26,7 +26,7 @@ func init() {
 }
 
 func StartApp(params Params) error {
-	//fmt.Println("Server starting at " + params.Port)
+	//fmt.Println("Server starting at " + params.AuthPort)
 
 	if err := db.Open(); err != nil {
 		//fmt.Println(err.Error())
