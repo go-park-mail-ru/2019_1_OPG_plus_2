@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+service CookieChecker {
+    rpc CheckCookie (CookieRequest) returns (CookieResponse);
+}
+//
+//service Hui {
+//    rpc Huila (CookieRequest) returns (CookieResponse);
+//}
+
+message CookieRequest {
+    string JwtToken = 1;
+}
+
+
+message CookieResponse {
+    JwtData Data = 1;
+    string Error = 2;
+}
+
+message JwtData {
+    int64 Exp = 1;
+    int64 Id = 2;
+    string Email = 3;
+    string Username = 4;
+}

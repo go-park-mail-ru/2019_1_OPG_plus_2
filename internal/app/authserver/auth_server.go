@@ -1,10 +1,10 @@
 package authserver
 
 import (
+	"2019_1_OPG_plus_2/internal/pkg/authproto"
 	"2019_1_OPG_plus_2/internal/pkg/authservice"
 	"2019_1_OPG_plus_2/internal/pkg/config"
 	"2019_1_OPG_plus_2/internal/pkg/db"
-	authproto "2019_1_OPG_plus_2/internal/pkg/proto"
 	"google.golang.org/grpc"
 	"net"
 	"os"
@@ -24,7 +24,7 @@ func Start() error {
 		serv.Log.LogErr("%v", err)
 	}
 
-	lis, err := net.Listen("tcp", ":"+config.Auth.Port)
+	lis, err := net.Listen("tcp", ":"+config.Auth.AuthPort)
 	if err != nil {
 		serv.Log.LogFatal("AUTH: cant listen port: %s", err)
 	}
@@ -33,7 +33,7 @@ func Start() error {
 
 	authproto.RegisterAuthServiceServer(server, serv)
 
-	serv.Log.LogTrace("AUTH: starting server at %v:%v", config.Auth.ServiceLocation, config.Auth.Port)
+	serv.Log.LogTrace("AUTH: starting server at %v:%v", config.Auth.AuthServiceLocation, config.Auth.AuthPort)
 	return server.Serve(lis)
 }
 

@@ -1,12 +1,14 @@
 package auth
 
 import (
-	authproto "2019_1_OPG_plus_2/internal/pkg/proto"
+	"2019_1_OPG_plus_2/internal/pkg/authproto"
+	"2019_1_OPG_plus_2/internal/pkg/cookiecheckerproto"
 	"2019_1_OPG_plus_2/internal/pkg/tsLogger"
 	"context"
 	"crypto/sha256"
 	"errors"
 	"fmt"
+	"github.com/dgrijalva/jwt-go"
 	"google.golang.org/grpc"
 	"net/http"
 	"time"
@@ -17,15 +19,22 @@ import (
 var Manager authManager
 
 func init() {
-	url := serviceLocation + ":" + port
-	conn, err := grpc.Dial(url, grpc.WithInsecure())
+	authurl := serviceLocation + ":" + port
+	authconn, err := grpc.Dial(authurl, grpc.WithInsecure())
 	if err != nil {
 		tsLogger.LogErr("AUTH: can not connect to service [%v]", err)
 	}
 
+	cookieurl := cookielocation + ":" + cookieport
+	cookieconn, err := grpc.Dial(cookieurl, grpc.WithInsecure())
+	if err != nil {
+		tsLogger.LogErr("СOOKIE: can not connect to service [%v]", err)
+	}
+
 	Manager = authManager{
-		Conn:       conn,
-		AuthClient: authproto.NewAuthServiceClient(conn),
+		Conn:         authconn,
+		AuthClient:   authproto.NewAuthServiceClient(authconn),
+		CookieClient: cookiecheckerproto.NewCookieCheckerClient(cookieconn),
 	}
 }
 
@@ -44,8 +53,33 @@ func CreateAuthCookie(data models.JwtData, lifetime time.Duration) *http.Cookie 
 }
 
 func CheckJwt(token string) (models.JwtData, error) {
-	data := models.JwtData{}
-	err := data.UnMarshal(token, secret)
+	//data := models.JwtData{}
+	//err := data.UnMarshal(token, secret)
+	//return data, err
+
+	req := &cookiecheckerproto.CookieRequest{
+		JwtToken: token,
+	}
+
+	res, err := Manager.CookieClient.CheckCookie(context.Background(), req)
+	if err != nil {
+		tsLogger.LogErr("AUTH: CheckCookie call ended in: %v", err)
+		return models.JwtData{}, err
+	}
+
+	data := models.JwtData{
+		Email:    res.Data.GetEmail(),
+		Id:       res.Data.GetId(),
+		Username: res.Data.GetUsername(),
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: res.Data.GetExp(),
+		},
+	}
+
+	err = errors.New(res.Error)
+	if res.Error == "" {
+		err = nil
+	}
 	return data, err
 }
 
@@ -198,5 +232,5 @@ func (*Storage) RemoveAuth(id int64, removeData models.RemoveUserData) (error, [
 type authManager struct {
 	Conn         *grpc.ClientConn
 	AuthClient   authproto.AuthServiceClient
-	CookieClient authproto.CookieCheckerClient
+	CookieClient cookiecheckerproto.CookieCheckerClient
 }

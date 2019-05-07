@@ -10,9 +10,6 @@ service AuthService {
     rpc RemoveAuth (RemoveAuthRequest) returns (RemoveAuthResponse);
 }
 
-service CookieChecker {
-    rpc CheckCookie (CookieRequest) returns (CookieResponse);
-}
 
 // data
 
@@ -66,10 +63,6 @@ message RemoveAuthRequest {
     RemoveUserData removeData = 2;
 }
 
-message CookieRequest {
-    string JwtToken = 1;
-}
-
 // responses
 
 message SignUpResponse {
@@ -98,8 +91,4 @@ message UpdatePasswordResponse {
 message RemoveAuthResponse {
     string error = 1;
     repeated string fields = 2;
-}
-
-message CookieResponse{
-    string Result = 1;
 }

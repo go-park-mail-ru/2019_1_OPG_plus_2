@@ -112,9 +112,12 @@ func parseDbConfig() {
 }
 
 type AuthConfig struct {
-	Secret          string `json:"secret"`
-	ServiceLocation string `json:"service_location"`
-	Port            string `json:"port"`
+	Secret              string `json:"secret"`
+	AuthServiceLocation string `json:"auth_service_location"`
+	AuthPort            string `json:"auth port"`
+
+	CookieServiceLocation string `json:"cookie_service_location"`
+	CookieServicePort     string `json:"cookie_service_port"`
 }
 
 func parseAuthConfig() {
@@ -125,8 +128,11 @@ func parseAuthConfig() {
 	if len(conf) == 0 {
 		conf = CONFIG.GetStringMapString("auth.envs.default")
 	}
-	Auth.Port = conf["port"]
-	Auth.ServiceLocation = conf["service_location"]
+	Auth.AuthPort = conf["port"]
+	Auth.AuthServiceLocation = conf["service_location"]
+
+	Auth.CookieServiceLocation = conf["cookie_service_location"]
+	Auth.CookieServicePort = conf["cookie_service_port"]
 }
 
 type LoggerConfig struct {

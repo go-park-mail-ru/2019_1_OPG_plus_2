@@ -2,9 +2,9 @@ package authservice
 
 import (
 	"2019_1_OPG_plus_2/internal/pkg/auth"
+	"2019_1_OPG_plus_2/internal/pkg/authproto"
 	"2019_1_OPG_plus_2/internal/pkg/config"
 	"2019_1_OPG_plus_2/internal/pkg/models"
-	authproto "2019_1_OPG_plus_2/internal/pkg/proto"
 	"2019_1_OPG_plus_2/internal/pkg/tsLogger"
 	"context"
 	"fmt"

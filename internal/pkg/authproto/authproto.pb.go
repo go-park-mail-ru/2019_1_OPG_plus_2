@@ -36,7 +36,7 @@ func (m *SignUpData) Reset()         { *m = SignUpData{} }
 func (m *SignUpData) String() string { return proto.CompactTextString(m) }
 func (*SignUpData) ProtoMessage()    {}
 func (*SignUpData) Descriptor() ([]byte, []int) {
-	return fileDescriptor_authproto_ee9995fba1894e8e, []int{0}
+	return fileDescriptor_authproto_c027de801905780f, []int{0}
 }
 func (m *SignUpData) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SignUpData.Unmarshal(m, b)
@@ -89,7 +89,7 @@ func (m *SignInData) Reset()         { *m = SignInData{} }
 func (m *SignInData) String() string { return proto.CompactTextString(m) }
 func (*SignInData) ProtoMessage()    {}
 func (*SignInData) Descriptor() ([]byte, []int) {
-	return fileDescriptor_authproto_ee9995fba1894e8e, []int{1}
+	return fileDescriptor_authproto_c027de801905780f, []int{1}
 }
 func (m *SignInData) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SignInData.Unmarshal(m, b)
@@ -135,7 +135,7 @@ func (m *UpdateUserData) Reset()         { *m = UpdateUserData{} }
 func (m *UpdateUserData) String() string { return proto.CompactTextString(m) }
 func (*UpdateUserData) ProtoMessage()    {}
 func (*UpdateUserData) Descriptor() ([]byte, []int) {
-	return fileDescriptor_authproto_ee9995fba1894e8e, []int{2}
+	return fileDescriptor_authproto_c027de801905780f, []int{2}
 }
 func (m *UpdateUserData) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UpdateUserData.Unmarshal(m, b)
@@ -181,7 +181,7 @@ func (m *UpdatePasswordData) Reset()         { *m = UpdatePasswordData{} }
 func (m *UpdatePasswordData) String() string { return proto.CompactTextString(m) }
 func (*UpdatePasswordData) ProtoMessage()    {}
 func (*UpdatePasswordData) Descriptor() ([]byte, []int) {
-	return fileDescriptor_authproto_ee9995fba1894e8e, []int{3}
+	return fileDescriptor_authproto_c027de801905780f, []int{3}
 }
 func (m *UpdatePasswordData) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UpdatePasswordData.Unmarshal(m, b)
@@ -226,7 +226,7 @@ func (m *RemoveUserData) Reset()         { *m = RemoveUserData{} }
 func (m *RemoveUserData) String() string { return proto.CompactTextString(m) }
 func (*RemoveUserData) ProtoMessage()    {}
 func (*RemoveUserData) Descriptor() ([]byte, []int) {
-	return fileDescriptor_authproto_ee9995fba1894e8e, []int{4}
+	return fileDescriptor_authproto_c027de801905780f, []int{4}
 }
 func (m *RemoveUserData) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_RemoveUserData.Unmarshal(m, b)
@@ -264,7 +264,7 @@ func (m *SignUpRequest) Reset()         { *m = SignUpRequest{} }
 func (m *SignUpRequest) String() string { return proto.CompactTextString(m) }
 func (*SignUpRequest) ProtoMessage()    {}
 func (*SignUpRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_authproto_ee9995fba1894e8e, []int{5}
+	return fileDescriptor_authproto_c027de801905780f, []int{5}
 }
 func (m *SignUpRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SignUpRequest.Unmarshal(m, b)
@@ -302,7 +302,7 @@ func (m *SignInRequest) Reset()         { *m = SignInRequest{} }
 func (m *SignInRequest) String() string { return proto.CompactTextString(m) }
 func (*SignInRequest) ProtoMessage()    {}
 func (*SignInRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_authproto_ee9995fba1894e8e, []int{6}
+	return fileDescriptor_authproto_c027de801905780f, []int{6}
 }
 func (m *SignInRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SignInRequest.Unmarshal(m, b)
@@ -341,7 +341,7 @@ func (m *UpdateAuthRequest) Reset()         { *m = UpdateAuthRequest{} }
 func (m *UpdateAuthRequest) String() string { return proto.CompactTextString(m) }
 func (*UpdateAuthRequest) ProtoMessage()    {}
 func (*UpdateAuthRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_authproto_ee9995fba1894e8e, []int{7}
+	return fileDescriptor_authproto_c027de801905780f, []int{7}
 }
 func (m *UpdateAuthRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UpdateAuthRequest.Unmarshal(m, b)
@@ -387,7 +387,7 @@ func (m *UpdatePasswordRequest) Reset()         { *m = UpdatePasswordRequest{} }
 func (m *UpdatePasswordRequest) String() string { return proto.CompactTextString(m) }
 func (*UpdatePasswordRequest) ProtoMessage()    {}
 func (*UpdatePasswordRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_authproto_ee9995fba1894e8e, []int{8}
+	return fileDescriptor_authproto_c027de801905780f, []int{8}
 }
 func (m *UpdatePasswordRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UpdatePasswordRequest.Unmarshal(m, b)
@@ -433,7 +433,7 @@ func (m *RemoveAuthRequest) Reset()         { *m = RemoveAuthRequest{} }
 func (m *RemoveAuthRequest) String() string { return proto.CompactTextString(m) }
 func (*RemoveAuthRequest) ProtoMessage()    {}
 func (*RemoveAuthRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_authproto_ee9995fba1894e8e, []int{9}
+	return fileDescriptor_authproto_c027de801905780f, []int{9}
 }
 func (m *RemoveAuthRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_RemoveAuthRequest.Unmarshal(m, b)
@@ -467,44 +467,6 @@ func (m *RemoveAuthRequest) GetRemoveData() *RemoveUserData {
 	return nil
 }
 
-type CookieRequest struct {
-	JwtToken             string   `protobuf:"bytes,1,opt,name=JwtToken,proto3" json:"JwtToken,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *CookieRequest) Reset()         { *m = CookieRequest{} }
-func (m *CookieRequest) String() string { return proto.CompactTextString(m) }
-func (*CookieRequest) ProtoMessage()    {}
-func (*CookieRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_authproto_ee9995fba1894e8e, []int{10}
-}
-func (m *CookieRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_CookieRequest.Unmarshal(m, b)
-}
-func (m *CookieRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_CookieRequest.Marshal(b, m, deterministic)
-}
-func (dst *CookieRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_CookieRequest.Merge(dst, src)
-}
-func (m *CookieRequest) XXX_Size() int {
-	return xxx_messageInfo_CookieRequest.Size(m)
-}
-func (m *CookieRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_CookieRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_CookieRequest proto.InternalMessageInfo
-
-func (m *CookieRequest) GetJwtToken() string {
-	if m != nil {
-		return m.JwtToken
-	}
-	return ""
-}
-
 type SignUpResponse struct {
 	JwtToken             string   `protobuf:"bytes,1,opt,name=jwtToken,proto3" json:"jwtToken,omitempty"`
 	Error                string   `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
@@ -518,7 +480,7 @@ func (m *SignUpResponse) Reset()         { *m = SignUpResponse{} }
 func (m *SignUpResponse) String() string { return proto.CompactTextString(m) }
 func (*SignUpResponse) ProtoMessage()    {}
 func (*SignUpResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_authproto_ee9995fba1894e8e, []int{11}
+	return fileDescriptor_authproto_c027de801905780f, []int{10}
 }
 func (m *SignUpResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SignUpResponse.Unmarshal(m, b)
@@ -572,7 +534,7 @@ func (m *SignInResponse) Reset()         { *m = SignInResponse{} }
 func (m *SignInResponse) String() string { return proto.CompactTextString(m) }
 func (*SignInResponse) ProtoMessage()    {}
 func (*SignInResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_authproto_ee9995fba1894e8e, []int{12}
+	return fileDescriptor_authproto_c027de801905780f, []int{11}
 }
 func (m *SignInResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SignInResponse.Unmarshal(m, b)
@@ -626,7 +588,7 @@ func (m *UpdateAuthResponse) Reset()         { *m = UpdateAuthResponse{} }
 func (m *UpdateAuthResponse) String() string { return proto.CompactTextString(m) }
 func (*UpdateAuthResponse) ProtoMessage()    {}
 func (*UpdateAuthResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_authproto_ee9995fba1894e8e, []int{13}
+	return fileDescriptor_authproto_c027de801905780f, []int{12}
 }
 func (m *UpdateAuthResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UpdateAuthResponse.Unmarshal(m, b)
@@ -679,7 +641,7 @@ func (m *UpdatePasswordResponse) Reset()         { *m = UpdatePasswordResponse{}
 func (m *UpdatePasswordResponse) String() string { return proto.CompactTextString(m) }
 func (*UpdatePasswordResponse) ProtoMessage()    {}
 func (*UpdatePasswordResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_authproto_ee9995fba1894e8e, []int{14}
+	return fileDescriptor_authproto_c027de801905780f, []int{13}
 }
 func (m *UpdatePasswordResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UpdatePasswordResponse.Unmarshal(m, b)
@@ -725,7 +687,7 @@ func (m *RemoveAuthResponse) Reset()         { *m = RemoveAuthResponse{} }
 func (m *RemoveAuthResponse) String() string { return proto.CompactTextString(m) }
 func (*RemoveAuthResponse) ProtoMessage()    {}
 func (*RemoveAuthResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_authproto_ee9995fba1894e8e, []int{15}
+	return fileDescriptor_authproto_c027de801905780f, []int{14}
 }
 func (m *RemoveAuthResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_RemoveAuthResponse.Unmarshal(m, b)
@@ -759,44 +721,6 @@ func (m *RemoveAuthResponse) GetFields() []string {
 	return nil
 }
 
-type CookieResponse struct {
-	Result               string   `protobuf:"bytes,1,opt,name=Result,proto3" json:"Result,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *CookieResponse) Reset()         { *m = CookieResponse{} }
-func (m *CookieResponse) String() string { return proto.CompactTextString(m) }
-func (*CookieResponse) ProtoMessage()    {}
-func (*CookieResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_authproto_ee9995fba1894e8e, []int{16}
-}
-func (m *CookieResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_CookieResponse.Unmarshal(m, b)
-}
-func (m *CookieResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_CookieResponse.Marshal(b, m, deterministic)
-}
-func (dst *CookieResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_CookieResponse.Merge(dst, src)
-}
-func (m *CookieResponse) XXX_Size() int {
-	return xxx_messageInfo_CookieResponse.Size(m)
-}
-func (m *CookieResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_CookieResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_CookieResponse proto.InternalMessageInfo
-
-func (m *CookieResponse) GetResult() string {
-	if m != nil {
-		return m.Result
-	}
-	return ""
-}
-
 func init() {
 	proto.RegisterType((*SignUpData)(nil), "SignUpData")
 	proto.RegisterType((*SignInData)(nil), "SignInData")
@@ -808,13 +732,11 @@ func init() {
 	proto.RegisterType((*UpdateAuthRequest)(nil), "UpdateAuthRequest")
 	proto.RegisterType((*UpdatePasswordRequest)(nil), "UpdatePasswordRequest")
 	proto.RegisterType((*RemoveAuthRequest)(nil), "RemoveAuthRequest")
-	proto.RegisterType((*CookieRequest)(nil), "CookieRequest")
 	proto.RegisterType((*SignUpResponse)(nil), "SignUpResponse")
 	proto.RegisterType((*SignInResponse)(nil), "SignInResponse")
 	proto.RegisterType((*UpdateAuthResponse)(nil), "UpdateAuthResponse")
 	proto.RegisterType((*UpdatePasswordResponse)(nil), "UpdatePasswordResponse")
 	proto.RegisterType((*RemoveAuthResponse)(nil), "RemoveAuthResponse")
-	proto.RegisterType((*CookieResponse)(nil), "CookieResponse")
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -1021,107 +943,39 @@ var _AuthService_serviceDesc = grpc.ServiceDesc{
 	Metadata: "authproto.proto",
 }
 
-// CookieCheckerClient is the client API for CookieChecker service.
-//
-// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
-type CookieCheckerClient interface {
-	CheckCookie(ctx context.Context, in *CookieRequest, opts ...grpc.CallOption) (*CookieResponse, error)
-}
+func init() { proto.RegisterFile("authproto.proto", fileDescriptor_authproto_c027de801905780f) }
 
-type cookieCheckerClient struct {
-	cc *grpc.ClientConn
-}
-
-func NewCookieCheckerClient(cc *grpc.ClientConn) CookieCheckerClient {
-	return &cookieCheckerClient{cc}
-}
-
-func (c *cookieCheckerClient) CheckCookie(ctx context.Context, in *CookieRequest, opts ...grpc.CallOption) (*CookieResponse, error) {
-	out := new(CookieResponse)
-	err := c.cc.Invoke(ctx, "/CookieChecker/CheckCookie", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-// CookieCheckerServer is the server API for CookieChecker service.
-type CookieCheckerServer interface {
-	CheckCookie(context.Context, *CookieRequest) (*CookieResponse, error)
-}
-
-func RegisterCookieCheckerServer(s *grpc.Server, srv CookieCheckerServer) {
-	s.RegisterService(&_CookieChecker_serviceDesc, srv)
-}
-
-func _CookieChecker_CheckCookie_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CookieRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(CookieCheckerServer).CheckCookie(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/CookieChecker/CheckCookie",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CookieCheckerServer).CheckCookie(ctx, req.(*CookieRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-var _CookieChecker_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "CookieChecker",
-	HandlerType: (*CookieCheckerServer)(nil),
-	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "CheckCookie",
-			Handler:    _CookieChecker_CheckCookie_Handler,
-		},
-	},
-	Streams:  []grpc.StreamDesc{},
-	Metadata: "authproto.proto",
-}
-
-func init() { proto.RegisterFile("authproto.proto", fileDescriptor_authproto_ee9995fba1894e8e) }
-
-var fileDescriptor_authproto_ee9995fba1894e8e = []byte{
-	// 545 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xac, 0x55, 0x51, 0x6f, 0xd3, 0x30,
-	0x10, 0x56, 0x53, 0xa8, 0xc6, 0x85, 0xa5, 0x9a, 0x07, 0xa5, 0xea, 0x0b, 0x53, 0x9e, 0x8a, 0x86,
-	0x0c, 0x2a, 0x42, 0xbc, 0x81, 0xb6, 0x02, 0x52, 0x11, 0x42, 0x53, 0xb6, 0xbe, 0xf0, 0x80, 0x08,
-	0xab, 0xb7, 0x85, 0xb6, 0x76, 0x70, 0xd2, 0xf5, 0x8f, 0xf0, 0x83, 0xe7, 0xd8, 0xbe, 0x34, 0x4e,
-	0xba, 0x3d, 0x4c, 0x7b, 0xa9, 0x7c, 0xf6, 0xdd, 0x77, 0x77, 0xdf, 0x77, 0x97, 0x42, 0x37, 0x5e,
-	0xe5, 0x57, 0xa9, 0x14, 0xb9, 0xa0, 0xfa, 0x37, 0xfc, 0x09, 0x70, 0x9a, 0x5c, 0xf2, 0x69, 0xfa,
-	0x39, 0xce, 0x63, 0xf2, 0x0c, 0x1e, 0x7f, 0x59, 0xc6, 0xc9, 0xa2, 0xdf, 0x3a, 0x68, 0x0d, 0x9f,
-	0x44, 0xc6, 0x20, 0x03, 0xd8, 0x99, 0x66, 0x4c, 0xf2, 0x78, 0xc9, 0xfa, 0x9e, 0x7e, 0x28, 0xed,
-	0xe2, 0xed, 0x24, 0xce, 0xb2, 0xb5, 0x90, 0xb3, 0x7e, 0xdb, 0xbc, 0xa1, 0x1d, 0x7e, 0x34, 0xd8,
-	0x13, 0x8e, 0xd8, 0xdf, 0xc5, 0x65, 0xc2, 0x11, 0x5b, 0x1b, 0x4e, 0xbc, 0x57, 0x8b, 0x3f, 0x86,
-	0x60, 0x9a, 0xce, 0xe2, 0x9c, 0x15, 0xd9, 0xee, 0x57, 0x5f, 0xf8, 0x1b, 0x88, 0xc1, 0x40, 0x54,
-	0x8d, 0x73, 0x00, 0xfe, 0x0f, 0xb6, 0x2e, 0x13, 0x1b, 0xb4, 0xea, 0x15, 0x19, 0x42, 0x17, 0xcf,
-	0x63, 0xc1, 0x2f, 0x12, 0xb9, 0xb4, 0xd0, 0xf5, 0xeb, 0xf0, 0x35, 0x04, 0x11, 0x5b, 0x8a, 0xeb,
-	0x4d, 0x95, 0xd5, 0x9e, 0x5a, 0xb5, 0x9e, 0xde, 0xc2, 0xae, 0xe1, 0x3b, 0x62, 0xff, 0x56, 0x2c,
-	0xcb, 0xc9, 0x4b, 0x78, 0xa4, 0xca, 0x8b, 0xb5, 0xa3, 0x3f, 0xf2, 0xe9, 0x46, 0x8d, 0x48, 0x3f,
-	0x60, 0xc4, 0x84, 0xdf, 0x15, 0x61, 0x38, 0xb6, 0x11, 0x27, 0xb0, 0x67, 0x7a, 0x3e, 0x52, 0x62,
-	0x63, 0x54, 0x00, 0x5e, 0x62, 0xca, 0x69, 0x47, 0xea, 0x44, 0x0e, 0x61, 0x67, 0x65, 0x0b, 0xd6,
-	0x9d, 0xf9, 0xa3, 0x2e, 0x75, 0xd9, 0x8e, 0x4a, 0x07, 0xc5, 0xe2, 0x73, 0x97, 0xc5, 0xdb, 0x50,
-	0x3f, 0xc0, 0xd3, 0xb4, 0x42, 0xb4, 0x45, 0xde, 0xa7, 0x4d, 0x0d, 0x22, 0xc7, 0x31, 0x3c, 0x83,
-	0x3d, 0xc3, 0xe2, 0x5d, 0x35, 0xbf, 0x01, 0x90, 0xda, 0xc9, 0xa9, 0xda, 0x65, 0x3f, 0xaa, 0xb8,
-	0x84, 0x87, 0xb0, 0x3b, 0x16, 0x62, 0x9e, 0x30, 0x44, 0x54, 0xd2, 0x7c, 0x5b, 0xe7, 0x67, 0x62,
-	0xce, 0x70, 0x0e, 0x4b, 0x5b, 0xad, 0x42, 0x80, 0xd2, 0x64, 0xa9, 0xe0, 0x99, 0x1e, 0xee, 0xbf,
-	0x35, 0x6f, 0xb4, 0x8b, 0x51, 0x64, 0x52, 0x0a, 0x69, 0xc7, 0xc2, 0x18, 0xa4, 0x07, 0x9d, 0x8b,
-	0x84, 0x2d, 0x66, 0x99, 0x5a, 0x86, 0xb6, 0xba, 0xb6, 0x16, 0x62, 0x17, 0x22, 0x3e, 0x38, 0xf6,
-	0x2f, 0x1c, 0x71, 0x43, 0xdd, 0x83, 0xe3, 0x7f, 0x85, 0x5e, 0x5d, 0x7c, 0x9b, 0xa3, 0xc4, 0x69,
-	0x6d, 0xc7, 0xf1, 0x1c, 0x9c, 0x63, 0x20, 0x55, 0x89, 0xef, 0x85, 0x31, 0x84, 0x00, 0x05, 0xb5,
-	0xf1, 0xca, 0x53, 0x9d, 0x57, 0x8b, 0xdc, 0x02, 0x58, 0x6b, 0xf4, 0xdf, 0x03, 0xbf, 0x48, 0x74,
-	0xca, 0xe4, 0x75, 0x72, 0xce, 0xc8, 0x2b, 0xe8, 0x18, 0x75, 0x49, 0x40, 0x9d, 0x0d, 0x1c, 0x74,
-	0x69, 0x4d, 0x76, 0xeb, 0x3a, 0xe1, 0xd6, 0xb5, 0x5c, 0x3d, 0xeb, 0x5a, 0x51, 0xf1, 0x3d, 0xc0,
-	0x86, 0x7b, 0x42, 0x68, 0x63, 0xef, 0x06, 0xfb, 0x74, 0x8b, 0x38, 0x47, 0xf8, 0x65, 0x2b, 0xbf,
-	0x37, 0x3d, 0xba, 0x75, 0xc1, 0x06, 0x2f, 0xe8, 0x2d, 0xdc, 0xab, 0xcc, 0x1b, 0x36, 0x55, 0xe6,
-	0xc6, 0xf6, 0xa8, 0xcc, 0x4d, 0xba, 0x47, 0x9f, 0x70, 0x23, 0xc6, 0x57, 0xec, 0x7c, 0xce, 0x24,
-	0xa1, 0xe0, 0xeb, 0xa3, 0xb9, 0x55, 0x1d, 0x3b, 0x0b, 0xa3, 0x3a, 0x76, 0xf9, 0xfe, 0xd3, 0xd1,
-	0xff, 0x1b, 0xef, 0x6e, 0x02, 0x00, 0x00, 0xff, 0xff, 0x63, 0x3b, 0x6d, 0x80, 0x4a, 0x06, 0x00,
-	0x00,
+var fileDescriptor_authproto_c027de801905780f = []byte{
+	// 490 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xac, 0x54, 0x4d, 0x6f, 0xd4, 0x30,
+	0x10, 0xd5, 0x66, 0x61, 0x55, 0x26, 0x90, 0xa8, 0x2e, 0x2c, 0xab, 0x5c, 0xa8, 0x72, 0x2a, 0x02,
+	0x19, 0xb4, 0x08, 0x71, 0x43, 0x6a, 0xf9, 0x90, 0x56, 0x42, 0xa8, 0x72, 0xbb, 0x17, 0x0e, 0x08,
+	0xc3, 0xba, 0x25, 0xd0, 0xd8, 0xc1, 0xc9, 0x76, 0xff, 0x08, 0x3f, 0xb8, 0x8e, 0x3f, 0x92, 0x38,
+	0xd9, 0xf6, 0x50, 0xf5, 0x12, 0x65, 0xec, 0x37, 0x6f, 0xc6, 0xef, 0x8d, 0x0d, 0x31, 0x5d, 0x57,
+	0xbf, 0x0b, 0x29, 0x2a, 0x81, 0xf5, 0x37, 0xfd, 0x06, 0x70, 0x92, 0x9d, 0xf3, 0x65, 0xf1, 0x91,
+	0x56, 0x14, 0x3d, 0x86, 0xfb, 0x9f, 0x72, 0x9a, 0x5d, 0xcc, 0x46, 0xfb, 0xa3, 0x83, 0x07, 0xc4,
+	0x04, 0x28, 0x81, 0x9d, 0x65, 0xc9, 0x24, 0xa7, 0x39, 0x9b, 0x05, 0x7a, 0xa3, 0x89, 0xeb, 0xbd,
+	0x63, 0x5a, 0x96, 0x1b, 0x21, 0x57, 0xb3, 0xb1, 0xd9, 0x73, 0x71, 0xfa, 0xde, 0x70, 0x2f, 0xb8,
+	0xe3, 0xfe, 0x22, 0xce, 0x33, 0xee, 0xb8, 0x75, 0xe0, 0xe5, 0x07, 0xbd, 0xfc, 0x23, 0x88, 0x96,
+	0xc5, 0x8a, 0x56, 0xac, 0xae, 0x76, 0xbb, 0xfe, 0xd2, 0x1f, 0x80, 0x0c, 0x87, 0x63, 0xd5, 0x3c,
+	0xfb, 0x10, 0x7e, 0x65, 0x9b, 0xa6, 0xb0, 0x61, 0xeb, 0x2e, 0xa1, 0x03, 0x88, 0xdd, 0xff, 0x07,
+	0xc1, 0xcf, 0x32, 0x99, 0x5b, 0xea, 0xfe, 0x72, 0xfa, 0x12, 0x22, 0xc2, 0x72, 0x71, 0xd9, 0x76,
+	0xd9, 0x3d, 0xd3, 0xa8, 0x77, 0xa6, 0xd7, 0xf0, 0xc8, 0xe8, 0x4d, 0xd8, 0xbf, 0x35, 0x2b, 0x2b,
+	0xf4, 0x0c, 0xee, 0xa9, 0xf6, 0xa8, 0x06, 0x86, 0xf3, 0x10, 0xb7, 0x6e, 0x10, 0xbd, 0xe1, 0x32,
+	0x16, 0xfc, 0xa6, 0x0c, 0xa3, 0xb1, 0xcd, 0x38, 0x86, 0x5d, 0x73, 0xe6, 0x43, 0x65, 0xb6, 0xcb,
+	0x8a, 0x20, 0xc8, 0x4c, 0x3b, 0x63, 0xa2, 0xfe, 0xd0, 0x0b, 0xd8, 0x59, 0xdb, 0x86, 0xf5, 0xc9,
+	0xc2, 0x79, 0x8c, 0x7d, 0xb5, 0x49, 0x03, 0x50, 0x2a, 0x3e, 0xf1, 0x55, 0xbc, 0x8e, 0xf5, 0x1d,
+	0x3c, 0x2c, 0x3a, 0x42, 0x5b, 0xe6, 0x3d, 0x3c, 0xf4, 0x80, 0x78, 0xc0, 0xf4, 0x14, 0x76, 0x8d,
+	0x8a, 0x37, 0xf5, 0xfc, 0x0a, 0x40, 0x6a, 0x90, 0xd7, 0xb5, 0xaf, 0x3e, 0xe9, 0x40, 0xd4, 0x74,
+	0x47, 0x4e, 0xed, 0xb2, 0x10, 0xbc, 0xd4, 0xf3, 0xfa, 0x67, 0x53, 0x9d, 0x8a, 0xbf, 0xcc, 0x0d,
+	0x62, 0x13, 0xd7, 0xd3, 0xc5, 0xa4, 0x14, 0xd2, 0x3a, 0x6d, 0x02, 0x34, 0x85, 0xc9, 0x59, 0xc6,
+	0x2e, 0x56, 0xa5, 0x9a, 0xef, 0xb1, 0x5a, 0xb6, 0x91, 0xe3, 0xae, 0x7d, 0xb9, 0x73, 0xee, 0xef,
+	0x6e, 0x6a, 0x8d, 0x1a, 0x77, 0xce, 0xff, 0x19, 0xa6, 0x7d, 0x3f, 0x6d, 0x8d, 0x86, 0x67, 0xb4,
+	0x9d, 0x27, 0xf0, 0x78, 0x8e, 0x00, 0x75, 0x5d, 0xbb, 0x0d, 0xc7, 0xfc, 0x7f, 0x00, 0x61, 0x9d,
+	0x7e, 0xc2, 0xe4, 0x65, 0xf6, 0x8b, 0xa1, 0xe7, 0x30, 0x31, 0x9e, 0xa1, 0x08, 0x7b, 0x57, 0x25,
+	0x89, 0x71, 0xcf, 0x4c, 0x0b, 0x5d, 0x70, 0x0b, 0x6d, 0xee, 0x88, 0x85, 0x76, 0xbc, 0x79, 0x0b,
+	0xd0, 0x2a, 0x8a, 0x10, 0x1e, 0x5c, 0x90, 0x64, 0x0f, 0x6f, 0x91, 0xfc, 0xd0, 0x3d, 0x41, 0xcd,
+	0xc3, 0x30, 0xc5, 0x5b, 0x6f, 0x42, 0xf2, 0x14, 0x5f, 0xa3, 0xa8, 0xaa, 0xdc, 0x6a, 0xa4, 0x2a,
+	0x0f, 0xc6, 0x5c, 0x55, 0x1e, 0x8a, 0xf8, 0x73, 0xa2, 0xdf, 0xe7, 0x37, 0x57, 0x01, 0x00, 0x00,
+	0xff, 0xff, 0xd1, 0x02, 0x84, 0x5c, 0xb2, 0x05, 0x00, 0x00,
 }
