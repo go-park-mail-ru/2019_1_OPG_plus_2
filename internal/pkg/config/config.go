@@ -5,6 +5,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"strings"
 
 	"github.com/spf13/viper"
 )
@@ -123,7 +124,7 @@ type AuthConfig struct {
 func parseAuthConfig() {
 	Auth.Secret = CONFIG.GetString("auth.secret")
 
-	keyPrefix := "auth.envs." + os.Getenv("COLORS_SERVICE_USE_MODE")
+	keyPrefix := "auth.envs." + strings.ToLower(os.Getenv("COLORS_SERVICE_USE_MODE"))
 	conf := CONFIG.GetStringMapString(keyPrefix)
 	if len(conf) == 0 {
 		conf = CONFIG.GetStringMapString("auth.envs.default")

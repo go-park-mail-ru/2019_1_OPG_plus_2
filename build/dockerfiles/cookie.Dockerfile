@@ -14,7 +14,7 @@ RUN cp config.json colors-cookie-service/config.json
 
 FROM alpine:latest
 ENV COLORS_SERVICE_USE_MODE=IN_DOCKER_NET
-ENV COLORS_CONFIG_PATH="/root/colors-auth-service"
+ENV COLORS_CONFIG_PATH="/root/colors-cookie-service"
 
 RUN apk --no-cache add ca-certificates
 WORKDIR /root/
