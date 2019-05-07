@@ -7,8 +7,7 @@ while getopts 'p:' flag; do
   esac
 done
 
-
-echo [COOKIE] The published port of the container is ${port}
+echo [SERVER-COOKIE] The published port of the container is ${port}
 
 docker build --rm -t colors-back-cookie -f dockerfiles/cookie.Dockerfile .. && \
 docker run -d \
@@ -16,4 +15,4 @@ docker run -d \
            -p ${port}:50243 \
            --name colors-back-cookie \
            colors-back-cookie >> ~/docker.log && \
-echo [COOKIE] Cookie-validation service is now running at: ${port}
+echo [SERVER-COOKIE] Cookie-validation service is now running at: ${port}

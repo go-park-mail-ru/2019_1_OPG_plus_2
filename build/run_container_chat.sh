@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-if [[ "$#" -eq 1 ]]
-then
-    port=$1
-    else
-    port=8003
-    fi
+port=8003
+while getopts 'p:' flag; do
+  case ${flag} in
+    p) port=${OPTARG};;
+  esac
+done
 
 echo [SERVER-CHAT] The published port of the container is ${port}
 

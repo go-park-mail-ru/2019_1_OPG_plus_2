@@ -80,7 +80,7 @@ func AddGameServicePaths(router *mux.Router) *mux.Router {
 			return
 		}
 		_, _ = fmt.Fprint(w, "Room ", id, " created")
-	}).Methods("CREATE")
+	}).Methods("POST")
 
 	go hub.run()
 
