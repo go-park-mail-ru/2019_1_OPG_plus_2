@@ -31,12 +31,7 @@ before_script:
   - go mod tidy
   - curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh |
     sh -s -- -b $(go env GOPATH)/bin v1.16.0
-  - cd build &&
-    sh initial.sh &&
-    sh run_container_db.sh &&
-    sh run_container_cookie.sh &&
-    sh run_container_auth.sh -t &&
-    cd ..
+  - cd build && sh initial.sh && sh run_container_db.sh && sh run_container_cookie.sh && sh run_container_auth.sh -t && cd ..
 script:
   - go build -i cmd/server/main.go
   - go build -i cmd/auth/auth_server.go
