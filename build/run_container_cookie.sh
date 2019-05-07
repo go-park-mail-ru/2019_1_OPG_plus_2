@@ -10,7 +10,7 @@ done
 
 echo [COOKIE] The published port of the container is ${port}
 
-docker build --rm -t colors-db -f dockerfiles/db.Dockerfile .. && \
+docker build --rm -t colors-back-cookie -f dockerfiles/cookie.Dockerfile .. && \
 docker run -d \
            --network=opg-net \
            -p ${port}:50243 \
