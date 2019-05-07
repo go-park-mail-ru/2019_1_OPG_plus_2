@@ -20,24 +20,21 @@ var Manager authManager
 
 func init() {
 
-AUTH:
 	authurl := serviceLocation + ":" + port
 	authconn, err := grpc.Dial(authurl, grpc.WithInsecure())
 	if err != nil {
 		tsLogger.LogErr("AUTH: can not connect to service [%v]", err)
-		goto AUTH
 	}
 
-COOKIE:
 	cookieurl := cookielocation + ":" + cookieport
 	cookieconn, err := grpc.Dial(cookieurl, grpc.WithInsecure())
 	if err != nil {
 		tsLogger.LogErr("СOOKIE: can not connect to service [%v]", err)
-		goto COOKIE
 	}
 
 	Manager = authManager{
-		Conn:         authconn,
+		AuthConn:     authconn,
+		CookieConn:   cookieconn,
 		AuthClient:   authproto.NewAuthServiceClient(authconn),
 		CookieClient: cookiecheckerproto.NewCookieCheckerClient(cookieconn),
 	}
@@ -241,7 +238,8 @@ func (*Storage) RemoveAuth(id int64, removeData models.RemoveUserData) (error, [
 }
 
 type authManager struct {
-	Conn         *grpc.ClientConn
+	AuthConn     *grpc.ClientConn
+	CookieConn   *grpc.ClientConn
 	AuthClient   authproto.AuthServiceClient
 	CookieClient cookiecheckerproto.CookieCheckerClient
 }

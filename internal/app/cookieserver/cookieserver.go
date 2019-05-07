@@ -15,7 +15,7 @@ func Start() error {
 
 	lis, err := net.Listen("tcp", ":"+config.Auth.CookieServicePort)
 	if err != nil {
-		panic(err)
+		serv.Log.LogFatal("COOKIE: cant listen port: %s", err)
 	}
 
 	server := grpc.NewServer()
@@ -24,4 +24,4 @@ func Start() error {
 	return server.Serve(lis)
 }
 
-func Stop() {}
+//func Stop() {}
