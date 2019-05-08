@@ -28,26 +28,26 @@ var (
 	Logger  LoggerConfig
 )
 
-//func init() {
-//	CONFIG.SetConfigName("config")                                   // name of testConfig file (without extension)
-//	CONFIG.AddConfigPath("/etc/colors-game/")                        // path to look for the testConfig file in
-//	CONFIG.AddConfigPath("$HOME/.colors-game")                       // call multiple times to add many search paths
-//	CONFIG.AddConfigPath(".")                                        // optionally look for testConfig in the working directory
-//	CONFIG.AddConfigPath("/home/daniknik/go/src/2019_1_OPG_plus_2/") // optionally look for testConfig in the working directory
-//	CONFIG.AddConfigPath(os.Getenv("COLORS_CONFIG_PATH"))
-//	err := CONFIG.ReadInConfig() // Find and read the testConfig file
-//	if err != nil {              // Handle errors reading the testConfig file
-//		panic(fmt.Errorf("Fatal error config file: %v \n", err))
-//	}
-//
-//	parseAuthConfig(CONFIG, &Auth)
-//
-//	parseVkConfig(CONFIG, &VkOAuth)
-//
-//	parseDbConfig(CONFIG, &Db)
-//
-//	parseLoggerConfig(CONFIG, &Logger)
-//}
+func init() {
+	CONFIG.SetConfigName("config")                                   // name of testConfig file (without extension)
+	CONFIG.AddConfigPath("/etc/colors-game/")                        // path to look for the testConfig file in
+	CONFIG.AddConfigPath("$HOME/.colors-game")                       // call multiple times to add many search paths
+	CONFIG.AddConfigPath(".")                                        // optionally look for testConfig in the working directory
+	CONFIG.AddConfigPath("/home/daniknik/go/src/2019_1_OPG_plus_2/") // optionally look for testConfig in the working directory
+	CONFIG.AddConfigPath(os.Getenv("COLORS_CONFIG_PATH"))
+	err := CONFIG.ReadInConfig() // Find and read the testConfig file
+	if err != nil {              // Handle errors reading the testConfig file
+		panic(fmt.Errorf("Fatal error config file: %v \n", err))
+	}
+
+	parseAuthConfig(CONFIG, &Auth)
+
+	parseVkConfig(CONFIG, &VkOAuth)
+
+	parseDbConfig(CONFIG, &Db)
+
+	parseLoggerConfig(CONFIG, &Logger)
+}
 
 type OAuthConfig struct {
 	AppId     string `json:"app_id, string"`
