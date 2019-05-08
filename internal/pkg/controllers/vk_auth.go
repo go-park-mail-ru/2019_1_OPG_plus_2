@@ -1,11 +1,11 @@
 package controllers
 
 import (
-	"encoding/json"
-	"fmt"
 	"2019_1_OPG_plus_2/internal/pkg/adapters"
 	"2019_1_OPG_plus_2/internal/pkg/auth"
 	"2019_1_OPG_plus_2/internal/pkg/models"
+	"encoding/json"
+	"fmt"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/vk"
 	"io/ioutil"

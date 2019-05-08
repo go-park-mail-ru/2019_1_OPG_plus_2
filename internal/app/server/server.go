@@ -2,7 +2,10 @@ package server
 
 import (
 	"2019_1_OPG_plus_2/internal/pkg/gameservice"
+	"2019_1_OPG_plus_2/internal/pkg/monitoring"
 	"2019_1_OPG_plus_2/internal/pkg/tsLogger"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -26,15 +29,27 @@ func init() {
 }
 
 func StartApp(params Params) error {
-	//fmt.Println("Server starting at " + params.Port)
 
 	if err := db.Open(); err != nil {
-		//fmt.Println(err.Error())
 		tsLogger.LogErr("%v", err)
 	}
 
-	a.SetStorages(user.NewStorage(), auth.NewStorage())
-	a.SetHandlers(controllers.NewUserHandlers(), controllers.NewAuthHandlers(), controllers.NewVkAuthHandlers())
+	a.SetStorages(
+		user.NewStorage(),
+		auth.NewStorage(),
+	)
+
+	a.SetHandlers(
+		controllers.NewUserHandlers(),
+		controllers.NewAuthHandlers(),
+		controllers.NewVkAuthHandlers(),
+	)
+
+	prometheus.MustRegister(
+		monitoring.ActiveRooms,
+		monitoring.ActiveConns,
+		monitoring.AccessSummary,
+	)
 
 	router := mux.NewRouter()
 	apiRouter := router.PathPrefix("/api").Subrouter()
@@ -42,12 +57,14 @@ func StartApp(params Params) error {
 	router.Use(middleware.CorsMiddleware)
 	router.Use(middleware.PanicMiddleware)
 
+	router.Handle("/metrics", promhttp.Handler())
 	router.HandleFunc("/", controllers.MainHandler)
 	router.PathPrefix("/docs").Handler(httpSwagger.WrapHandler)
 
 	apiRouter.Use(middleware.AuthMiddleware)
 	apiRouter.Use(middleware.ApplyJsonContentType)
-	apiRouter.Use(middleware.AccessLoggingMiddleware)
+	apiRouter.Use(middleware.AccessMonitoringMiddleware)
+	//apiRouter.Use(middleware.AccessLoggingMiddleware)
 
 	apiRouter.HandleFunc("/", controllers.IndexApiHandler)
 
@@ -82,10 +99,8 @@ func StartApp(params Params) error {
 }
 
 func StopApp() {
-	//fmt.Println("Stopping server...")
 	tsLogger.LogTrace("Stopping server...")
 	if err := db.Close(); err != nil {
-		//fmt.Println(err.Error())
 		tsLogger.LogErr("%s", err)
 	}
 }

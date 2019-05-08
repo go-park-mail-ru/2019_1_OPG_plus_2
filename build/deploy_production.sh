@@ -14,6 +14,8 @@ git pull
 cd build
 ./initial.sh
 ./clear_up_containers.sh -c
-./auth_run_container.sh -d production && ./server_run_container.sh -d production
+./run_container_cookie.sh && ./run_container_auth.sh -d production && ./run_container_server.sh -d production
+cd ../monitoring
+./run_container_node_exporter.sh -d & ./run_container_prometheus.sh -d
 exit
 EOF

@@ -1,4 +1,4 @@
-package tsLogger
+package middleware
 
 import "net/http"
 

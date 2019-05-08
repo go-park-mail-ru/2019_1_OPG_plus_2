@@ -25,16 +25,17 @@ done
 
 echo [SERVER-CORE] The published port of the container is ${port}
 
-docker build --rm -t colors-back-core -f core.Dockerfile .. && \
+docker build --rm -t colors-back-core -f dockerfiles/core.Dockerfile .. && \
 docker run -d \
-    -e COLORS_SERVICE_USE_MODE=${colors_mode} \
-    -e COLORS_DB=${db_mode} \
-    -e DB_HOST=${DB_HOST} \
-    -e DB_PORT=${DB_PORT} \
-    -e DB_USERNAME=${DB_USERNAME} \
-    -e DB_PASSWORD=${DB_PASSWORD} \
-    --network=opg-net \
-    -p ${port}:8002 \
-    --name colors-back-core colors-back-core >> ~/docker.log && \
+           -e COLORS_SERVICE_USE_MODE=${colors_mode} \
+           -e COLORS_DB=${db_mode} \
+           -e DB_HOST=${DB_HOST} \
+           -e DB_PORT=${DB_PORT} \
+           -e DB_USERNAME=${DB_USERNAME} \
+           -e DB_PASSWORD=${DB_PASSWORD} \
+           --network=opg-net \
+           --network-alias=colors-back-core \
+           -p ${port}:8002 \
+           --name colors-back-core colors-back-core >> ~/docker.log && \
 echo [SERVER-CORE] Server is now running at: ${port}
 exit 0
