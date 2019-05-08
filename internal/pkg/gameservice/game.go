@@ -29,7 +29,12 @@ func NewFieldModel() *FieldModel {
 	}
 }
 
-func (f *FieldModel) TryTurn(coords []int, char string) error {
+func (f *FieldModel) TryTurn(coords []int, char string) (err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("invaild turn")
+		}
+	}()
 	copy(f.fieldCopy, f.field)
 	for _, coord := range coords {
 		x := coord / 5
@@ -72,7 +77,7 @@ func (g *GameModel) DoTurn(a GameMessage) error {
 }
 
 func (g *GameModel) Check() bool {
-	return g.cellsCount <= 24
+	return g.cellsCount <= 0
 }
 
 func (g *GameModel) IsReady() bool {
