@@ -7,7 +7,7 @@ while getopts 'd' flag; do
   esac
 done
 
-if [[ docker = "true" ]]
+if [[ ${docker} = "true" ]]
 then
 docker run -d \
            -p 9100:9100 \
