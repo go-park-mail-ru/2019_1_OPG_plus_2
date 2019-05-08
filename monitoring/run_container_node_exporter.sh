@@ -7,8 +7,6 @@ while getopts 'd' flag; do
   esac
 done
 
-docker build --rm -t colors-mon-prometheus -f ../dockerfiles/prometheus.Dockerfile ./../.. &&
-
 if [[ docker = "true" ]]
 then
 docker run -d \

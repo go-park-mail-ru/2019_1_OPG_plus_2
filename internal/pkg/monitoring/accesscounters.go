@@ -2,8 +2,8 @@ package monitoring
 
 import "github.com/prometheus/client_golang/prometheus"
 
-var AccessCounter = prometheus.NewCounterVec(prometheus.CounterOpts{
-	Name:      "access_counts",
+var AccessSummary = prometheus.NewSummaryVec(prometheus.SummaryOpts{
+	Name:      "access_time_summaries",
 	Namespace: "colors_core",
 }, []string{"status", "path", "method"})
 
