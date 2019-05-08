@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"2019_1_OPG_plus_2/internal/pkg/monitoring"
-	"fmt"
 	"net/http"
 	"strconv"
 )
