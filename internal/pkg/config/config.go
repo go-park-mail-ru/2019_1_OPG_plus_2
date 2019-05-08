@@ -173,7 +173,11 @@ func parseLoggerConfig(v *viper.Viper, conf *LoggerConfig) {
 		case "suppress":
 			conf.Levels[k] = ioutil.Discard
 		case "file":
-			f, err := os.OpenFile(vm["file"].(string), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+			var filename interface{}
+			if filename = vm["file"]; filename == nil {
+				filename = "colors.log"
+			}
+			f, err := os.OpenFile(filename.(string), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 			if err != nil {
 				panic("error opening file: " + err.Error())
 			}

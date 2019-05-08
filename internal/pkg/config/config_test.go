@@ -1,6 +1,8 @@
 package config
 
 import (
+	"io"
+	"io/ioutil"
 	"os"
 	"reflect"
 	"strings"
@@ -97,8 +99,7 @@ var TestData = map[string]string{
 {
 	"logging": {
 	    "trace": {
-			"mode": "file",
-	      	"file": ".log"
+			"mode": "file"
 	   	},
 	    "info": {
 			"mode": "file",
@@ -106,25 +107,47 @@ var TestData = map[string]string{
 	    },
 	    "warn": {
 	      	"mode": "file",
-	      	"file": ".log"
+	      	"file": "warn.log"
 	    },
 	    "err": {
 			"mode": "file",
-	      	"file": ".log"
+			"file": "err.log"
 	    },
 	    "access": {
 		    "mode": "file",
-		    "file": ".log"
+		    "file": "access.log"
 	    },
 	    "fatal": {
 	    	"mode": "file",
-			"file": ".log"
+			"file": "fatal.log"
 	    }
   	}
 }
 `,
-	"testLoggerSuppress": ``,
-	"testLoggerMixed":    ``,
+	"testLoggerSuppress": `
+{
+	"logging": {
+	    "trace": {
+			"mode": "suppress"
+	   	},
+	    "info": {
+			"mode": "suppress"
+	    },
+	    "warn": {
+	      	"mode": "suppress"
+	    },
+	    "err": {
+			"mode": "suppress"
+	    },
+	    "access": {
+		    "mode": "suppress"
+	    },
+	    "fatal": {
+	    	"mode": "suppress"
+	    }
+  	}
+}
+`,
 }
 
 func Test_parseVkConfig(t *testing.T) {
@@ -355,7 +378,10 @@ func Test_parseLoggerConfig(t *testing.T) {
 		conf *LoggerConfig
 
 		configString string
-		sample       LoggerConfig
+
+		compMode  string
+		sample    LoggerConfig
+		filenames map[string]string
 	}
 	tests := []struct {
 		name string
@@ -367,8 +393,9 @@ func Test_parseLoggerConfig(t *testing.T) {
 				v:            viper.New(),
 				configString: `{"not_logging_key": "not_logging_value"}`,
 
-				conf:   &LoggerConfig{},
-				sample: *NewLoggerConfig(),
+				conf:     &LoggerConfig{},
+				compMode: "sample",
+				sample:   *NewLoggerConfig(),
 			},
 		},
 		{
@@ -377,22 +404,49 @@ func Test_parseLoggerConfig(t *testing.T) {
 				v:            viper.New(),
 				configString: TestData["testLoggerPrompts"],
 
-				conf:   &LoggerConfig{},
-				sample: *NewLoggerConfig(),
+				conf:     &LoggerConfig{},
+				compMode: "sample",
+				sample:   *NewLoggerConfig(),
 			},
 		},
-		//{
-		//	name: "LoggerFileConfig",
-		//	args:args{},
-		//},
-		//{
-		//	name: "LoggerSuppressConfig",
-		//	args: args{},
-		//},
-		//{
-		//	name: "LoggerMixedConfig",
-		//	args: args{},
-		//},
+		{
+			name: "LoggerFileConfig",
+			args: args{
+				v:            viper.New(),
+				configString: TestData["testLoggerFiles"],
+
+				conf:     &LoggerConfig{},
+				compMode: "file",
+				filenames: map[string]string{
+					"trace":  "colors.log",
+					"info":   "info.log",
+					"warn":   "warn.log",
+					"err":    "err.log",
+					"access": "access.log",
+					"fatal":  "fatal.log",
+				},
+			},
+		},
+		{
+			name: "LoggerSuppressConfig",
+			args: args{
+				v:            viper.New(),
+				configString: TestData["testLoggerSuppress"],
+
+				conf:     &LoggerConfig{},
+				compMode: "sample",
+				sample: LoggerConfig{
+					Levels: map[string]io.Writer{
+						"trace":  ioutil.Discard,
+						"info":   ioutil.Discard,
+						"warn":   ioutil.Discard,
+						"err":    ioutil.Discard,
+						"access": ioutil.Discard,
+						"fatal":  ioutil.Discard,
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -402,9 +456,26 @@ func Test_parseLoggerConfig(t *testing.T) {
 				t.Fatalf("WTF: %v", err)
 			}
 			parseLoggerConfig(tt.args.v, tt.args.conf)
-			if !reflect.DeepEqual(*tt.args.conf, tt.args.sample) {
-				t.Errorf("Configs are not equal:\nGOT: %v\nEXP:%v", *tt.args.conf, tt.args.sample)
+			if tt.args.compMode == "sample" {
+				if !reflect.DeepEqual(*tt.args.conf, tt.args.sample) {
+					t.Errorf("Configs are not equal:\nGOT: %v\nEXP:%v", *tt.args.conf, tt.args.sample)
+				}
+			} else if tt.args.compMode == "file" {
+				for key, val := range tt.args.conf.Levels {
+					if tt.args.filenames[key] != val.(*os.File).Name() {
+						t.Errorf("Filenames not equal:\nGOT: %v\nEXP: %v", tt.args.filenames[key], val.(*os.File).Name())
+					}
+				}
 			}
+
+			defer func() {
+				for _, f := range tt.args.conf.Files {
+					err := f.Close()
+					if err != nil {
+						t.Fatalf("WTF: %v", err)
+					}
+				}
+			}()
 		})
 	}
 }
