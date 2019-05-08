@@ -34,8 +34,8 @@ docker run -d \
            -e DB_USERNAME=${DB_USERNAME} \
            -e DB_PASSWORD=${DB_PASSWORD} \
            --network=opg-net \
+           --network-alias=colors-back-core \
            -p ${port}:8002 \
-           --name colors-back-core \
-           colors-back-core >> ~/docker.log && \
+           --name colors-back-core colors-back-core >> ~/docker.log && \
 echo [SERVER-CORE] Server is now running at: ${port}
 exit 0
