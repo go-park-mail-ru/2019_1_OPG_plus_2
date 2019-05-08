@@ -12,7 +12,7 @@ echo [SERVER-CHAT] The published port of the container is ${port}
 docker build --rm -t colors-back-chat -f dockerfiles/chat.Dockerfile .. &&\
 docker run -d \
            --network=opg-net \
+           --network-alias=colors-back-chat \
            -p ${port}:8003 \
-           --name colors-back-chat \
-           colors-back-chat >> ~/docker.log &&\
+           --name colors-back-chat colors-back-chat >> ~/docker.log &&\
 echo [SERVER-CHAT] Server is now running at: ${port}

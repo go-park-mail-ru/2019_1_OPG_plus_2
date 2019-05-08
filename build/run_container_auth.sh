@@ -41,7 +41,7 @@ docker run -d \
            -e DB_USERNAME=${DB_USERNAME} \
            -e DB_PASSWORD=${DB_PASSWORD} \
            --network=opg-net \
+           --network-alias=colors-back-auth \
            -p ${port}:50242 \
-           --name colors-back-auth \
-           colors-back-auth \>> ~/docker.log && \
+           --name colors-back-auth colors-back-auth >> ~/docker.log && \
 echo [SERVER-AUTH] Server is now running at: ${port}

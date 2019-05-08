@@ -6,11 +6,12 @@ import (
 	"time"
 )
 
+// DEPRECATED
 func AccessLoggingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 
-		sw := tsLogger.NewStatusWriter(w)
+		sw := NewStatusWriter(w)
 		next.ServeHTTP(sw, r)
 
 		tsLogger.LogAcc(
