@@ -7,7 +7,7 @@ while getopts 'd' flag; do
   esac
 done
 
-docker build --rm -t colors-mon-prometheus -f prometheus.Dockerfile . &&
+docker build --rm -t colors-mon-prometheus -f prometheus.Dockerfile .. &&
 
 if [[ docker = "true" ]]
 then
