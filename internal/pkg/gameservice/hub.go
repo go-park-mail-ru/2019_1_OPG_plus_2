@@ -1,6 +1,7 @@
 package gameservice
 
 import (
+	"2019_1_OPG_plus_2/internal/pkg/monitoring"
 	"2019_1_OPG_plus_2/internal/pkg/tsLogger"
 	"fmt"
 	"time"
@@ -50,8 +51,9 @@ func (h *Hub) run() {
 		return cnt
 	}
 	for range ticker.C {
-
 		tsLogger.LogInfo("HUB INFO: conns: %d, rooms : %d", activeConns(), len(h.rooms))
+		monitoring.ActiveConns.Set(float64(activeConns()))
+		monitoring.ActiveRooms.Set(float64(len(h.rooms)))
 	}
 }
 

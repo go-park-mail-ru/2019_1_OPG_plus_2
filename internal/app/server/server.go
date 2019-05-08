@@ -39,7 +39,7 @@ func StartApp(params Params) error {
 	a.SetStorages(user.NewStorage(), auth.NewStorage())
 	a.SetHandlers(controllers.NewUserHandlers(), controllers.NewAuthHandlers(), controllers.NewVkAuthHandlers())
 
-	prometheus.MustRegister(monitoring.AccessCounter)
+	prometheus.MustRegister(monitoring.AccessCounter, monitoring.ActiveRooms, monitoring.ActiveConns)
 
 	router := mux.NewRouter()
 	apiRouter := router.PathPrefix("/api").Subrouter()
