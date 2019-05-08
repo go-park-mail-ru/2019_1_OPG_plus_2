@@ -29,4 +29,4 @@ scrape_configs:
 
   - job_name: 'colors-back-core'
     static_configs:
-      - targets: ['colors-back-core:8002']
+      - targets: ['localhost:8002']
