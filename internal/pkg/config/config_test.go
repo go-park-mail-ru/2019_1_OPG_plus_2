@@ -188,6 +188,14 @@ func Test_parseVkConfig(t *testing.T) {
 }
 
 func Test_parseDbConfig(t *testing.T) {
+	oldValues := map[string]string{
+		"COLORS_DB":   os.Getenv("COLORS_DB"),
+		"DB_HOST":     os.Getenv("DB_HOST"),
+		"DB_PORT":     os.Getenv("DB_PORT"),
+		"DB_USERNAME": os.Getenv("DB_USERNAME"),
+		"DB_PASSWORD": os.Getenv("DB_PASSWORD"),
+	}
+
 	type args struct {
 		v            *viper.Viper
 		configString string
@@ -215,7 +223,9 @@ func Test_parseDbConfig(t *testing.T) {
 					AuthDbName: "auth_db",
 				},
 				conf: &DbConfig{},
-				envs: map[string]string{},
+				envs: map[string]string{
+					"COLORS_DB": "", //setting it empty to be sure it is not accidentally filled
+				},
 			},
 		},
 		{
@@ -280,12 +290,13 @@ func Test_parseDbConfig(t *testing.T) {
 			},
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.args.v.SetConfigType("json")
 			err := tt.args.v.ReadConfig(strings.NewReader(tt.args.configString))
 			if err != nil {
-				t.Fatalf("WTF: %v", err)
+				t.Errorf("WTF: %v", err)
 			}
 			for name, val := range tt.args.envs {
 				err := os.Setenv(name, val)
@@ -299,9 +310,21 @@ func Test_parseDbConfig(t *testing.T) {
 			}
 		})
 	}
+
+	for k, v := range oldValues {
+		err := os.Setenv(k, v)
+		if err != nil {
+			t.Logf("Setting env back to initial values failed: %v: %v", k, v)
+		}
+
+	}
 }
 
 func Test_parseAuthConfig(t *testing.T) {
+	oldValues := map[string]string{
+		"COLORS_SERVICE_USE_MODE": os.Getenv("COLORS_SERVICE_USE_MODE"),
+	}
+
 	type args struct {
 		v    *viper.Viper
 		conf *AuthConfig
@@ -328,7 +351,9 @@ func Test_parseAuthConfig(t *testing.T) {
 					CookieServiceLocation: "cookie_default",
 					CookieServicePort:     "cookie_port_default",
 				},
-				envs: map[string]string{},
+				envs: map[string]string{
+					"COLORS_SERVICE_USE_MODE": "", //setting it empty to be sure it is not accidentally filled
+				},
 			},
 		},
 		{
@@ -351,6 +376,7 @@ func Test_parseAuthConfig(t *testing.T) {
 			},
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.args.v.SetConfigType("json")
@@ -369,6 +395,14 @@ func Test_parseAuthConfig(t *testing.T) {
 				t.Errorf("Configs are not equal:\nGOT: %v\nEXP:%v", *tt.args.conf, tt.args.sample)
 			}
 		})
+	}
+
+	for k, v := range oldValues {
+		err := os.Setenv(k, v)
+		if err != nil {
+			t.Logf("Setting env back to initial values failed: %v: %v", k, v)
+		}
+
 	}
 }
 
