@@ -24,11 +24,8 @@ type Params struct {
 	Port string
 }
 
-func init() {
-	tsLogger.Logger.Run()
-}
-
 func StartApp(params Params) error {
+	tsLogger.Logger.Run()
 
 	if err := db.Open(); err != nil {
 		tsLogger.LogErr("%v", err)
@@ -83,6 +80,7 @@ func StartApp(params Params) error {
 
 	apiRouter.HandleFunc("/users", controllers.GetScoreboard).Methods("GET", "OPTIONS")
 
+	// TODO: game as separate service with it's own routes and monitoring
 	gameRouter := router.PathPrefix("/game").Subrouter()
 
 	router.PathPrefix("/upload").Handler(http.StripPrefix(
