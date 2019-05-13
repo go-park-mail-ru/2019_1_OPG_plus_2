@@ -17,6 +17,7 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
+// TODO: update users' score mechanics
 func AddGameServicePaths(router *mux.Router) *mux.Router {
 	hub := NewHub()
 	err := hub.AttachRooms(newRoom(hub, 0))
