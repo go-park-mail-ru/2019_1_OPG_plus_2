@@ -71,6 +71,22 @@ var TestData = map[string]string{
   	}
 }
 `,
+	"testGameConfig": `
+{
+	"game":{
+		"envs":{
+			"IN_DOCKER_NET": {
+		        "service_location": "game_docker_net",
+		        "port": "port_docker_net"
+	      	},
+	      	"default": {
+	        	"service_location": "game_default",
+	        	"port": "port_default"
+	      	}
+		}
+	}
+}
+`,
 
 	"testLoggerPrompts": `
 {
@@ -391,6 +407,86 @@ func Test_parseAuthConfig(t *testing.T) {
 				}
 			}
 			parseAuthConfig(tt.args.v, tt.args.conf)
+			if !reflect.DeepEqual(*tt.args.conf, tt.args.sample) {
+				t.Errorf("Configs are not equal:\nGOT: %v\nEXP:%v", *tt.args.conf, tt.args.sample)
+			}
+		})
+	}
+
+	for k, v := range oldValues {
+		err := os.Setenv(k, v)
+		if err != nil {
+			t.Logf("Setting env back to initial values failed: %v: %v", k, v)
+		}
+
+	}
+}
+
+func Test_parseGameConfig(t *testing.T) {
+	oldValues := map[string]string{
+		"COLORS_SERVICE_USE_MODE": os.Getenv("COLORS_SERVICE_USE_MODE"),
+	}
+
+	type args struct {
+		v    *viper.Viper
+		conf *GameConfig
+
+		configString string
+		sample       GameConfig
+		envs         map[string]string
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			name: "GameConfigNoEnv",
+			args: args{
+				v:            viper.New(),
+				conf:         &GameConfig{},
+				configString: TestData["testGameConfig"],
+
+				sample: GameConfig{
+					GameServicePort:     "port_default",
+					GameServiceLocation: "game_default",
+				},
+				envs: map[string]string{
+					"COLORS_SERVICE_USE_MODE": "", //setting it empty to be sure it is not accidentally filled
+				},
+			},
+		},
+		{
+			name: "GameConfigInDockerNet",
+			args: args{
+				v:            viper.New(),
+				conf:         &GameConfig{},
+				configString: TestData["testGameConfig"],
+
+				sample: GameConfig{
+					GameServicePort:     "port_docker_net",
+					GameServiceLocation: "game_docker_net",
+				},
+				envs: map[string]string{
+					"COLORS_SERVICE_USE_MODE": "IN_DOCKER_NET",
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.args.v.SetConfigType("json")
+			err := tt.args.v.ReadConfig(strings.NewReader(tt.args.configString))
+			if err != nil {
+				t.Fatalf("WTF: %v", err)
+			}
+			for name, val := range tt.args.envs {
+				err := os.Setenv(name, val)
+				if err != nil || os.Getenv(name) != val {
+					t.Errorf("WTF setenv failed")
+				}
+			}
+			parseGameConfig(tt.args.v, tt.args.conf)
 			if !reflect.DeepEqual(*tt.args.conf, tt.args.sample) {
 				t.Errorf("Configs are not equal:\nGOT: %v\nEXP:%v", *tt.args.conf, tt.args.sample)
 			}

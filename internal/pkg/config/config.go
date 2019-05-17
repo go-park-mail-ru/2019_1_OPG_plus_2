@@ -26,15 +26,16 @@ var (
 	Db      DbConfig
 	VkOAuth OAuthConfig
 	Logger  LoggerConfig
+	Game    GameConfig
 )
 
 // TODO: get rid of init for parsing config
 func init() {
-	CONFIG.SetConfigName("config")                          // name of testConfig file (without extension)
-	CONFIG.AddConfigPath("/etc/colors-game/")               // path to look for the testConfig file in
-	CONFIG.AddConfigPath("$HOME/.colors-game")              // call multiple times to add many search paths
-	CONFIG.AddConfigPath(".")                               // optionally look for testConfig in the working directory
-	CONFIG.AddConfigPath("$HOME/go/src/2019_1_OPG_plus_2/") // optionally look for testConfig in the working directory
+	CONFIG.SetConfigName("config")                                  // name of testConfig file (without extension)
+	CONFIG.AddConfigPath("/etc/colors-game/")                       // path to look for the testConfig file in
+	CONFIG.AddConfigPath("$HOME/.colors-game")                      // call multiple times to add many search paths
+	CONFIG.AddConfigPath(".")                                       // optionally look for testConfig in the working directory
+	CONFIG.AddConfigPath("$HOME/GolandProjects/2019_1_OPG_plus_2/") // optionally look for testConfig in the working directory
 	CONFIG.AddConfigPath(os.Getenv("COLORS_CONFIG_PATH"))
 	err := CONFIG.ReadInConfig() // Find and read the testConfig file
 	if err != nil {              // Handle errors reading the testConfig file
@@ -48,6 +49,8 @@ func init() {
 	parseDbConfig(CONFIG, &Db)
 
 	parseLoggerConfig(CONFIG, &Logger)
+
+	parseGameConfig(CONFIG, &Game)
 }
 
 type OAuthConfig struct {
@@ -153,7 +156,6 @@ func NewLoggerConfig() *LoggerConfig {
 		},
 	}
 }
-
 func parseLoggerConfig(v *viper.Viper, conf *LoggerConfig) {
 	conf.Levels = NewLoggerConfig().Levels //fucking costyl' but it works only this way. holy crap...
 
@@ -190,6 +192,21 @@ func parseLoggerConfig(v *viper.Viper, conf *LoggerConfig) {
 	}
 }
 
+type GameConfig struct {
+	GameServiceLocation string
+	GameServicePort     string
+}
+
+func parseGameConfig(v *viper.Viper, conf *GameConfig) {
+	keyPrefix := "game.envs." + strings.ToLower(os.Getenv("COLORS_SERVICE_USE_MODE"))
+	confMap := v.GetStringMapString(keyPrefix)
+	if len(confMap) == 0 {
+		confMap = v.GetStringMapString("game.envs.default")
+	}
+
+	conf.GameServiceLocation = confMap["service_location"]
+	conf.GameServicePort = confMap["port"]
+}
 func checkLevel(l string) error {
 	ok := false
 	for _, pl := range permittedLevels {
