@@ -33,7 +33,7 @@ func Start() error {
 
 	authproto.RegisterAuthServiceServer(server, serv)
 
-	serv.Log.LogTrace("AUTH: starting server at %v:%v", config.Auth.AuthServiceLocation, config.Auth.AuthPort)
+	serv.Log.LogTrace("AUTH: starting core at %v:%v", config.Auth.AuthServiceLocation, config.Auth.AuthPort)
 	return server.Serve(lis)
 }
 

@@ -77,7 +77,7 @@ func (g *GameModel) DoTurn(a GameMessage) error {
 }
 
 func (g *GameModel) Check() bool {
-	return g.cellsCount <= 0
+	return g.cellsCount <= 24
 }
 
 func (g *GameModel) IsReady() bool {

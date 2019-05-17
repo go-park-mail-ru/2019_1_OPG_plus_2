@@ -38,7 +38,7 @@ before_script:
   - bash run_container_auth.sh -t
   - cd ..
 script:
-  - go build -i cmd/server/main.go
+  - go build -i cmd/core/main.go
   - go build -i cmd/auth/auth_server.go
   - go test -v -race ./...
   - golangci-lint run -c .golangci.yml

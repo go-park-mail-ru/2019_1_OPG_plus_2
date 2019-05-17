@@ -1,4 +1,4 @@
-package server
+package coreserver
 
 import (
 	"2019_1_OPG_plus_2/internal/pkg/gameservice"
@@ -97,7 +97,7 @@ func StartApp(params Params) error {
 }
 
 func StopApp() {
-	tsLogger.LogTrace("Stopping server...")
+	tsLogger.LogTrace("Stopping core...")
 	if err := db.Close(); err != nil {
 		tsLogger.LogErr("%s", err)
 	}

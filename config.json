@@ -78,27 +78,27 @@
   },
   "logging": {
     "trace": {
-      "mode": "file",
+      "mode": "prompt",
       "file": ".log"
     },
     "info": {
-      "mode": "file",
+      "mode": "suppress",
       "file": "info.log"
     },
     "warn": {
-      "mode": "file",
+      "mode": "prompt",
       "file": ".log"
     },
     "err": {
-      "mode": "file",
+      "mode": "prompt",
       "file": ".log"
     },
     "access": {
-      "mode": "file",
+      "mode": "prompt",
       "file": ".log"
     },
     "fatal": {
-      "mode": "file",
+      "mode": "prompt",
       "file": ".log"
     }
   }

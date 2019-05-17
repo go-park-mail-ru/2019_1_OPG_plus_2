@@ -1,7 +1,7 @@
 package main
 
 import (
-	"2019_1_OPG_plus_2/internal/app/server"
+	"2019_1_OPG_plus_2/internal/app/coreserver"
 	"2019_1_OPG_plus_2/internal/pkg/tsLogger"
 	"os"
 )
@@ -18,14 +18,14 @@ import (
 // @BasePath /api
 
 func main() {
-	params := server.Params{Port: os.Getenv("PORT")}
+	params := coreserver.Params{Port: os.Getenv("PORT")}
 	if params.Port == "" {
 		params.Port = "8002"
 	}
 
-	err := server.StartApp(params)
+	err := coreserver.StartApp(params)
 	if err != nil {
-		server.StopApp()
+		coreserver.StopApp()
 		tsLogger.LogFatal("%s", err)
 	}
 

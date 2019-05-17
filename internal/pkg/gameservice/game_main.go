@@ -17,34 +17,37 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
+type Service struct {
+	hub *Hub
+	log *tsLogger.TSLogger
+}
+
+func NewService(hub *Hub, log *tsLogger.TSLogger) *Service {
+	return &Service{hub: hub, log: log}
+}
+
 // TODO: update users' score mechanics
+// TODO: delimit game as separate service
 func AddGameServicePaths(router *mux.Router) *mux.Router {
 	hub := NewHub()
-	err := hub.AttachRooms(newRoom(hub, 0))
-	if err != nil {
-		tsLogger.LogErr("ROOM ATTACHMENT ERROR: %v", hub.rooms)
-		panic("WTF")
-	}
-	tsLogger.LogTrace("INITIAL ROOM CREATED")
+	service := NewService(hub, tsLogger.NewLogger())
+	//err := hub.AttachRooms(newRoom(hub, 0))
+	//if err != nil {
+	//	tsLogger.LogErr("ROOM ATTACHMENT ERROR: %v", hub.rooms)
+	//	panic("WTF")
+	//}
+	//tsLogger.LogTrace("INITIAL ROOM CREATED")
 
-	router.HandleFunc("/{id}", func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("/{id}", service.GetRoom).Methods("GET")
+
+	router.HandleFunc("/{id}/room", func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
 		if err != nil {
 			tsLogger.LogWarn("could not parse %d", id)
 			return
 		}
 		if hub.rooms[int(id)] == nil {
-			_, _ = fmt.Fprint(w, "no such room with id ", id)
-			return
-		}
-		//http.ServeFile(w, r, "home.html")
-		_, _ = fmt.Fprint(w, "IDI NAHUY")
-	}).Methods("GET")
-
-	router.HandleFunc("/{id}/room", func(w http.ResponseWriter, r *http.Request) {
-		id, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
-		if err != nil {
-			tsLogger.LogWarn("could not parse %d", id)
+			upgrader.Error(w, r, http.StatusNotFound, fmt.Errorf("no room with id %v", id))
 			return
 		}
 		err = serveClientConnection(hub.rooms[int(id)], w, r)
@@ -68,7 +71,7 @@ func AddGameServicePaths(router *mux.Router) *mux.Router {
 		_, _ = fmt.Fprint(w, "Room ", id, " closing")
 	}).Methods("DELETE")
 
-	router.HandleFunc("/{id}/", func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("/{id}", func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
 		if err != nil {
 			tsLogger.LogWarn("could not parse %d", id)
@@ -101,4 +104,19 @@ func serveClientConnection(room *Room, w http.ResponseWriter, r *http.Request) e
 	go client.writePump()
 	go client.readPump()
 	return nil
+}
+
+func (s *Service) GetRoom(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
+	if err != nil {
+		tsLogger.LogWarn("could not parse %d", id)
+		return
+	}
+	if s.hub.rooms[int(id)] == nil {
+		w.WriteHeader(http.StatusNotFound)
+		_, _ = fmt.Fprint(w, "no such room with id ", id)
+		return
+	}
+	//http.ServeFile(w, r, "home.html")
+	_, _ = fmt.Fprint(w, "IDI NAHUY")
 }

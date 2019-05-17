@@ -74,6 +74,9 @@ func (r *Room) Run() {
 		case id := <-r.hub.closer:
 			if id == r.id {
 				for client := range r.clients {
+					var cMsg = NewBroadcastEventMessage("room_close", fmt.Sprintf("room %v closes", r.id))
+					closeMsg, _ := json.Marshal(&cMsg)
+					client.send <- closeMsg
 					close(client.send)
 					delete(r.clients, client)
 				}

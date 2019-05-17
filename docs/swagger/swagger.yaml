@@ -148,7 +148,7 @@ paths:
       consumes:
       - image/png
       - image/jpeg
-      description: This method saves avatar image in server storage and sets it as
+      description: This method saves avatar image in core storage and sets it as
         clients user avatar
       produces:
       - application/json

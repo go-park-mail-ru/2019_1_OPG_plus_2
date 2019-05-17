@@ -10,7 +10,7 @@ func PanicMiddleware(h http.Handler) http.Handler {
 		defer func() {
 			if r := recover(); r != nil {
 				fmt.Printf("Oh no, it's a panic: %v", r)
-				http.Error(w, "internal server error", http.StatusInternalServerError)
+				http.Error(w, "internal core error", http.StatusInternalServerError)
 			}
 		}()
 		h.ServeHTTP(w, r)
