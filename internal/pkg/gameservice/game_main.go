@@ -60,7 +60,7 @@ func (s *Service) serveClientConnection(room *Room, w http.ResponseWriter, r *ht
 func (s *Service) GetRoom(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 	if id == "" {
-		s.Log.LogWarn("could not parse %d", id)
+		s.Log.LogWarn("could not parse %q", id)
 		return
 	}
 	if s.Hub.rooms[id] == nil {
@@ -76,7 +76,7 @@ func (s *Service) ConnectionEndpoint(w http.ResponseWriter, r *http.Request) {
 
 	id := mux.Vars(r)["id"]
 	if id == "" {
-		s.Log.LogWarn("could not parse %d", id)
+		s.Log.LogWarn("could not parse %q", id)
 		return
 	}
 	if s.Hub.rooms[id] == nil {
@@ -96,7 +96,7 @@ func (s *Service) ConnectionEndpoint(w http.ResponseWriter, r *http.Request) {
 func (s *Service) CreateRoom(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 	if id == "" {
-		s.Log.LogWarn("could not parse %d", id)
+		s.Log.LogWarn("could not parse %q", id)
 		return
 	}
 	err := s.Hub.AttachRooms(newRoom(s.Hub, id))
@@ -110,10 +110,10 @@ func (s *Service) CreateRoom(w http.ResponseWriter, r *http.Request) {
 func (s *Service) DeleteRoom(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 	if id == "" {
-		s.Log.LogWarn("could not parse %d", id)
+		s.Log.LogWarn("could not parse %q", id)
 		return
 	}
-	s.Log.LogTrace("CLOSING ROOM %d", id)
+	s.Log.LogTrace("CLOSING ROOM %q", id)
 	s.Hub.closeRoom(id)
 
 	_, _ = fmt.Fprint(w, "Room ", id, " closing")
@@ -152,15 +152,14 @@ func (s *Service) GetFreeRoom(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		room = newRoom(s.Hub, freeRoom)
+		err = s.Hub.AttachRooms(room)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = fmt.Fprint(w, err)
+			return
+		}
 	} else {
 		room = s.Hub.rooms[freeRoom]
-	}
-
-	err := s.Hub.AttachRooms(room)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		_, _ = fmt.Fprint(w, err)
-		return
 	}
 
 	var roomData = models.RoomData{

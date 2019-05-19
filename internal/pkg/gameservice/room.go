@@ -41,6 +41,7 @@ func newRoom(hub *Hub, id string) *Room {
 		clients:           make(map[*Client]bool),
 		maxPlayersNum:     2,
 		currentPlayersNum: 0,
+		win:               false,
 	}
 	r.gameModel = NewGameModel(r)
 	return r
