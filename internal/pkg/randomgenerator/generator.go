@@ -3,6 +3,7 @@ package randomgenerator
 import (
 	"crypto/rand"
 	"encoding/base64"
+	mathRand "math/rand"
 
 	"github.com/google/uuid"
 )
@@ -30,6 +31,10 @@ func RandomBool() bool {
 	case <-c:
 		return false
 	}
+}
+
+func RandomInt(from, to int) int {
+	return mathRand.Intn(from + to) - from
 }
 
 func RandomUUID() (string, error) {

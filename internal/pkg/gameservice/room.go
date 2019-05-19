@@ -216,6 +216,7 @@ func (r *Room) CheckReady() ([]byte, error) {
 		r.gameModel.Init()
 		r.gameModel.running = true
 		var dat = NewBroadcastEventMessage("ready", map[string]interface{}{
+			"field":       r.gameModel.GetField(),
 			"players_num": r.currentPlayersNum,
 			"players":     r.gameModel.players,
 			"whose_turn":  r.gameModel.players[r.gameModel.whoseTurn],
