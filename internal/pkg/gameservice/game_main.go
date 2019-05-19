@@ -31,12 +31,11 @@ func NewService(hub *Hub, log *tsLogger.TSLogger) *Service {
 }
 
 // TODO: update users' score mechanics
-// TODO: delimit game as separate service
 func (s *Service) AddGameServicePaths(router *mux.Router) *mux.Router {
 	router.HandleFunc("/rooms", s.ListRooms).Methods("GET")
 	router.HandleFunc("/free_room", s.GetFreeRoom)
 	router.HandleFunc("/{id}", s.CreateRoom).Methods("POST")
-	router.HandleFunc("/{id}", s.GetRoom).Methods("GET") // TODO: serve information about room from this endpoint
+	router.HandleFunc("/{id}", s.GetRoom).Methods("GET")
 	router.HandleFunc("/{id}", s.DeleteRoom).Methods("DELETE")
 	router.HandleFunc("/{id}/room", s.ConnectionEndpoint)
 	return router
