@@ -61,15 +61,23 @@ func (s *Service) GetRoom(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 	if id == "" {
 		s.Log.LogWarn("could not parse %q", id)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	if s.Hub.rooms[id] == nil {
-		w.WriteHeader(http.StatusNotFound)
-		_, _ = fmt.Fprint(w, "no such room with id ", id)
+	room := s.Hub.rooms[id]
+	if room == nil {
+		models.Send(w, http.StatusNotFound, models.NotFound)
 		return
 	}
-	//http.ServeFile(w, r, "home.html")
-	_, _ = fmt.Fprint(w, "IDI NAHUY")
+
+	roomData := models.RoomData{
+		Id:         room.id,
+		PlayersNum: room.currentPlayersNum,
+		Players:    room.gameModel.players,
+	}
+
+	models.Send(w, http.StatusOK, roomData)
+
 }
 
 func (s *Service) ConnectionEndpoint(w http.ResponseWriter, r *http.Request) {
@@ -97,14 +105,23 @@ func (s *Service) CreateRoom(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 	if id == "" {
 		s.Log.LogWarn("could not parse %q", id)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	err := s.Hub.AttachRooms(newRoom(s.Hub, id))
+	room := newRoom(s.Hub, id)
+	err := s.Hub.AttachRooms(room)
 	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
 		_, _ = fmt.Fprint(w, err)
 		return
 	}
-	_, _ = fmt.Fprint(w, "Room ", id, " created")
+
+	var roomData = models.RoomData{
+		Id:         room.id,
+		PlayersNum: room.currentPlayersNum,
+		Players:    room.gameModel.players,
+	}
+	models.Send(w, http.StatusOK, roomData)
 }
 
 func (s *Service) DeleteRoom(w http.ResponseWriter, r *http.Request) {
@@ -113,10 +130,14 @@ func (s *Service) DeleteRoom(w http.ResponseWriter, r *http.Request) {
 		s.Log.LogWarn("could not parse %q", id)
 		return
 	}
+
+	if s.Hub.rooms[id] == nil {
+		models.Send(w, http.StatusNotFound, models.NotFound)
+	}
 	s.Log.LogTrace("CLOSING ROOM %q", id)
 	s.Hub.closeRoom(id)
 
-	_, _ = fmt.Fprint(w, "Room ", id, " closing")
+	models.Send(w, http.StatusOK, models.NewRoomDeletedMessage(id))
 }
 
 func (s *Service) ListRooms(w http.ResponseWriter, r *http.Request) {
