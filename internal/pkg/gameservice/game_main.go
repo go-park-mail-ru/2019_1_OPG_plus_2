@@ -1,98 +1,50 @@
 package gameservice
 
 import (
+	"2019_1_OPG_plus_2/internal/pkg/models"
+	"2019_1_OPG_plus_2/internal/pkg/randomgenerator"
 	"2019_1_OPG_plus_2/internal/pkg/tsLogger"
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 	"net/http"
-	"strconv"
 )
 
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-	CheckOrigin: func(r *http.Request) bool {
-		return true
-	},
+type Service struct {
+	Hub      *Hub
+	Log      *tsLogger.TSLogger
+	upgrader websocket.Upgrader
+}
+
+func NewService(hub *Hub, log *tsLogger.TSLogger) *Service {
+	return &Service{
+		Hub: hub,
+		Log: log,
+		upgrader: websocket.Upgrader{
+			ReadBufferSize:  1024,
+			WriteBufferSize: 1024,
+			CheckOrigin: func(r *http.Request) bool {
+				return true
+			},
+		},
+	}
 }
 
 // TODO: update users' score mechanics
-func AddGameServicePaths(router *mux.Router) *mux.Router {
-	hub := NewHub()
-	err := hub.AttachRooms(newRoom(hub, 0))
-	if err != nil {
-		tsLogger.LogErr("ROOM ATTACHMENT ERROR: %v", hub.rooms)
-		panic("WTF")
-	}
-	tsLogger.LogTrace("INITIAL ROOM CREATED")
-
-	router.HandleFunc("/{id}", func(w http.ResponseWriter, r *http.Request) {
-		id, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
-		if err != nil {
-			tsLogger.LogWarn("could not parse %d", id)
-			return
-		}
-		if hub.rooms[int(id)] == nil {
-			_, _ = fmt.Fprint(w, "no such room with id ", id)
-			return
-		}
-		//http.ServeFile(w, r, "home.html")
-		_, _ = fmt.Fprint(w, "IDI NAHUY")
-	}).Methods("GET")
-
-	router.HandleFunc("/{id}/room", func(w http.ResponseWriter, r *http.Request) {
-		id, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
-		if err != nil {
-			tsLogger.LogWarn("could not parse %d", id)
-			return
-		}
-		err = serveClientConnection(hub.rooms[int(id)], w, r)
-		if err != nil {
-			tsLogger.LogErr("CONNECTION FAILED")
-			_, _ = fmt.Fprintln(w, err)
-			return
-		}
-		tsLogger.LogTrace("CONNECTION TO %q", r.RequestURI)
-	})
-
-	router.HandleFunc("/{id}", func(w http.ResponseWriter, r *http.Request) {
-		id, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
-		if err != nil {
-			tsLogger.LogWarn("could not parse %d", id)
-			return
-		}
-		tsLogger.LogTrace("CLOSING ROOM %d", id)
-		hub.closeRoom(int(id))
-
-		_, _ = fmt.Fprint(w, "Room ", id, " closing")
-	}).Methods("DELETE")
-
-	router.HandleFunc("/{id}/", func(w http.ResponseWriter, r *http.Request) {
-		id, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
-		if err != nil {
-			tsLogger.LogWarn("could not parse %d", id)
-			return
-		}
-
-		err = hub.AttachRooms(newRoom(hub, int(id)))
-		if err != nil {
-			_, _ = fmt.Fprint(w, err)
-			return
-		}
-		_, _ = fmt.Fprint(w, "Room ", id, " created")
-	}).Methods("POST")
-
-	go hub.run()
-
+func (s *Service) AddGameServicePaths(router *mux.Router) *mux.Router {
+	router.HandleFunc("/rooms", s.ListRooms).Methods("GET")
+	router.HandleFunc("/free_room", s.GetFreeRoom)
+	router.HandleFunc("/{id}", s.CreateRoom).Methods("POST")
+	router.HandleFunc("/{id}", s.GetRoom).Methods("GET")
+	router.HandleFunc("/{id}", s.DeleteRoom).Methods("DELETE")
+	router.HandleFunc("/{id}/room", s.ConnectionEndpoint)
 	return router
-
 }
 
-func serveClientConnection(room *Room, w http.ResponseWriter, r *http.Request) error {
-	conn, err := upgrader.Upgrade(w, r, nil)
+func (s *Service) serveClientConnection(room *Room, w http.ResponseWriter, r *http.Request) error {
+	conn, err := s.upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		tsLogger.LogErr("CONNECTION UPGRADE ERROR: %s", err)
+		s.Log.LogErr("CONNECTION UPGRADE ERROR: %s", err)
 		return err
 	}
 	client := NewClient(room, conn)
@@ -101,4 +53,139 @@ func serveClientConnection(room *Room, w http.ResponseWriter, r *http.Request) e
 	go client.writePump()
 	go client.readPump()
 	return nil
+}
+
+// RoomInfo
+func (s *Service) GetRoom(w http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["id"]
+	if id == "" {
+		s.Log.LogWarn("could not parse %q", id)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	room := s.Hub.rooms[id]
+	if room == nil {
+		models.Send(w, http.StatusNotFound, models.NotFound)
+		return
+	}
+
+	roomData := models.RoomData{
+		Id:         room.id,
+		PlayersNum: room.currentPlayersNum,
+		Players:    room.gameModel.players,
+	}
+
+	models.Send(w, http.StatusOK, roomData)
+
+}
+
+func (s *Service) ConnectionEndpoint(w http.ResponseWriter, r *http.Request) {
+
+	id := mux.Vars(r)["id"]
+	if id == "" {
+		s.Log.LogWarn("could not parse %q", id)
+		return
+	}
+	if s.Hub.rooms[id] == nil {
+		s.upgrader.Error(w, r, http.StatusNotFound, fmt.Errorf("no room with id %v", id))
+		return
+	}
+	err := s.serveClientConnection(s.Hub.rooms[id], w, r)
+	if err != nil {
+		s.Log.LogErr("CONNECTION FAILED")
+		s.upgrader.Error(w, r, http.StatusInternalServerError, err)
+		return
+	}
+	s.Log.LogTrace("CONNECTION TO %q", r.RequestURI)
+
+}
+
+func (s *Service) CreateRoom(w http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["id"]
+	if id == "" {
+		s.Log.LogWarn("could not parse %q", id)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	room := newRoom(s.Hub, id)
+	err := s.Hub.AttachRooms(room)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		_, _ = fmt.Fprint(w, err)
+		return
+	}
+
+	var roomData = models.RoomData{
+		Id:         room.id,
+		PlayersNum: room.currentPlayersNum,
+		Players:    room.gameModel.players,
+	}
+	models.Send(w, http.StatusOK, roomData)
+}
+
+func (s *Service) DeleteRoom(w http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["id"]
+	if id == "" {
+		s.Log.LogWarn("could not parse %q", id)
+		return
+	}
+
+	if s.Hub.rooms[id] == nil {
+		models.Send(w, http.StatusNotFound, models.NotFound)
+	}
+	s.Log.LogTrace("CLOSING ROOM %q", id)
+	s.Hub.closeRoom(id)
+
+	models.Send(w, http.StatusOK, models.NewRoomDeletedMessage(id))
+}
+
+func (s *Service) ListRooms(w http.ResponseWriter, r *http.Request) {
+	roomsOnline := models.RoomsOnlineMessage{}
+	for k, v := range s.Hub.rooms {
+		room := models.RoomData{
+			Id:         k,
+			PlayersNum: v.currentPlayersNum,
+			Players:    v.gameModel.players,
+		}
+		roomsOnline.RoomsOnline = append(roomsOnline.RoomsOnline, room)
+	}
+
+	models.Send(w, http.StatusOK, roomsOnline)
+}
+
+func (s *Service) GetFreeRoom(w http.ResponseWriter, r *http.Request) {
+	var freeRoom string
+	found := false
+	for k, v := range s.Hub.rooms {
+		if v.currentPlayersNum < v.maxPlayersNum {
+			found = true
+			freeRoom = k
+		}
+	}
+
+	var room *Room
+	if !found {
+		freeRoomId, err := randomgenerator.RandomString(6)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = fmt.Fprint(w, err)
+			return
+		}
+		room = newRoom(s.Hub, freeRoomId)
+		err = s.Hub.AttachRooms(room)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = fmt.Fprint(w, err)
+			return
+		}
+	} else {
+		room = s.Hub.rooms[freeRoom]
+	}
+
+	var roomData = models.RoomData{
+		Id:         room.id,
+		PlayersNum: room.currentPlayersNum,
+		Players:    room.gameModel.players,
+	}
+	models.Send(w, http.StatusOK, roomData)
 }

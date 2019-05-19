@@ -8,7 +8,7 @@ RUN go mod download
 
 COPY . .
 RUN mkdir colors-core-service
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o colors-core-service/main -i cmd/server/main.go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o colors-core-service/main -i cmd/core/core_server.go
 RUN cp config.json colors-core-service/config.json
 
 

@@ -1,7 +1,6 @@
-package server
+package coreserver
 
 import (
-	"2019_1_OPG_plus_2/internal/pkg/gameservice"
 	"2019_1_OPG_plus_2/internal/pkg/monitoring"
 	"2019_1_OPG_plus_2/internal/pkg/tsLogger"
 	"github.com/prometheus/client_golang/prometheus"
@@ -80,9 +79,6 @@ func StartApp(params Params) error {
 
 	apiRouter.HandleFunc("/users", controllers.GetScoreboard).Methods("GET", "OPTIONS")
 
-	// TODO: game as separate service with it's own routes and monitoring
-	gameRouter := router.PathPrefix("/game").Subrouter()
-
 	router.PathPrefix("/upload").Handler(http.StripPrefix(
 		"/upload",
 		http.FileServer(http.Dir(controllers.StaticPath)),
@@ -90,14 +86,13 @@ func StartApp(params Params) error {
 
 	//apiRouter.HandleFunc("/vk_login", a.GetHandlers().OAuth.Login1stStageRetrieveCode)
 	//apiRouter.HandleFunc("/callback", a.GetHandlers().OAuth.Login2ndStageRetrieveTokenGetData)
-	gameservice.AddGameServicePaths(gameRouter)
 
 	tsLogger.LogTrace("Server starting at " + params.Port)
 	return http.ListenAndServe(":"+params.Port, router)
 }
 
 func StopApp() {
-	tsLogger.LogTrace("Stopping server...")
+	tsLogger.LogTrace("Stopping core...")
 	if err := db.Close(); err != nil {
 		tsLogger.LogErr("%s", err)
 	}

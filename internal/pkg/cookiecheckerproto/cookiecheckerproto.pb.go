@@ -207,7 +207,7 @@ func (c *cookieCheckerClient) CheckCookie(ctx context.Context, in *CookieRequest
 	return out, nil
 }
 
-// CookieCheckerServer is the server API for CookieChecker service.
+// CookieCheckerServer is the core API for CookieChecker service.
 type CookieCheckerServer interface {
 	CheckCookie(context.Context, *CookieRequest) (*CookieResponse, error)
 }

@@ -5,10 +5,15 @@ type GenericMessage struct {
 	MType string `json:"type, string"`
 }
 
+type Point struct {
+    X int `json:"x"`
+    Y int `json:"y"`
+}
+
 type GameMessage struct {
 	GenericMessage
 	Data struct {
-		Coords []int `json:"coords"`
+		Coords []Point `json:"coords"`
 	} `json:"data"`
 }
 
