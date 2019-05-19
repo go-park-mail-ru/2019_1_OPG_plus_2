@@ -28,7 +28,7 @@ func TestGameModel_DoTurn(t *testing.T) {
 				whoseTurn: 0,
 				ready:     true,
 				running:   true,
-				field:     NewFieldModel(),
+				field:     NewFieldModel(false),
 			},
 			args: args{
 				a: GameMessage{
@@ -37,9 +37,9 @@ func TestGameModel_DoTurn(t *testing.T) {
 						User:  "u1",
 					},
 					struct {
-						Coords []int `json:"coords"`
+						Coords []Point `json:"coords"`
 					}{
-						Coords: []int{1, 2, 3, 4},
+						Coords: []Point{{X: 1, Y: 1}, {X: 3, Y: 1}},
 					},
 				},
 			},
@@ -53,7 +53,7 @@ func TestGameModel_DoTurn(t *testing.T) {
 				whoseTurn: 1,
 				ready:     true,
 				running:   true,
-				field:     NewFieldModel(),
+				field:     NewFieldModel(false),
 			},
 			args: args{
 				a: GameMessage{
@@ -62,9 +62,9 @@ func TestGameModel_DoTurn(t *testing.T) {
 						User:  "u1",
 					},
 					struct {
-						Coords []int `json:"coords"`
+						Coords []Point `json:"coords"`
 					}{
-						Coords: []int{23, 24, 25},
+						Coords: []Point{{X: 1, Y: 1}, {X: 3, Y: 3}},
 					},
 				},
 			},
@@ -80,7 +80,6 @@ func TestGameModel_DoTurn(t *testing.T) {
 				whoseTurn:  tt.fields.whoseTurn,
 				ready:      tt.fields.ready,
 				running:    tt.fields.running,
-				cellsCount: tt.fields.cellsCount,
 			}
 			if err := g.DoTurn(tt.args.a); (err != nil) != tt.wantErr {
 				t.Errorf("GameModel.DoTurn() error = %v, wantErr %v", err, tt.wantErr)

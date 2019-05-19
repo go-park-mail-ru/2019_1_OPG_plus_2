@@ -6,14 +6,14 @@ import (
 )
 
 func TestFieldCorrectTurn(t *testing.T) {
-	type tcase []int
+	type tcase []Point
 	tCases := []tcase{
-		[]int{1, 2, 3},
-		[]int{1, 6, 11},
+		[]Point{{X: 1, Y: 1}, {X: 3, Y: 1}},
+		[]Point{{X: 1, Y: 1}, {X: 1, Y: 3}},
 	}
 
 	for _, c := range tCases {
-		field := NewFieldModel()
+		field := NewFieldModel(false)
 		err := field.TryTurn(c, "1")
 		if err != nil {
 			t.Errorf("Unexpected err: %v", err)
@@ -22,41 +22,36 @@ func TestFieldCorrectTurn(t *testing.T) {
 }
 
 func TestFieldIncorrectTurn(t *testing.T) {
-	type tcase []int
+	type tcase []Point
 	tCases := []tcase{
-		[]int{0, 1, 2},
-		[]int{15, 20},
+		[]Point{{X: 1, Y: 0}, {X: 1, Y: 3}},
+		[]Point{{X: 2, Y: 4}, {X: 4, Y: 4}},
+		[]Point{{X: 1, Y: 1}, {X: 2, Y: 2}},
+		[]Point{{X: -1, Y: 0}, {X: 0, Y: 0}},
+		[]Point{{X: 0, Y: -1}, {X: 0, Y: 0}},
+		[]Point{{X: 4, Y: 4}, {X: 4, Y: 5}},
+		[]Point{{X: 4, Y: 4}, {X: 5, Y: 4}},
 	}
 
 	for _, c := range tCases {
-		field := NewFieldModel()
-		field.field = [][]string{
+		field := NewFieldModel(false)
+		field.data = [][]string{
 			{"", "*", "*", "*", "*"},
 			{"", "", "", "", ""},
 			{"", "", "", "", ""},
 			{"", "", "", "", ""},
 			{"2", "2", "2", "", ""},
 		}
-		field.fieldCopy = [][]string{
-			{"", "*", "*", "*", "*"},
-			{"", "", "", "", ""},
-			{"", "", "", "", ""},
-			{"", "", "", "", ""},
-			{"2", "2", "2", "", ""},
-		}
+		field.freeCells = 18
 
-		oldState := field.field
-		oldStateCopy := field.fieldCopy
+		oldState := field.data
 		err := field.TryTurn(c, "1")
 
 		if err == nil {
 			t.Errorf("Unexpected no err: %v", err)
 		}
-		if !reflect.DeepEqual(field.field, oldState) {
-			t.Errorf("Incorrect turn was applied to real field")
-		}
-		if !reflect.DeepEqual(field.fieldCopy, oldStateCopy) {
-			t.Errorf("Incorrect turn was applied to field temp copy")
+		if !reflect.DeepEqual(field.data, oldState) {
+			t.Errorf("Incorrect turn was applied to real data")
 		}
 	}
 }
