@@ -1,8 +1,8 @@
 package gameservice
 
 import (
+	"2019_1_OPG_plus_2/internal/pkg/randomgenerator"
 	"fmt"
-	"math/rand"
 )
 
 type FieldModel struct {
@@ -90,7 +90,12 @@ func (g *GameModel) IsRunning() bool {
 }
 
 func (g *GameModel) Init() {
-	g.whoseTurn = rand.Intn(len(g.players))
+	flag := randomgenerator.RandomBool()
+	index := 0
+	if flag {
+		index = 1
+	}
+	g.whoseTurn = index
 	g.field = NewFieldModel()
 	g.cellsCount = 25
 }

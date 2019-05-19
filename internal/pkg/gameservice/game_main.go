@@ -1,12 +1,13 @@
 package gameservice
 
 import (
+	"2019_1_OPG_plus_2/internal/pkg/models"
+	"2019_1_OPG_plus_2/internal/pkg/randomgenerator"
 	"2019_1_OPG_plus_2/internal/pkg/tsLogger"
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 	"net/http"
-	"strconv"
 )
 
 type Service struct {
@@ -32,12 +33,12 @@ func NewService(hub *Hub, log *tsLogger.TSLogger) *Service {
 // TODO: update users' score mechanics
 // TODO: delimit game as separate service
 func (s *Service) AddGameServicePaths(router *mux.Router) *mux.Router {
+	router.HandleFunc("/rooms", s.ListRooms).Methods("GET")
+	router.HandleFunc("/free_room", s.GetFreeRoom)
 	router.HandleFunc("/{id}", s.CreateRoom).Methods("POST")
-	router.HandleFunc("/{id}", s.GetRoom).Methods("GET")
+	router.HandleFunc("/{id}", s.GetRoom).Methods("GET") // TODO: serve information about room from this endpoint
 	router.HandleFunc("/{id}", s.DeleteRoom).Methods("DELETE")
 	router.HandleFunc("/{id}/room", s.ConnectionEndpoint)
-
-	go s.Hub.run()
 	return router
 }
 
@@ -55,13 +56,14 @@ func (s *Service) serveClientConnection(room *Room, w http.ResponseWriter, r *ht
 	return nil
 }
 
+// RoomInfo
 func (s *Service) GetRoom(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
-	if err != nil {
+	id := mux.Vars(r)["id"]
+	if id == "" {
 		s.Log.LogWarn("could not parse %d", id)
 		return
 	}
-	if s.Hub.rooms[int(id)] == nil {
+	if s.Hub.rooms[id] == nil {
 		w.WriteHeader(http.StatusNotFound)
 		_, _ = fmt.Fprint(w, "no such room with id ", id)
 		return
@@ -72,16 +74,16 @@ func (s *Service) GetRoom(w http.ResponseWriter, r *http.Request) {
 
 func (s *Service) ConnectionEndpoint(w http.ResponseWriter, r *http.Request) {
 
-	id, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
-	if err != nil {
+	id := mux.Vars(r)["id"]
+	if id == "" {
 		s.Log.LogWarn("could not parse %d", id)
 		return
 	}
-	if s.Hub.rooms[int(id)] == nil {
+	if s.Hub.rooms[id] == nil {
 		s.upgrader.Error(w, r, http.StatusNotFound, fmt.Errorf("no room with id %v", id))
 		return
 	}
-	err = s.serveClientConnection(s.Hub.rooms[int(id)], w, r)
+	err := s.serveClientConnection(s.Hub.rooms[id], w, r)
 	if err != nil {
 		s.Log.LogErr("CONNECTION FAILED")
 		s.upgrader.Error(w, r, http.StatusInternalServerError, err)
@@ -92,13 +94,12 @@ func (s *Service) ConnectionEndpoint(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Service) CreateRoom(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
-	if err != nil {
+	id := mux.Vars(r)["id"]
+	if id == "" {
 		s.Log.LogWarn("could not parse %d", id)
 		return
 	}
-
-	err = s.Hub.AttachRooms(newRoom(s.Hub, int(id)))
+	err := s.Hub.AttachRooms(newRoom(s.Hub, id))
 	if err != nil {
 		_, _ = fmt.Fprint(w, err)
 		return
@@ -107,13 +108,65 @@ func (s *Service) CreateRoom(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Service) DeleteRoom(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
-	if err != nil {
+	id := mux.Vars(r)["id"]
+	if id == "" {
 		s.Log.LogWarn("could not parse %d", id)
 		return
 	}
 	s.Log.LogTrace("CLOSING ROOM %d", id)
-	s.Hub.closeRoom(int(id))
+	s.Hub.closeRoom(id)
 
 	_, _ = fmt.Fprint(w, "Room ", id, " closing")
+}
+
+func (s *Service) ListRooms(w http.ResponseWriter, r *http.Request) {
+	roomsOnline := models.RoomsOnlineMessage{}
+	for k, v := range s.Hub.rooms {
+		room := models.RoomData{
+			Id:         k,
+			PlayersNum: v.currentPlayersNum,
+			Players:    v.gameModel.players,
+		}
+		roomsOnline.RoomsOnline = append(roomsOnline.RoomsOnline, room)
+	}
+
+	models.Send(w, http.StatusOK, roomsOnline)
+}
+
+func (s *Service) GetFreeRoom(w http.ResponseWriter, r *http.Request) {
+	var freeRoom string
+	found := false
+	for k, v := range s.Hub.rooms {
+		if v.currentPlayersNum < v.maxPlayersNum {
+			found = true
+			freeRoom = k
+		}
+	}
+
+	var room *Room
+	if !found {
+		freeRoom, err := randomgenerator.RandomString(6)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = fmt.Fprint(w, err)
+			return
+		}
+		room = newRoom(s.Hub, freeRoom)
+	} else {
+		room = s.Hub.rooms[freeRoom]
+	}
+
+	err := s.Hub.AttachRooms(room)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		_, _ = fmt.Fprint(w, err)
+		return
+	}
+
+	var roomData = models.RoomData{
+		Id:         room.id,
+		PlayersNum: room.currentPlayersNum,
+		Players:    room.gameModel.players,
+	}
+	models.Send(w, http.StatusOK, roomData)
 }

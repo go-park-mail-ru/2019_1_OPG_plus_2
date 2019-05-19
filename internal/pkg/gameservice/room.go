@@ -13,7 +13,7 @@ type Message struct {
 
 type Room struct {
 	gameModel *GameModel
-	id        int
+	id        string
 	hub       *Hub
 	clients   map[*Client]bool
 
@@ -31,7 +31,7 @@ type Room struct {
 	win               bool
 }
 
-func newRoom(hub *Hub, id int) *Room {
+func newRoom(hub *Hub, id string) *Room {
 	r := &Room{
 		hub:               hub,
 		id:                id,
@@ -58,6 +58,7 @@ func (r *Room) Run() {
 			if _, ok := r.clients[client]; ok {
 				delete(r.clients, client)
 				close(client.send)
+				r.currentPlayersNum--
 			}
 		case message := <-r.messageHandler:
 			m, err := r.handleMessage(message)
@@ -74,11 +75,12 @@ func (r *Room) Run() {
 		case id := <-r.hub.closer:
 			if id == r.id {
 				for client := range r.clients {
-					var cMsg = NewBroadcastEventMessage("room_close", fmt.Sprintf("room %v closes", r.id))
+					var cMsg = NewBroadcastEventMessage("room_close", fmt.Sprintf("room %q closes", r.id))
 					closeMsg, _ := json.Marshal(&cMsg)
 					client.send <- closeMsg
 					close(client.send)
 					delete(r.clients, client)
+					r.currentPlayersNum--
 				}
 				return
 			}
@@ -97,6 +99,13 @@ func (r *Room) broadcastMsg(message []byte) {
 		default:
 			close(client.send)
 			delete(r.clients, client)
+			for i, c := range r.gameModel.players {
+				if c == client.username {
+					r.gameModel.players = append(r.gameModel.players[:i], r.gameModel.players[i+1:]...)
+				}
+			}
+			r.currentPlayersNum--
+
 		}
 	}
 }
@@ -104,7 +113,7 @@ func (r *Room) broadcastMsg(message []byte) {
 func (r *Room) handleMessage(message Message) ([]byte, error) {
 	var msg GenericMessage
 	err := json.Unmarshal(message.msg, &msg)
-	tsLogger.LogInfo("ROOM %d: %+v", r.id, msg)
+	tsLogger.LogInfo("ROOM %q: %+v", r.id, msg)
 	if err != nil {
 		return nil, fmt.Errorf("JSON parsing: " + err.Error())
 	}
@@ -189,6 +198,7 @@ func (r *Room) performRegisterLogic(message Message) ([]byte, error) {
 	}
 
 	r.gameModel.players = append(r.gameModel.players, registerMessage.User)
+	message.feedback.username = registerMessage.User
 	message.feedback.registered = true
 
 	if len(r.gameModel.players) == r.maxPlayersNum {

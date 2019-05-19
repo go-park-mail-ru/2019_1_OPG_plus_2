@@ -11,7 +11,7 @@ import (
 )
 
 func Start() error {
-	serv := authservice.NewServer()
+	serv := authservice.NewService()
 
 	serv.Log.Run()
 

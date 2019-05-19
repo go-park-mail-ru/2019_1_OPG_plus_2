@@ -14,6 +14,7 @@ func Start() error {
 	router = service.AddGameServicePaths(router)
 
 	service.Log.Run()
+	go service.Hub.Run()
 	service.Log.LogTrace("GAME: Starting server at %v", gameservice.Port)
 	return http.ListenAndServe(gameservice.Port, router)
 }
