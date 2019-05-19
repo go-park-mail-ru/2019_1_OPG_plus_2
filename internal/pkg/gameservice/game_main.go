@@ -165,13 +165,13 @@ func (s *Service) GetFreeRoom(w http.ResponseWriter, r *http.Request) {
 
 	var room *Room
 	if !found {
-		freeRoom, err := randomgenerator.RandomString(6)
+		freeRoomId, err := randomgenerator.RandomString(6)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = fmt.Fprint(w, err)
 			return
 		}
-		room = newRoom(s.Hub, freeRoom)
+		room = newRoom(s.Hub, freeRoomId)
 		err = s.Hub.AttachRooms(room)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
