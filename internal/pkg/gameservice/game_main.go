@@ -32,6 +32,7 @@ func NewService(hub *Hub, log *tsLogger.TSLogger) *Service {
 
 // TODO: update users' score mechanics
 func (s *Service) AddGameServicePaths(router *mux.Router) *mux.Router {
+	router.HandleFunc("/new_room", s.NewRoom).Methods("GET")
 	router.HandleFunc("/rooms", s.ListRooms).Methods("GET")
 	router.HandleFunc("/free_room", s.GetFreeRoom)
 	router.HandleFunc("/{id}", s.CreateRoom).Methods("POST")
@@ -182,6 +183,23 @@ func (s *Service) GetFreeRoom(w http.ResponseWriter, r *http.Request) {
 		room = s.Hub.rooms[freeRoom]
 	}
 
+	var roomData = models.RoomData{
+		Id:         room.id,
+		PlayersNum: room.currentPlayersNum,
+		Players:    room.gameModel.players,
+	}
+	models.Send(w, http.StatusOK, roomData)
+}
+func (s *Service) NewRoom(w http.ResponseWriter, r *http.Request) {
+	freeRoom, err := randomgenerator.RandomString(10)
+	if err != nil {
+		models.Send(w, http.StatusInternalServerError, models.GetDeveloperErrorAnswer(err.Error()))
+	}
+	room := newRoom(s.Hub, freeRoom)
+	err = s.Hub.AttachRooms(room)
+	if err != nil {
+		models.Send(w, http.StatusInternalServerError, models.GetDeveloperErrorAnswer(err.Error()))
+	}
 	var roomData = models.RoomData{
 		Id:         room.id,
 		PlayersNum: room.currentPlayersNum,
