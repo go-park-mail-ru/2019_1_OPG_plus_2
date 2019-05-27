@@ -33,13 +33,13 @@ func NewService(hub *Hub, log *tsLogger.TSLogger) *Service {
 
 // TODO: update users' score mechanics
 func (s *Service) AddGameServicePaths(router *mux.Router) *mux.Router {
-	router.HandleFunc("/new_room", s.NewRoom).Methods("GET")
-	router.HandleFunc("/rooms", s.ListRooms).Methods("GET")
-	router.HandleFunc("/free_room", s.GetFreeRoom)
-	router.HandleFunc("/{id}", s.CreateRoom).Methods("POST")
-	router.HandleFunc("/{id}", s.GetRoom).Methods("GET")
-	router.HandleFunc("/{id}", s.DeleteRoom).Methods("DELETE")
-	router.HandleFunc("/{id}/room", s.ConnectionEndpoint)
+	router.HandleFunc("/game/new_room", s.NewRoom).Methods("GET")
+	router.HandleFunc("/game/rooms", s.ListRooms).Methods("GET")
+	router.HandleFunc("/game/free_room", s.GetFreeRoom)
+	router.HandleFunc("/game/{id}", s.CreateRoom).Methods("POST")
+	router.HandleFunc("/game/{id}", s.GetRoom).Methods("GET")
+	router.HandleFunc("/game/{id}", s.DeleteRoom).Methods("DELETE")
+	router.HandleFunc("/game/{id}/room", s.ConnectionEndpoint)
 	router.Use(middleware.CorsMiddleware)
 	router.Use(middleware.AuthMiddleware)
 	return router
