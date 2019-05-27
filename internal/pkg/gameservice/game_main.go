@@ -1,6 +1,7 @@
 package gameservice
 
 import (
+	"2019_1_OPG_plus_2/internal/pkg/middleware"
 	"2019_1_OPG_plus_2/internal/pkg/models"
 	"2019_1_OPG_plus_2/internal/pkg/randomgenerator"
 	"2019_1_OPG_plus_2/internal/pkg/tsLogger"
@@ -39,6 +40,7 @@ func (s *Service) AddGameServicePaths(router *mux.Router) *mux.Router {
 	router.HandleFunc("/{id}", s.GetRoom).Methods("GET")
 	router.HandleFunc("/{id}", s.DeleteRoom).Methods("DELETE")
 	router.HandleFunc("/{id}/room", s.ConnectionEndpoint)
+	router.Use(middleware.CorsMiddleware)
 	return router
 }
 
