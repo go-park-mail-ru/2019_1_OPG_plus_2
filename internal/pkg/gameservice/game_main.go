@@ -41,6 +41,7 @@ func (s *Service) AddGameServicePaths(router *mux.Router) *mux.Router {
 	router.HandleFunc("/{id}", s.DeleteRoom).Methods("DELETE")
 	router.HandleFunc("/{id}/room", s.ConnectionEndpoint)
 	router.Use(middleware.CorsMiddleware)
+	router.Use(middleware.AuthMiddleware)
 	return router
 }
 
