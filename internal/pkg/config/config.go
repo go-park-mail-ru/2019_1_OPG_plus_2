@@ -30,8 +30,9 @@ var (
 )
 
 // TODO: get rid of init for parsing config
-func init() {
-	CONFIG.SetConfigName("config")                                  // name of testConfig file (without extension)
+func Init() {
+	CONFIG.SetConfigName("config")
+	CONFIG.SetConfigType("json")                                    // name of testConfig file (without extension)
 	CONFIG.AddConfigPath("/etc/colors-game/")                       // path to look for the testConfig file in
 	CONFIG.AddConfigPath("$HOME/.colors-game")                      // call multiple times to add many search paths
 	CONFIG.AddConfigPath(".")                                       // optionally look for testConfig in the working directory

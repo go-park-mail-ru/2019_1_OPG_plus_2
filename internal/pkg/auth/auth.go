@@ -21,7 +21,7 @@ var Manager authManager
 // TODO: dial connections in runtime, not in init
 
 // TODO: leave connections persistent, monitor connection and ping it sometimes, reconnect
-func init() {
+func Init() {
 
 	authurl := serviceLocation + ":" + port
 	authconn, err := grpc.Dial(authurl, grpc.WithInsecure())

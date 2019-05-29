@@ -10,10 +10,17 @@ import (
 	"os"
 )
 
+//func init(){
+//	config.Init()
+//	auth.Init()
+//}
+
 func Start() error {
+	//config.Init()
 	serv := authservice.NewService()
 
 	serv.Log.Run()
+	//auth.Init()
 
 	if os.Getenv("COLORS_AUTH_MODE") == "TEST" {
 		db.AuthDbName = config.Db.AuthTestDb

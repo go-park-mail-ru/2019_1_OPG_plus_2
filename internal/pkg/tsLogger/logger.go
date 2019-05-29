@@ -47,11 +47,6 @@ type TSLogger struct {
 
 func NewLogger() *TSLogger {
 	l := &TSLogger{
-		//traceChan:   make(chan interface{}, 256),
-		//infoChan:    make(chan interface{}, 256),
-		//warningChan: make(chan interface{}, 256),
-		//errorChan:   make(chan interface{}, 256),
-		//accChan:     make(chan interface{}, 256),
 		logChan:   make(chan logMessage, 256),
 		fatalChan: make(chan interface{}, 256),
 	}
