@@ -34,7 +34,7 @@ func isImage(header textproto.MIMEHeader) bool {
 // @failure 500 {object} models.MessageAnswer
 // @router /avatar [post]
 func UploadAvatar(w http.ResponseWriter, r *http.Request) {
-	if !isAuth(r) {
+	if !IsAuth(r) {
 		models.Send(w, http.StatusUnauthorized, models.NotSignedInAnswer)
 		return
 	}
@@ -60,7 +60,7 @@ func UploadAvatar(w http.ResponseWriter, r *http.Request) {
 	nameParts := strings.Split(header.Filename, ".")
 	ext := nameParts[len(nameParts)-1]
 
-	newName := strconv.FormatInt(jwtData(r).Id, 10)
+	newName := strconv.FormatInt(JwtData(r).Id, 10)
 	err = fileVault.UploadFile(file, newName, ext)
 	if err != nil {
 		models.Send(w, http.StatusInternalServerError, models.ImpossibleSaveFileAnswer)
@@ -68,7 +68,7 @@ func UploadAvatar(w http.ResponseWriter, r *http.Request) {
 	}
 
 	url := "/upload/" + newName + "." + ext
-	err = db.ProfileUpdateAvatar(jwtData(r).Id, url)
+	err = db.ProfileUpdateAvatar(JwtData(r).Id, url)
 	if err != nil {
 		models.Send(w, http.StatusInternalServerError, models.GetDeveloperErrorAnswer(err.Error()))
 		return

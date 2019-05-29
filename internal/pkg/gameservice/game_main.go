@@ -1,6 +1,7 @@
 package gameservice
 
 import (
+	"2019_1_OPG_plus_2/internal/pkg/controllers"
 	"2019_1_OPG_plus_2/internal/pkg/middleware"
 	"2019_1_OPG_plus_2/internal/pkg/models"
 	"2019_1_OPG_plus_2/internal/pkg/randomgenerator"
@@ -52,6 +53,7 @@ func (s *Service) serveClientConnection(room *Room, w http.ResponseWriter, r *ht
 		return err
 	}
 	client := NewClient(room, conn)
+	client.username = controllers.JwtData(r).Username
 	client.room.register <- client
 
 	go client.writePump()
@@ -94,6 +96,12 @@ func (s *Service) ConnectionEndpoint(w http.ResponseWriter, r *http.Request) {
 		s.upgrader.Error(w, r, http.StatusNotFound, fmt.Errorf("no room with id %v", id))
 		return
 	}
+
+	if !controllers.IsAuth(r) {
+		models.Send(w, http.StatusUnauthorized, models.NotSignedInAnswer)
+		return
+	}
+
 	err := s.serveClientConnection(s.Hub.rooms[id], w, r)
 	if err != nil {
 		s.Log.LogErr("CONNECTION FAILED")

@@ -11,8 +11,8 @@ func MainHandler(w http.ResponseWriter, _ *http.Request) {
 }
 
 func IndexApiHandler(w http.ResponseWriter, r *http.Request) {
-	if isAuth(r) {
-		models.Send(w, http.StatusOK, models.GetSuccessAnswer("Hello, "+jwtData(r).Username+"!"))
+	if IsAuth(r) {
+		models.Send(w, http.StatusOK, models.GetSuccessAnswer("Hello, "+JwtData(r).Username+"!"))
 	} else {
 		models.Send(w, http.StatusOK, models.GetSuccessAnswer("I don't know about you, but hello!"))
 	}

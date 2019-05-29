@@ -29,7 +29,7 @@ type AuthHandlers struct{}
 // @failure 401 {object} models.MessageAnswer
 // @router /session [get]
 func (*AuthHandlers) IsAuth(w http.ResponseWriter, r *http.Request) {
-	if isAuth(r) {
+	if IsAuth(r) {
 		models.Send(w, http.StatusOK, models.SignedInAnswer)
 	} else {
 		models.Send(w, http.StatusUnauthorized, models.SignedOutAnswer)
@@ -50,7 +50,7 @@ func (*AuthHandlers) IsAuth(w http.ResponseWriter, r *http.Request) {
 // @failure 500 {object} models.MessageAnswer
 // @router /session [post]
 func (*AuthHandlers) SignIn(w http.ResponseWriter, r *http.Request) {
-	if isAuth(r) {
+	if IsAuth(r) {
 		models.Send(w, http.StatusMethodNotAllowed, models.AlreadySignedInAnswer)
 		return
 	}
@@ -88,7 +88,7 @@ func (*AuthHandlers) SignIn(w http.ResponseWriter, r *http.Request) {
 // @failure 405 {object} models.MessageAnswer
 // @router /session [delete]
 func (*AuthHandlers) SignOut(w http.ResponseWriter, r *http.Request) {
-	if !isAuth(r) {
+	if !IsAuth(r) {
 		models.Send(w, http.StatusMethodNotAllowed, models.AlreadySignedOutAnswer)
 		return
 	}
@@ -112,7 +112,7 @@ func (*AuthHandlers) SignOut(w http.ResponseWriter, r *http.Request) {
 // @failure 500 {object} models.MessageAnswer
 // @router /password [put]
 func (*AuthHandlers) UpdatePassword(w http.ResponseWriter, r *http.Request) {
-	if !isAuth(r) {
+	if !IsAuth(r) {
 		models.Send(w, http.StatusUnauthorized, models.NotSignedInAnswer)
 		return
 	}
@@ -125,7 +125,7 @@ func (*AuthHandlers) UpdatePassword(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	err, fields := a.GetStorages().Auth.UpdatePassword(jwtData(r).Id, updateData)
+	err, fields := a.GetStorages().Auth.UpdatePassword(JwtData(r).Id, updateData)
 	if err != nil {
 		if fields != nil {
 			models.Send(w, http.StatusBadRequest, models.GetIncorrectFieldsAnswer(fields))

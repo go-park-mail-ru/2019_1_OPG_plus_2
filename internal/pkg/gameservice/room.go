@@ -114,6 +114,8 @@ func (r *Room) broadcastMsg(message []byte) {
 func (r *Room) handleMessage(message Message) ([]byte, error) {
 	var msg GenericMessage
 	err := json.Unmarshal(message.msg, &msg)
+	msg.User = message.feedback.username
+
 	tsLogger.LogInfo("ROOM %q: %+v", r.id, msg)
 	if err != nil {
 		return nil, fmt.Errorf("JSON parsing: " + err.Error())
@@ -189,6 +191,7 @@ func (r *Room) performRegisterLogic(message Message) ([]byte, error) {
 	}
 	var registerMessage RegisterMessage
 	err := json.Unmarshal(message.msg, &registerMessage)
+	registerMessage.User = message.feedback.username
 
 	if err != nil {
 		return nil, err
@@ -199,7 +202,6 @@ func (r *Room) performRegisterLogic(message Message) ([]byte, error) {
 	}
 
 	r.gameModel.players = append(r.gameModel.players, registerMessage.User)
-	message.feedback.username = registerMessage.User
 	message.feedback.registered = true
 
 	if len(r.gameModel.players) == r.maxPlayersNum {

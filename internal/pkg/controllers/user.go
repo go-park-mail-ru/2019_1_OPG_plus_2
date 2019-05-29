@@ -35,7 +35,7 @@ type UserHandlers struct{}
 // @failure 500 {object} models.MessageAnswer
 // @router /user [post]
 func (*UserHandlers) CreateUser(w http.ResponseWriter, r *http.Request) {
-	if isAuth(r) {
+	if IsAuth(r) {
 		models.Send(w, http.StatusMethodNotAllowed, models.AlreadySignedInAnswer)
 		return
 	}
@@ -89,11 +89,11 @@ func (*UserHandlers) GetUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	} else {
-		if !isAuth(r) {
+		if !IsAuth(r) {
 			models.Send(w, http.StatusBadRequest, models.GetIncorrectFieldsAnswer([]string{"id"}))
 			return
 		}
-		id = jwtData(r).Id
+		id = JwtData(r).Id
 	}
 
 	userData, err := a.GetStorages().User.GetUser(id)
@@ -124,7 +124,7 @@ func (*UserHandlers) GetUser(w http.ResponseWriter, r *http.Request) {
 // @failure 500 {object} models.MessageAnswer
 // @router /user [put]
 func (*UserHandlers) UpdateUser(w http.ResponseWriter, r *http.Request) {
-	if !isAuth(r) {
+	if !IsAuth(r) {
 		models.Send(w, http.StatusUnauthorized, models.NotSignedInAnswer)
 		return
 	}
@@ -137,7 +137,7 @@ func (*UserHandlers) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	jwtData, err, fields := a.GetStorages().User.UpdateUser(jwtData(r).Id, updateData)
+	jwtData, err, fields := a.GetStorages().User.UpdateUser(JwtData(r).Id, updateData)
 	if err != nil {
 		if fields != nil {
 			models.Send(w, http.StatusBadRequest, models.GetIncorrectFieldsAnswer(fields))
@@ -165,7 +165,7 @@ func (*UserHandlers) UpdateUser(w http.ResponseWriter, r *http.Request) {
 // @failure 500 {object} models.MessageAnswer
 // @router /user [delete]
 func (*UserHandlers) RemoveUser(w http.ResponseWriter, r *http.Request) {
-	if !isAuth(r) {
+	if !IsAuth(r) {
 		models.Send(w, http.StatusUnauthorized, models.NotSignedInAnswer)
 		return
 	}
@@ -178,7 +178,7 @@ func (*UserHandlers) RemoveUser(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	err, fields := a.GetStorages().User.RemoveUser(jwtData(r).Id, removeData)
+	err, fields := a.GetStorages().User.RemoveUser(JwtData(r).Id, removeData)
 	if err != nil {
 		if fields != nil {
 			models.Send(w, http.StatusBadRequest, models.GetIncorrectFieldsAnswer(fields))
@@ -189,6 +189,6 @@ func (*UserHandlers) RemoveUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.SetCookie(w, auth.CreateAuthCookie(jwtData(r), 0))
+	http.SetCookie(w, auth.CreateAuthCookie(JwtData(r), 0))
 	models.Send(w, http.StatusOK, models.UserRemovedAnswer)
 }
