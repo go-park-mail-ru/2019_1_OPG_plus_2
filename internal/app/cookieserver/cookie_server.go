@@ -20,7 +20,7 @@ func Start() error {
 
 	server := grpc.NewServer()
 	cookiecheckerproto.RegisterCookieCheckerServer(server, serv)
-	serv.Log.LogInfo("Serving cookie at %v:%v", config.Auth.CookieServiceLocation, config.Auth.CookieServicePort)
+	serv.Log.LogTrace("Serving cookie at %v:%v", config.Auth.CookieServiceLocation, config.Auth.CookieServicePort)
 	return server.Serve(lis)
 }
 
