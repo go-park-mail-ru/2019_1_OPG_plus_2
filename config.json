@@ -64,6 +64,18 @@
       }
     }
   },
+  "game": {
+    "envs":{
+      "IN_DOCKER_NET": {
+        "service_location": "colors-back-game",
+        "port": "8004"
+      },
+      "default": {
+        "service_location": "127.0.0.1",
+        "port": "8004"
+      }
+    }
+  },
   "chat": {
     "envs": {
       "IN_DOCKER_NET": {
@@ -78,27 +90,27 @@
   },
   "logging": {
     "trace": {
-      "mode": "file",
+      "mode": "prompt",
       "file": ".log"
     },
     "info": {
-      "mode": "file",
+      "mode": "suppress",
       "file": "info.log"
     },
     "warn": {
-      "mode": "file",
+      "mode": "prompt",
       "file": ".log"
     },
     "err": {
-      "mode": "file",
+      "mode": "prompt",
       "file": ".log"
     },
     "access": {
-      "mode": "file",
+      "mode": "prompt",
       "file": ".log"
     },
     "fatal": {
-      "mode": "file",
+      "mode": "prompt",
       "file": ".log"
     }
   }

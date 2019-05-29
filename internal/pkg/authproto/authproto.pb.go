@@ -811,7 +811,7 @@ func (c *authServiceClient) RemoveAuth(ctx context.Context, in *RemoveAuthReques
 	return out, nil
 }
 
-// AuthServiceServer is the server API for AuthService service.
+// AuthServiceServer is the core API for AuthService service.
 type AuthServiceServer interface {
 	SignUp(context.Context, *SignUpRequest) (*SignUpResponse, error)
 	SignIn(context.Context, *SignInRequest) (*SignInResponse, error)

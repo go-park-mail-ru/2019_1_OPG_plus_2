@@ -9,10 +9,11 @@ require (
 	github.com/go-openapi/swag v0.18.0 // indirect
 	github.com/go-sql-driver/mysql v1.4.1
 	github.com/golang/protobuf v1.3.1
+	github.com/google/uuid v1.1.1
 	github.com/gorilla/mux v1.7.1
 	github.com/gorilla/websocket v1.4.0
 	github.com/kr/pretty v0.1.0 // indirect
-	github.com/mailru/easyjson v0.0.0-20190312143242-1de009706dbe // indirect
+	github.com/mailru/easyjson v0.0.0-20190403194419-1ea4449da983
 	github.com/prometheus/client_golang v0.9.2
 	github.com/spf13/viper v1.3.2
 	github.com/stretchr/testify v1.3.0 // indirect

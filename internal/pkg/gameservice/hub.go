@@ -8,31 +8,31 @@ import (
 )
 
 type Hub struct {
-	rooms  map[int]*Room
-	closer chan int
+	rooms  map[string]*Room
+	closer chan string
 }
 
 func NewHub() *Hub {
 	return &Hub{
-		closer: make(chan int),
-		rooms:  make(map[int]*Room),
+		closer: make(chan string),
+		rooms:  make(map[string]*Room),
 	}
 }
 
 func (h *Hub) AttachRooms(rooms ...*Room) error {
 	for _, room := range rooms {
 		if h.rooms[room.id] != nil {
-			tsLogger.LogErr("ROOM %d EXISTS", room.id)
-			return fmt.Errorf("ROOM %d EXISTS", room.id)
+			tsLogger.LogErr("ROOM %q EXISTS", room.id)
+			return fmt.Errorf("ROOM %q EXISTS", room.id)
 		}
 		h.rooms[room.id] = room
 		go room.Run()
-		tsLogger.LogTrace("CREATING ROOM %d", room.id)
+		tsLogger.LogTrace("CREATING ROOM %q", room.id)
 	}
 	return nil
 }
 
-func (h *Hub) run() {
+func (h *Hub) Run() {
 	ticker := time.NewTicker(time.Second * 20)
 	defer ticker.Stop()
 	for _, room := range h.rooms {
@@ -57,7 +57,7 @@ func (h *Hub) run() {
 	}
 }
 
-func (h *Hub) closeRoom(id int) {
-	h.closer <- int(id)
-	delete(h.rooms, int(id))
+func (h *Hub) closeRoom(id string) {
+	h.closer <- id
+	delete(h.rooms, id)
 }

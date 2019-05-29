@@ -1,6 +1,6 @@
 #!/bin/bash
 
-dir=("cmd/server/main.go")
+dir=("cmd/core/main.go")
 
 for var in ${dir[@]}
 do

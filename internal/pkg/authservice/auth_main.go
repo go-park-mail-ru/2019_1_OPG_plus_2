@@ -11,17 +11,17 @@ import (
 	"time"
 )
 
-type Server struct {
+type Service struct {
 	Log *tsLogger.TSLogger
 }
 
-func NewServer() *Server {
-	return &Server{
+func NewService() *Service {
+	return &Service{
 		Log: tsLogger.NewLogger(),
 	}
 }
 
-func (s *Server) SignUp(ctx context.Context, request *authproto.SignUpRequest) (*authproto.SignUpResponse, error) {
+func (s *Service) SignUp(ctx context.Context, request *authproto.SignUpRequest) (*authproto.SignUpResponse, error) {
 	s.Log.LogTrace("AUTH: call to SignUp RPC")
 	data := models.SignUpData{
 		Email:    request.Data.GetEmail(),
@@ -46,7 +46,7 @@ func (s *Server) SignUp(ctx context.Context, request *authproto.SignUpRequest) (
 	return response, nil
 }
 
-func (s *Server) SignIn(ctx context.Context, request *authproto.SignInRequest) (*authproto.SignInResponse, error) {
+func (s *Service) SignIn(ctx context.Context, request *authproto.SignInRequest) (*authproto.SignInResponse, error) {
 	s.Log.LogAcc("AUTH: call to SignIn RPC")
 	data := models.SignInData{
 		Login:    request.Data.GetLogin(),
@@ -71,7 +71,7 @@ func (s *Server) SignIn(ctx context.Context, request *authproto.SignInRequest) (
 	return response, nil
 }
 
-func (s *Server) UpdateAuth(ctx context.Context, request *authproto.UpdateAuthRequest) (*authproto.UpdateAuthResponse, error) {
+func (s *Service) UpdateAuth(ctx context.Context, request *authproto.UpdateAuthRequest) (*authproto.UpdateAuthResponse, error) {
 	s.Log.LogAcc("AUTH: call to UpdateAuth RPC")
 
 	data := models.UpdateUserData{
@@ -97,7 +97,7 @@ func (s *Server) UpdateAuth(ctx context.Context, request *authproto.UpdateAuthRe
 	return response, nil
 }
 
-func (s *Server) UpdatePassword(ctx context.Context, request *authproto.UpdatePasswordRequest) (*authproto.UpdatePasswordResponse, error) {
+func (s *Service) UpdatePassword(ctx context.Context, request *authproto.UpdatePasswordRequest) (*authproto.UpdatePasswordResponse, error) {
 	s.Log.LogAcc("AUTH: call to UpdatePassword RPC")
 
 	data := models.UpdatePasswordData{
@@ -117,7 +117,7 @@ func (s *Server) UpdatePassword(ctx context.Context, request *authproto.UpdatePa
 	return response, nil
 }
 
-func (s *Server) RemoveAuth(ctx context.Context, request *authproto.RemoveAuthRequest) (*authproto.RemoveAuthResponse, error) {
+func (s *Service) RemoveAuth(ctx context.Context, request *authproto.RemoveAuthRequest) (*authproto.RemoveAuthResponse, error) {
 	s.Log.LogAcc("AUTH: call to RemoveAuth RPC")
 
 	data := models.RemoveUserData{

@@ -4,11 +4,11 @@ WORKDIR /app
 
 COPY go.mod .
 COPY go.sum .
-RUN go mod download
+RUN go mod tidy
 
 COPY . .
 RUN mkdir colors-core-service
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o colors-core-service/main -i cmd/server/main.go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o colors-core-service/main -i cmd/core/core_server.go
 RUN cp config.json colors-core-service/config.json
 
 

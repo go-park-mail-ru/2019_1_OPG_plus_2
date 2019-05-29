@@ -4,11 +4,11 @@ WORKDIR /app
 
 COPY go.mod .
 COPY go.sum .
-RUN go mod download
+RUN go mod tidy
 
 COPY . .
 RUN mkdir colors-cookie-service
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o colors-cookie-service/main -i cmd/cookiechecker/cookie_checker.go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o colors-cookie-service/main -i cmd/cookiechecker/cookiechecker_server.go
 RUN cp config.json colors-cookie-service/config.json
 
 
