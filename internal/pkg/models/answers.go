@@ -1,5 +1,8 @@
 package models
 
+// TODO
+//go generate: easyjson -all
+
 // 100-199 - success answer
 // 200-299 - incorrect answer because of the user
 // 300-399 - incorrect answer because developers
