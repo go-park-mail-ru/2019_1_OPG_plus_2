@@ -30,6 +30,7 @@ func max(a, b int) int {
 
 type FieldModel struct {
     data      [][]string
+    locked    []Point
     width     int
     height    int
     freeCells int
@@ -37,6 +38,7 @@ type FieldModel struct {
 
 func NewFieldModel(withBlocked bool) *FieldModel {
     freeCells := 0
+    var lockedCells []Point
     field := make([][]string, height)
     for r := range field {
         field[r] = make([]string, width)
@@ -45,6 +47,10 @@ func NewFieldModel(withBlocked bool) *FieldModel {
                 switch randomgenerator.RandomInt(0, freeFreq) {
                 case 0:
                     field[r][c] = lockedCell
+                    lockedCells = append(lockedCells, Point{
+                        X: c,
+                        Y: r,
+                    })
                 default:
                     field[r][c] = freeCell
                     freeCells++
@@ -58,6 +64,7 @@ func NewFieldModel(withBlocked bool) *FieldModel {
 
     return &FieldModel{
         data:      field,
+        locked:    lockedCells,
         width:     width,
         height:    height,
         freeCells: freeCells,
@@ -72,7 +79,7 @@ func (f *FieldModel) TryTurn(coords []Point, char string) (err error) {
         coords[0].Y < 0 || f.height <= coords[0].Y || coords[1].Y < 0 || f.height <= coords[1].Y {
         return errors.New("out of field")
     }
-    
+
     minX := min(coords[0].X, coords[1].X)
     maxX := max(coords[0].X, coords[1].X)
     minY := min(coords[0].Y, coords[1].Y)
@@ -140,6 +147,10 @@ func (g *GameModel) IsRunning() bool {
 
 func (g *GameModel) GetField() [][]string {
     return g.field.data
+}
+
+func (g *GameModel) GetLocked() []Point {
+    return g.field.locked
 }
 
 func (g *GameModel) Init() {
