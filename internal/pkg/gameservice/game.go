@@ -103,7 +103,7 @@ func (f *FieldModel) TryTurn(coords []Point, char string) (err error) {
             f.data[y][x] = char
         }
     }
-    f.freeCells -= maxX - minX + maxY - minY
+    f.freeCells -= (maxX - minX + 1) * (maxY - minY + 1)
     return nil
 }
 
