@@ -1,12 +1,16 @@
 package gameservice
 
-import "testing"
+import (
+	"testing"
+
+	"2019_1_OPG_plus_2/internal/pkg/models"
+)
 
 func TestGameModel_DoTurn(t *testing.T) {
 	type fields struct {
 		room      *Room
 		field     *FieldModel
-		players   []string
+		players   []models.RoomPlayer
 		whoseTurn int
 		ready     bool
 		running   bool
@@ -24,7 +28,10 @@ func TestGameModel_DoTurn(t *testing.T) {
 		{
 			name: "CorrectTurn",
 			fields: fields{
-				players:   []string{"u1", "u2"},
+				players:   []models.RoomPlayer{
+					{"u1", ""},
+					{"u2", ""},
+				},
 				whoseTurn: 0,
 				ready:     true,
 				running:   true,
@@ -49,7 +56,10 @@ func TestGameModel_DoTurn(t *testing.T) {
 		{
 			name: "IncorrectTurn",
 			fields: fields{
-				players:   []string{"u1", "u2"},
+				players:   []models.RoomPlayer{
+					{"u1", ""},
+					{"u2", ""},
+				},
 				whoseTurn: 1,
 				ready:     true,
 				running:   true,

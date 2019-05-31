@@ -4,6 +4,7 @@ import (
     "encoding/json"
     "fmt"
 
+    "2019_1_OPG_plus_2/internal/pkg/models"
     "2019_1_OPG_plus_2/internal/pkg/tsLogger"
 )
 
@@ -102,7 +103,7 @@ func (r *Room) broadcastMsg(message []byte) {
             close(client.send)
             delete(r.clients, client)
             for i, c := range r.gameModel.players {
-                if c == client.username {
+                if c.Username == client.username {
                     r.gameModel.players = append(r.gameModel.players[:i], r.gameModel.players[i+1:]...)
                 }
             }
@@ -152,7 +153,7 @@ func (r *Room) performGameLogic(message Message) ([]byte, error) {
     if err != nil {
         return nil, err
     }
-    if gameAction.User != r.gameModel.players[r.gameModel.whoseTurn] {
+    if gameAction.User != r.gameModel.players[r.gameModel.whoseTurn].Username {
         return nil, fmt.Errorf("it's not your turn")
     }
 
@@ -199,7 +200,10 @@ func (r *Room) performRegisterLogic(message Message) ([]byte, error) {
         return nil, fmt.Errorf("already registered")
     }
 
-    r.gameModel.players = append(r.gameModel.players, registerMessage.User)
+    r.gameModel.players = append(r.gameModel.players, models.RoomPlayer{
+        Username: registerMessage.User,
+        Avatar:   registerMessage.Avatar,
+    })
     message.feedback.username = registerMessage.User
     message.feedback.registered = true
 
@@ -222,7 +226,7 @@ func (r *Room) CheckReady() ([]byte, error) {
             "locked":      r.gameModel.GetLocked(),
             "players_num": r.currentPlayersNum,
             "players":     r.gameModel.players,
-            "whose_turn":  r.gameModel.players[r.gameModel.whoseTurn],
+            "whose_turn":  r.gameModel.players[r.gameModel.whoseTurn].Username,
         })
         m, _ := json.Marshal(&dat)
         return m, nil
