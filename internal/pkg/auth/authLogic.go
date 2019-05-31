@@ -11,7 +11,25 @@ func SignUp(signUpData models.SignUpData) (models.JwtData, error, []string) {
 		return models.JwtData{}, models.FieldsError, incorrectFields
 	}
 
-	id, err := db.AuthCreate(db.AuthData{
+	id, err := db.AuthGetIdByEmail(signUpData.Email)
+	if err != nil {
+		return models.JwtData{}, err, nil
+	}
+	if id != 0 {
+		incorrectFields = append(incorrectFields, "email")
+	}
+	id, err = db.AuthGetIdByUsername(signUpData.Username)
+	if err != nil {
+		return models.JwtData{}, err, nil
+	}
+	if id != 0 {
+		incorrectFields = append(incorrectFields, "username")
+	}
+	if len(incorrectFields) > 0 {
+		return models.JwtData{}, models.AlreadyExists, incorrectFields
+	}
+
+	id, err = db.AuthCreate(db.AuthData{
 		Email:    signUpData.Email,
 		Username: signUpData.Username,
 		Password: PasswordHash(signUpData.Password),
