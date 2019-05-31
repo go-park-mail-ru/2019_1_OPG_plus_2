@@ -120,7 +120,90 @@ func (v *RoomsOnlineMessage) UnmarshalJSON(data []byte) error {
 func (v *RoomsOnlineMessage) UnmarshalEasyJSON(l *jlexer.Lexer) {
 	easyjson85f0d656Decode20191OPGPlus2InternalPkgModels(l, v)
 }
-func easyjson85f0d656Decode20191OPGPlus2InternalPkgModels1(in *jlexer.Lexer, out *RoomDeletedMessage) {
+func easyjson85f0d656Decode20191OPGPlus2InternalPkgModels1(in *jlexer.Lexer, out *RoomPlayer) {
+	isTopLevel := in.IsStart()
+	if in.IsNull() {
+		if isTopLevel {
+			in.Consumed()
+		}
+		in.Skip()
+		return
+	}
+	in.Delim('{')
+	for !in.IsDelim('}') {
+		key := in.UnsafeString()
+		in.WantColon()
+		if in.IsNull() {
+			in.Skip()
+			in.WantComma()
+			continue
+		}
+		switch key {
+		case "username":
+			out.Username = string(in.String())
+		case "avatar":
+			out.Avatar = string(in.String())
+		default:
+			in.SkipRecursive()
+		}
+		in.WantComma()
+	}
+	in.Delim('}')
+	if isTopLevel {
+		in.Consumed()
+	}
+}
+func easyjson85f0d656Encode20191OPGPlus2InternalPkgModels1(out *jwriter.Writer, in RoomPlayer) {
+	out.RawByte('{')
+	first := true
+	_ = first
+	{
+		const prefix string = ",\"username\":"
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
+		out.String(string(in.Username))
+	}
+	{
+		const prefix string = ",\"avatar\":"
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
+		out.String(string(in.Avatar))
+	}
+	out.RawByte('}')
+}
+
+// MarshalJSON supports json.Marshaler interface
+func (v RoomPlayer) MarshalJSON() ([]byte, error) {
+	w := jwriter.Writer{}
+	easyjson85f0d656Encode20191OPGPlus2InternalPkgModels1(&w, v)
+	return w.Buffer.BuildBytes(), w.Error
+}
+
+// MarshalEasyJSON supports easyjson.Marshaler interface
+func (v RoomPlayer) MarshalEasyJSON(w *jwriter.Writer) {
+	easyjson85f0d656Encode20191OPGPlus2InternalPkgModels1(w, v)
+}
+
+// UnmarshalJSON supports json.Unmarshaler interface
+func (v *RoomPlayer) UnmarshalJSON(data []byte) error {
+	r := jlexer.Lexer{Data: data}
+	easyjson85f0d656Decode20191OPGPlus2InternalPkgModels1(&r, v)
+	return r.Error()
+}
+
+// UnmarshalEasyJSON supports easyjson.Unmarshaler interface
+func (v *RoomPlayer) UnmarshalEasyJSON(l *jlexer.Lexer) {
+	easyjson85f0d656Decode20191OPGPlus2InternalPkgModels1(l, v)
+}
+func easyjson85f0d656Decode20191OPGPlus2InternalPkgModels2(in *jlexer.Lexer, out *RoomDeletedMessage) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -155,7 +238,7 @@ func easyjson85f0d656Decode20191OPGPlus2InternalPkgModels1(in *jlexer.Lexer, out
 		in.Consumed()
 	}
 }
-func easyjson85f0d656Encode20191OPGPlus2InternalPkgModels1(out *jwriter.Writer, in RoomDeletedMessage) {
+func easyjson85f0d656Encode20191OPGPlus2InternalPkgModels2(out *jwriter.Writer, in RoomDeletedMessage) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -195,27 +278,27 @@ func easyjson85f0d656Encode20191OPGPlus2InternalPkgModels1(out *jwriter.Writer, 
 // MarshalJSON supports json.Marshaler interface
 func (v RoomDeletedMessage) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson85f0d656Encode20191OPGPlus2InternalPkgModels1(&w, v)
+	easyjson85f0d656Encode20191OPGPlus2InternalPkgModels2(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v RoomDeletedMessage) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson85f0d656Encode20191OPGPlus2InternalPkgModels1(w, v)
+	easyjson85f0d656Encode20191OPGPlus2InternalPkgModels2(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *RoomDeletedMessage) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson85f0d656Decode20191OPGPlus2InternalPkgModels1(&r, v)
+	easyjson85f0d656Decode20191OPGPlus2InternalPkgModels2(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *RoomDeletedMessage) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson85f0d656Decode20191OPGPlus2InternalPkgModels1(l, v)
+	easyjson85f0d656Decode20191OPGPlus2InternalPkgModels2(l, v)
 }
-func easyjson85f0d656Decode20191OPGPlus2InternalPkgModels2(in *jlexer.Lexer, out *RoomData) {
+func easyjson85f0d656Decode20191OPGPlus2InternalPkgModels3(in *jlexer.Lexer, out *RoomData) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -246,16 +329,16 @@ func easyjson85f0d656Decode20191OPGPlus2InternalPkgModels2(in *jlexer.Lexer, out
 				in.Delim('[')
 				if out.Players == nil {
 					if !in.IsDelim(']') {
-						out.Players = make([]string, 0, 4)
+						out.Players = make([]RoomPlayer, 0, 2)
 					} else {
-						out.Players = []string{}
+						out.Players = []RoomPlayer{}
 					}
 				} else {
 					out.Players = (out.Players)[:0]
 				}
 				for !in.IsDelim(']') {
-					var v4 string
-					v4 = string(in.String())
+					var v4 RoomPlayer
+					(v4).UnmarshalEasyJSON(in)
 					out.Players = append(out.Players, v4)
 					in.WantComma()
 				}
@@ -271,7 +354,7 @@ func easyjson85f0d656Decode20191OPGPlus2InternalPkgModels2(in *jlexer.Lexer, out
 		in.Consumed()
 	}
 }
-func easyjson85f0d656Encode20191OPGPlus2InternalPkgModels2(out *jwriter.Writer, in RoomData) {
+func easyjson85f0d656Encode20191OPGPlus2InternalPkgModels3(out *jwriter.Writer, in RoomData) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -311,7 +394,7 @@ func easyjson85f0d656Encode20191OPGPlus2InternalPkgModels2(out *jwriter.Writer, 
 				if v5 > 0 {
 					out.RawByte(',')
 				}
-				out.String(string(v6))
+				(v6).MarshalEasyJSON(out)
 			}
 			out.RawByte(']')
 		}
@@ -322,23 +405,23 @@ func easyjson85f0d656Encode20191OPGPlus2InternalPkgModels2(out *jwriter.Writer, 
 // MarshalJSON supports json.Marshaler interface
 func (v RoomData) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson85f0d656Encode20191OPGPlus2InternalPkgModels2(&w, v)
+	easyjson85f0d656Encode20191OPGPlus2InternalPkgModels3(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v RoomData) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson85f0d656Encode20191OPGPlus2InternalPkgModels2(w, v)
+	easyjson85f0d656Encode20191OPGPlus2InternalPkgModels3(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *RoomData) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson85f0d656Decode20191OPGPlus2InternalPkgModels2(&r, v)
+	easyjson85f0d656Decode20191OPGPlus2InternalPkgModels3(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *RoomData) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson85f0d656Decode20191OPGPlus2InternalPkgModels2(l, v)
+	easyjson85f0d656Decode20191OPGPlus2InternalPkgModels3(l, v)
 }
