@@ -36,6 +36,7 @@ docker run -d \
            --network=opg-net \
            --network-alias=colors-back-core \
            --mount type=bind,source=$PWD/../upload,target=/root/colors-core-service/upload \
+           --mount type=bind,source=$PWD/../upload,target=/root/upload \
            -p ${port}:8002 \
            --name colors-back-core colors-back-core >> ~/docker.log && \
 echo [SERVER-CORE] Server is now running at: ${port}
