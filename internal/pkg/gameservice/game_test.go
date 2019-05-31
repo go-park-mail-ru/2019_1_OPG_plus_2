@@ -28,9 +28,15 @@ func TestGameModel_DoTurn(t *testing.T) {
 		{
 			name: "CorrectTurn",
 			fields: fields{
-				players:   []models.RoomPlayer{
-					{"u1", ""},
-					{"u2", ""},
+				players: []models.RoomPlayer{
+					{
+						Username: "u1",
+						Avatar:   "",
+					},
+					{
+						Username: "u2",
+						Avatar:   "",
+					},
 				},
 				whoseTurn: 0,
 				ready:     true,
@@ -56,9 +62,14 @@ func TestGameModel_DoTurn(t *testing.T) {
 		{
 			name: "IncorrectTurn",
 			fields: fields{
-				players:   []models.RoomPlayer{
-					{"u1", ""},
-					{"u2", ""},
+				players: []models.RoomPlayer{
+					{
+						Username: "u1",
+						Avatar:   ""},
+					{
+						Username: "u2",
+						Avatar:   "",
+					},
 				},
 				whoseTurn: 1,
 				ready:     true,
