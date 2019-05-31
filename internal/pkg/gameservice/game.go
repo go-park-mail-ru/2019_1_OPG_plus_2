@@ -3,6 +3,7 @@ package gameservice
 import (
     "errors"
 
+    "2019_1_OPG_plus_2/internal/pkg/models"
     "2019_1_OPG_plus_2/internal/pkg/randomgenerator"
 )
 
@@ -111,7 +112,7 @@ type GameModel struct {
     room *Room
 
     field     *FieldModel
-    players   []string
+    players   []models.RoomPlayer
     whoseTurn int
 
     ready   bool
