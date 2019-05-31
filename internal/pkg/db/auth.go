@@ -16,6 +16,22 @@ type AuthData struct {
 	Password string `json:"pass_hash"`
 }
 
+func AuthGetIdByEmail(email string) (id int64, err error) {
+	id, err = isExists(AuthDbName, AuthUsersTable, "email = ?", email)
+	if err != nil {
+		return
+	}
+	return id, nil
+}
+
+func AuthGetIdByUsername(username string) (id int64, err error) {
+	id, err = isExists(AuthDbName, AuthUsersTable, "username = ?", username)
+	if err != nil {
+		return
+	}
+	return id, nil
+}
+
 func AuthCreate(data AuthData) (id int64, err error) {
 	id, err = isExists(AuthDbName, AuthUsersTable, "email = ? OR username = ?", data.Email, data.Username)
 	if err != nil {

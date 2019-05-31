@@ -51,7 +51,15 @@ func (*UserHandlers) CreateUser(w http.ResponseWriter, r *http.Request) {
 	jwtData, err, fields := a.GetStorages().User.CreateUser(signUpData)
 	if err != nil {
 		if fields != nil {
-			models.Send(w, http.StatusBadRequest, models.GetIncorrectFieldsAnswer(fields))
+			if err == models.FieldsError {
+				models.Send(w, http.StatusBadRequest, models.GetIncorrectFieldsAnswer(fields))
+			} else {
+				models.Send(w, http.StatusBadRequest, &models.IncorrectFieldsAnswer{
+					Status:  200,
+					Message: err.Error(),
+					Data:    fields,
+				})
+			}
 			return
 		}
 		models.Send(w, http.StatusInternalServerError, models.GetDeveloperErrorAnswer(err.Error()))
@@ -140,7 +148,15 @@ func (*UserHandlers) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	jwtData, err, fields := a.GetStorages().User.UpdateUser(jwtData(r).Id, updateData)
 	if err != nil {
 		if fields != nil {
-			models.Send(w, http.StatusBadRequest, models.GetIncorrectFieldsAnswer(fields))
+			if err == models.FieldsError {
+				models.Send(w, http.StatusBadRequest, models.GetIncorrectFieldsAnswer(fields))
+			} else {
+				models.Send(w, http.StatusBadRequest, &models.IncorrectFieldsAnswer{
+					Status:  200,
+					Message: err.Error(),
+					Data:    fields,
+				})
+			}
 			return
 		}
 		models.Send(w, http.StatusInternalServerError, models.GetDeveloperErrorAnswer(err.Error()))
@@ -181,7 +197,15 @@ func (*UserHandlers) RemoveUser(w http.ResponseWriter, r *http.Request) {
 	err, fields := a.GetStorages().User.RemoveUser(jwtData(r).Id, removeData)
 	if err != nil {
 		if fields != nil {
-			models.Send(w, http.StatusBadRequest, models.GetIncorrectFieldsAnswer(fields))
+			if err == models.FieldsError {
+				models.Send(w, http.StatusBadRequest, models.GetIncorrectFieldsAnswer(fields))
+			} else {
+				models.Send(w, http.StatusBadRequest, &models.IncorrectFieldsAnswer{
+					Status:  200,
+					Message: err.Error(),
+					Data:    fields,
+				})
+			}
 			return
 		}
 		models.Send(w, http.StatusInternalServerError, models.GetDeveloperErrorAnswer(err.Error()))
