@@ -29,7 +29,7 @@ func SignUp(signUpData models.SignUpData) (models.JwtData, error, []string) {
 		return models.JwtData{}, models.AlreadyExists, incorrectFields
 	}
 
-	id, err = db.AuthCgitreate(db.AuthData{
+	id, err = db.AuthCreate(db.AuthData{
 		Email:    signUpData.Email,
 		Username: signUpData.Username,
 		Password: PasswordHash(signUpData.Password),
