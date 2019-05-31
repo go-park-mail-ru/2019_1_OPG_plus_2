@@ -65,7 +65,8 @@ func TestGameModel_DoTurn(t *testing.T) {
 				players: []models.RoomPlayer{
 					{
 						Username: "u1",
-						Avatar:   ""},
+						Avatar:   "",
+					},
 					{
 						Username: "u2",
 						Avatar:   "",
