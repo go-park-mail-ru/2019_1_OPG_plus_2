@@ -90,28 +90,28 @@
   },
   "logging": {
     "trace": {
-      "mode": "prompt",
-      "file": ".log"
+      "mode": "file",
+      "file": "trace.log"
     },
     "info": {
-      "mode": "suppress",
+      "mode": "file",
       "file": "info.log"
     },
     "warn": {
-      "mode": "prompt",
-      "file": ".log"
+      "mode": "warn",
+      "file": "warn.log"
     },
     "err": {
-      "mode": "prompt",
-      "file": ".log"
+      "mode": "err",
+      "file": "err.log"
     },
     "access": {
-      "mode": "prompt",
-      "file": ".log"
+      "mode": "access",
+      "file": "access.log"
     },
     "fatal": {
-      "mode": "prompt",
-      "file": ".log"
+      "mode": "file",
+      "file": "fatal.log"
     }
   }
 }
