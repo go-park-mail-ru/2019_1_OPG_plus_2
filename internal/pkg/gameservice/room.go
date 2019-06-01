@@ -3,10 +3,13 @@ package gameservice
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"2019_1_OPG_plus_2/internal/pkg/models"
 	"2019_1_OPG_plus_2/internal/pkg/tsLogger"
 )
+
+var timeToKillRoom = 3 * time.Minute
 
 type Message struct {
 	msg      []byte
@@ -18,6 +21,7 @@ type Room struct {
 	id        string
 	hub       *Hub
 	clients   map[*Client]bool
+	timer     *time.Timer
 
 	// channel which messages are broadcasted from
 	messageHandler chan Message
@@ -27,6 +31,8 @@ type Room struct {
 
 	// Unregister requests from clients.
 	unregister chan *Client
+
+	alertChan chan *Client
 
 	maxPlayersNum     int
 	currentPlayersNum int
@@ -40,10 +46,12 @@ func newRoom(hub *Hub, id string) *Room {
 		messageHandler:    make(chan Message, 1024),
 		register:          make(chan *Client, 2),
 		unregister:        make(chan *Client, 2),
+		alertChan:         make(chan *Client),
 		clients:           make(map[*Client]bool),
 		maxPlayersNum:     2,
 		currentPlayersNum: 0,
 		win:               false,
+		timer:             time.NewTimer(timeToKillRoom),
 	}
 	r.gameModel = NewGameModel(r)
 	return r
@@ -51,30 +59,37 @@ func newRoom(hub *Hub, id string) *Room {
 
 func (r *Room) Run() {
 	defer func() {
-		for client := range r.clients {
-			var cMsg = NewBroadcastEventMessage("room_close", fmt.Sprintf("room %q closes", r.id))
-			closeMsg, _ := json.Marshal(&cMsg)
-			client.send <- closeMsg
-			close(client.send)
-			delete(r.clients, client)
-			r.currentPlayersNum--
-		}
+		r.timer.Stop()
 	}()
-
 	for {
 		select {
 		case client := <-r.register:
+			r.timer.Reset(timeToKillRoom)
 			if !(r.currentPlayersNum >= r.maxPlayersNum) {
 				r.clients[client] = true
 				r.currentPlayersNum++
 			}
 		case client := <-r.unregister:
+			r.timer.Reset(timeToKillRoom)
 			if _, ok := r.clients[client]; ok {
 				delete(r.clients, client)
 				close(client.send)
 				r.currentPlayersNum--
 			}
+		case client := <-r.alertChan:
+			delete(r.clients, client)
+			for k := range r.clients {
+				if k != client {
+					bcMsg := NewBroadcastEventMessage("win", map[string]interface{}{
+						"winner": k.username,
+					})
+					breakMsg, _ := json.Marshal(&bcMsg)
+					r.broadcastMsg(breakMsg)
+					r.hub.closeRoom(r.id)
+				}
+			}
 		case message := <-r.messageHandler:
+			r.timer.Reset(timeToKillRoom)
 			m, err := r.handleMessage(message)
 			if err != nil {
 				var bMsg = NewBroadcastErrorMessage(err.Error())
@@ -86,11 +101,14 @@ func (r *Room) Run() {
 			if r.win {
 				r.hub.closeRoom(r.id)
 			}
+		case <-r.timer.C:
+			r.hub.closeRoom(r.id)
 		case id := <-r.hub.closer:
 			if id == r.id {
+				var cMsg = NewBroadcastEventMessage("room_close", fmt.Sprintf("room %q closes", r.id))
+				closeMsg, _ := json.Marshal(&cMsg)
+
 				for client := range r.clients {
-					var cMsg = NewBroadcastEventMessage("room_close", fmt.Sprintf("room %q closes", r.id))
-					closeMsg, _ := json.Marshal(&cMsg)
 					client.send <- closeMsg
 					close(client.send)
 					delete(r.clients, client)
@@ -111,15 +129,7 @@ func (r *Room) broadcastMsg(message []byte) {
 		select {
 		case client.send <- message:
 		default:
-			close(client.send)
-			delete(r.clients, client)
-			for i, c := range r.gameModel.players {
-				if c.Username == client.username {
-					r.gameModel.players = append(r.gameModel.players[:i], r.gameModel.players[i+1:]...)
-				}
-			}
-			r.currentPlayersNum--
-
+			r.alertChan <- client
 		}
 	}
 }
