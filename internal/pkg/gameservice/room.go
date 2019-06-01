@@ -32,6 +32,8 @@ type Room struct {
 	// Unregister requests from clients.
 	unregister chan *Client
 
+	alertChan chan *Client
+
 	maxPlayersNum     int
 	currentPlayersNum int
 	win               bool
@@ -44,6 +46,7 @@ func newRoom(hub *Hub, id string) *Room {
 		messageHandler:    make(chan Message, 1024),
 		register:          make(chan *Client, 2),
 		unregister:        make(chan *Client, 2),
+		alertChan:         make(chan *Client),
 		clients:           make(map[*Client]bool),
 		maxPlayersNum:     2,
 		currentPlayersNum: 0,
@@ -55,6 +58,9 @@ func newRoom(hub *Hub, id string) *Room {
 }
 
 func (r *Room) Run() {
+	defer func() {
+		r.timer.Stop()
+	}()
 	for {
 		select {
 		case client := <-r.register:
@@ -69,6 +75,18 @@ func (r *Room) Run() {
 				delete(r.clients, client)
 				close(client.send)
 				r.currentPlayersNum--
+			}
+		case client := <-r.alertChan:
+			delete(r.clients, client)
+			for k := range r.clients {
+				if k != client {
+					bcMsg := NewBroadcastEventMessage("win", map[string]interface{}{
+						"winner": k.username,
+					})
+					breakMsg, _ := json.Marshal(&bcMsg)
+					r.broadcastMsg(breakMsg)
+					r.hub.closeRoom(r.id)
+				}
 			}
 		case message := <-r.messageHandler:
 			r.timer.Reset(timeToKillRoom)
@@ -87,9 +105,10 @@ func (r *Room) Run() {
 			r.hub.closeRoom(r.id)
 		case id := <-r.hub.closer:
 			if id == r.id {
+				var cMsg = NewBroadcastEventMessage("room_close", fmt.Sprintf("room %q closes", r.id))
+				closeMsg, _ := json.Marshal(&cMsg)
+
 				for client := range r.clients {
-					var cMsg = NewBroadcastEventMessage("room_close", fmt.Sprintf("room %q closes", r.id))
-					closeMsg, _ := json.Marshal(&cMsg)
 					client.send <- closeMsg
 					close(client.send)
 					delete(r.clients, client)
@@ -110,14 +129,7 @@ func (r *Room) broadcastMsg(message []byte) {
 		select {
 		case client.send <- message:
 		default:
-			close(client.send)
-			delete(r.clients, client)
-			for i, c := range r.gameModel.players {
-				if c.Username == client.username {
-					r.gameModel.players = append(r.gameModel.players[:i], r.gameModel.players[i+1:]...)
-				}
-			}
-			r.currentPlayersNum--
+			r.alertChan <- client
 		}
 	}
 }
