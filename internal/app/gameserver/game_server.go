@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-var service = gameservice.NewService(gameservice.NewHub(), tsLogger.NewLogger())
+var service = gameservice.NewService(tsLogger.NewLogger())
 
 func Start() error {
 	router := mux.NewRouter()
