@@ -50,6 +50,17 @@ func newRoom(hub *Hub, id string) *Room {
 }
 
 func (r *Room) Run() {
+	defer func() {
+		for client := range r.clients {
+			var cMsg = NewBroadcastEventMessage("room_close", fmt.Sprintf("room %q closes", r.id))
+			closeMsg, _ := json.Marshal(&cMsg)
+			client.send <- closeMsg
+			close(client.send)
+			delete(r.clients, client)
+			r.currentPlayersNum--
+		}
+	}()
+
 	for {
 		select {
 		case client := <-r.register:

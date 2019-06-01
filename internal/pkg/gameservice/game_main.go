@@ -136,11 +136,13 @@ func (s *Service) DeleteRoom(w http.ResponseWriter, r *http.Request) {
 		models.Send(w, http.StatusBadRequest, models.IncorrectQueryParams)
 		return
 	}
-
+	s.Hub.mutex.RLock()
 	if s.Hub.rooms[id] == nil {
 		models.Send(w, http.StatusNotFound, models.GetNotFoundRoomAnswer(id))
+		s.Hub.mutex.RUnlock()
 		return
 	}
+	s.Hub.mutex.RUnlock()
 	s.Log.LogTrace("CLOSING ROOM %q", id)
 	s.Hub.closeRoom(id)
 
@@ -149,6 +151,7 @@ func (s *Service) DeleteRoom(w http.ResponseWriter, r *http.Request) {
 
 func (s *Service) ListRooms(w http.ResponseWriter, r *http.Request) {
 	roomsOnline := models.RoomsOnlineMessage{}
+	s.Hub.mutex.RLock()
 	for k, v := range s.Hub.rooms {
 		room := models.RoomData{
 			Id:         k,
@@ -157,6 +160,7 @@ func (s *Service) ListRooms(w http.ResponseWriter, r *http.Request) {
 		}
 		roomsOnline.RoomsOnline = append(roomsOnline.RoomsOnline, room)
 	}
+	s.Hub.mutex.RUnlock()
 
 	models.Send(w, http.StatusOK, roomsOnline)
 }
@@ -165,10 +169,12 @@ func (s *Service) GetFreeRoom(w http.ResponseWriter, r *http.Request) {
 	var freeRoom string
 	found := false
 	for k, v := range s.Hub.rooms {
+		s.Hub.mutex.RLock()
 		if v.currentPlayersNum < v.maxPlayersNum {
 			found = true
 			freeRoom = k
 		}
+		s.Hub.mutex.RUnlock()
 	}
 
 	var room *Room

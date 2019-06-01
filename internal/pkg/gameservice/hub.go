@@ -7,33 +7,35 @@ import (
 	"time"
 )
 
+// I have both mutex and chan because Hub is the most stressed component of all system
+// The mutex+chan setup has shown the best RPS result, so I stopped here
 type Hub struct {
 	rooms    map[string]*Room
 	attacher chan *Room
 	closer   chan string
 	service  *Service
-	mutex    *sync.Mutex
+	mutex    *sync.RWMutex
 }
 
 func NewHub(service *Service) *Hub {
 	return &Hub{
 		closer:   make(chan string, 1024),
-		attacher: make(chan *Room),
+		attacher: make(chan *Room, 1024),
 		rooms:    make(map[string]*Room),
 		service:  service,
-		mutex:    &sync.Mutex{},
+		mutex:    &sync.RWMutex{},
 	}
 }
 
 func (h *Hub) AttachRooms(rooms ...*Room) error {
 	for _, room := range rooms {
-		h.mutex.Lock()
+		h.mutex.RLock()
 		if h.rooms[room.id] != nil {
-			h.mutex.Unlock()
+			h.mutex.RUnlock()
 			h.service.Log.LogErr("ROOM %q EXISTS", room.id)
 			return fmt.Errorf("ROOM %q EXISTS", room.id)
 		}
-		h.mutex.Unlock()
+		h.mutex.RUnlock()
 		h.attacher <- room
 	}
 	return nil
@@ -64,8 +66,8 @@ func (h *Hub) Run() {
 			h.service.Log.LogTrace("CREATING ROOM %q", room.id)
 			h.mutex.Lock()
 			h.rooms[room.id] = room
-			go room.Run()
 			h.mutex.Unlock()
+			go room.Run()
 		case <-ticker.C:
 			h.service.Log.LogInfo("HUB INFO: conns: %d, rooms : %d", activeConns(), len(h.rooms))
 			monitoring.ActiveConns.Set(float64(activeConns()))
@@ -76,5 +78,7 @@ func (h *Hub) Run() {
 
 func (h *Hub) closeRoom(id string) {
 	h.closer <- id
+	h.mutex.Lock()
 	delete(h.rooms, id)
+	h.mutex.Unlock()
 }
