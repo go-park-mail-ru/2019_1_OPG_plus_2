@@ -98,15 +98,15 @@
       "file": "info.log"
     },
     "warn": {
-      "mode": "warn",
+      "mode": "file",
       "file": "warn.log"
     },
     "err": {
-      "mode": "err",
+      "mode": "file",
       "file": "err.log"
     },
     "access": {
-      "mode": "access",
+      "mode": "file",
       "file": "access.log"
     },
     "fatal": {
