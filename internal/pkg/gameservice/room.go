@@ -3,10 +3,13 @@ package gameservice
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"2019_1_OPG_plus_2/internal/pkg/models"
 	"2019_1_OPG_plus_2/internal/pkg/tsLogger"
 )
+
+var timeToKillRoom = 3 * time.Minute
 
 type Message struct {
 	msg      []byte
@@ -18,6 +21,7 @@ type Room struct {
 	id        string
 	hub       *Hub
 	clients   map[*Client]bool
+	timer     *time.Timer
 
 	// channel which messages are broadcasted from
 	messageHandler chan Message
@@ -44,6 +48,7 @@ func newRoom(hub *Hub, id string) *Room {
 		maxPlayersNum:     2,
 		currentPlayersNum: 0,
 		win:               false,
+		timer:             time.NewTimer(timeToKillRoom),
 	}
 	r.gameModel = NewGameModel(r)
 	return r
@@ -64,17 +69,20 @@ func (r *Room) Run() {
 	for {
 		select {
 		case client := <-r.register:
+			r.timer.Reset(timeToKillRoom)
 			if !(r.currentPlayersNum >= r.maxPlayersNum) {
 				r.clients[client] = true
 				r.currentPlayersNum++
 			}
 		case client := <-r.unregister:
+			r.timer.Reset(timeToKillRoom)
 			if _, ok := r.clients[client]; ok {
 				delete(r.clients, client)
 				close(client.send)
 				r.currentPlayersNum--
 			}
 		case message := <-r.messageHandler:
+			r.timer.Reset(timeToKillRoom)
 			m, err := r.handleMessage(message)
 			if err != nil {
 				var bMsg = NewBroadcastErrorMessage(err.Error())
@@ -86,6 +94,8 @@ func (r *Room) Run() {
 			if r.win {
 				r.hub.closeRoom(r.id)
 			}
+		case <-r.timer.C:
+			r.hub.closeRoom(r.id)
 		case id := <-r.hub.closer:
 			if id == r.id {
 				for client := range r.clients {
