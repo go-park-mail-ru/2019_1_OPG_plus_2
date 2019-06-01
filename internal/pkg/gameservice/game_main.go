@@ -17,9 +17,8 @@ type Service struct {
 	upgrader websocket.Upgrader
 }
 
-func NewService(hub *Hub, log *tsLogger.TSLogger) *Service {
-	return &Service{
-		Hub: hub,
+func NewService(log *tsLogger.TSLogger) *Service {
+	s := &Service{
 		Log: log,
 		upgrader: websocket.Upgrader{
 			ReadBufferSize:  1024,
@@ -29,6 +28,9 @@ func NewService(hub *Hub, log *tsLogger.TSLogger) *Service {
 			},
 		},
 	}
+	hub := NewHub(s)
+	s.Hub = hub
+	return s
 }
 
 // TODO: update users' score mechanics
@@ -88,6 +90,7 @@ func (s *Service) ConnectionEndpoint(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 	if id == "" {
 		s.Log.LogWarn("could not parse %q", id)
+		models.Send(w, http.StatusBadRequest, models.IncorrectQueryParams)
 		return
 	}
 	if s.Hub.rooms[id] == nil {
@@ -108,7 +111,7 @@ func (s *Service) CreateRoom(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 	if id == "" {
 		s.Log.LogWarn("could not parse %q", id)
-		w.WriteHeader(http.StatusBadRequest)
+		models.Send(w, http.StatusBadRequest, models.IncorrectQueryParams)
 		return
 	}
 	room := newRoom(s.Hub, id)
@@ -130,13 +133,16 @@ func (s *Service) CreateRoom(w http.ResponseWriter, r *http.Request) {
 func (s *Service) DeleteRoom(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 	if id == "" {
-		s.Log.LogWarn("could not parse %q", id)
+		models.Send(w, http.StatusBadRequest, models.IncorrectQueryParams)
 		return
 	}
-
+	s.Hub.mutex.RLock()
 	if s.Hub.rooms[id] == nil {
-		models.Send(w, http.StatusNotFound, models.NotFound)
+		models.Send(w, http.StatusNotFound, models.GetNotFoundRoomAnswer(id))
+		s.Hub.mutex.RUnlock()
+		return
 	}
+	s.Hub.mutex.RUnlock()
 	s.Log.LogTrace("CLOSING ROOM %q", id)
 	s.Hub.closeRoom(id)
 
@@ -145,6 +151,7 @@ func (s *Service) DeleteRoom(w http.ResponseWriter, r *http.Request) {
 
 func (s *Service) ListRooms(w http.ResponseWriter, r *http.Request) {
 	roomsOnline := models.RoomsOnlineMessage{}
+	s.Hub.mutex.RLock()
 	for k, v := range s.Hub.rooms {
 		room := models.RoomData{
 			Id:         k,
@@ -153,6 +160,7 @@ func (s *Service) ListRooms(w http.ResponseWriter, r *http.Request) {
 		}
 		roomsOnline.RoomsOnline = append(roomsOnline.RoomsOnline, room)
 	}
+	s.Hub.mutex.RUnlock()
 
 	models.Send(w, http.StatusOK, roomsOnline)
 }
@@ -161,15 +169,17 @@ func (s *Service) GetFreeRoom(w http.ResponseWriter, r *http.Request) {
 	var freeRoom string
 	found := false
 	for k, v := range s.Hub.rooms {
+		s.Hub.mutex.RLock()
 		if v.currentPlayersNum < v.maxPlayersNum {
 			found = true
 			freeRoom = k
 		}
+		s.Hub.mutex.RUnlock()
 	}
 
 	var room *Room
 	if !found {
-		freeRoomId, err := randomgenerator.RandomString(6)
+		freeRoomId, err := randomgenerator.RandomString(5)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = fmt.Fprint(w, err)
@@ -193,15 +203,18 @@ func (s *Service) GetFreeRoom(w http.ResponseWriter, r *http.Request) {
 	}
 	models.Send(w, http.StatusOK, roomData)
 }
+
 func (s *Service) NewRoom(w http.ResponseWriter, r *http.Request) {
-	freeRoom, err := randomgenerator.RandomString(10)
+	freeRoom, err := randomgenerator.RandomString(5)
 	if err != nil {
 		models.Send(w, http.StatusInternalServerError, models.GetDeveloperErrorAnswer(err.Error()))
+		return
 	}
 	room := newRoom(s.Hub, freeRoom)
 	err = s.Hub.AttachRooms(room)
 	if err != nil {
 		models.Send(w, http.StatusInternalServerError, models.GetDeveloperErrorAnswer(err.Error()))
+		return
 	}
 	var roomData = models.RoomData{
 		Id:         room.id,

@@ -1,5 +1,7 @@
 package models
 
+import "fmt"
+
 // TODO
 //go generate: easyjson -all
 
@@ -170,4 +172,16 @@ var ImpossibleReadFileAnswer = MessageAnswer{
 var ImpossibleSaveFileAnswer = MessageAnswer{
 	Status:  303,
 	Message: "impossible save file",
+}
+
+var IncorrectQueryParams = MessageAnswer{
+	Status:  401,
+	Message: "incorrect query params",
+}
+
+func GetNotFoundRoomAnswer(id string) MessageAnswer {
+	return MessageAnswer{
+		Status:  402,
+		Message: fmt.Sprintf("Room %v not found", id),
+	}
 }
