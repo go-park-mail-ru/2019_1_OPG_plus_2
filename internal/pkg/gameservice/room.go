@@ -1,6 +1,7 @@
 package gameservice
 
 import (
+	"2019_1_OPG_plus_2/internal/pkg/db"
 	"encoding/json"
 	"fmt"
 	"time"
@@ -9,7 +10,7 @@ import (
 	"2019_1_OPG_plus_2/internal/pkg/tsLogger"
 )
 
-var timeToKillRoom = 3 * time.Minute
+var timeToKillRoom = 1 * time.Minute
 
 type Message struct {
 	msg      []byte
@@ -64,12 +65,14 @@ func (r *Room) Run() {
 	for {
 		select {
 		case client := <-r.register:
+			r.hub.service.Log.LogTrace("Room %v: client registered: %v", r.id, client.username)
 			r.timer.Reset(timeToKillRoom)
 			if !(r.currentPlayersNum >= r.maxPlayersNum) {
 				r.clients[client] = true
 				r.currentPlayersNum++
 			}
 		case client := <-r.unregister:
+			r.hub.service.Log.LogTrace("Room %v: client unregistered: %v", r.id, client.username)
 			r.timer.Reset(timeToKillRoom)
 			if _, ok := r.clients[client]; ok {
 				delete(r.clients, client)
@@ -77,6 +80,8 @@ func (r *Room) Run() {
 				r.currentPlayersNum--
 			}
 		case client := <-r.alertChan:
+			r.hub.service.Log.LogTrace("Room %v: client alert: %v", r.id, client.username)
+			r.timer.Reset(timeToKillRoom)
 			delete(r.clients, client)
 			for k := range r.clients {
 				if k != client {
@@ -92,6 +97,7 @@ func (r *Room) Run() {
 				}
 			}
 		case message := <-r.messageHandler:
+			r.hub.service.Log.LogTrace("Room %v: message: %+v", r.id, message)
 			r.timer.Reset(timeToKillRoom)
 			m, err := r.handleMessage(message)
 			if err != nil {
@@ -105,8 +111,11 @@ func (r *Room) Run() {
 				r.hub.closeRoom(r.id)
 			}
 		case <-r.timer.C:
+			r.hub.service.Log.LogTrace("Room %v: timer fired", r.id)
 			r.hub.closeRoom(r.id)
 		case id := <-r.hub.closer:
+			r.hub.service.Log.LogTrace("Room %v: close", r.id)
+			r.timer.Reset(timeToKillRoom)
 			if id == r.id {
 				var cMsg = NewBroadcastEventMessage("room_close", fmt.Sprintf("room %q closes", r.id))
 				closeMsg, _ := json.Marshal(&cMsg)
@@ -168,6 +177,7 @@ func (r *Room) handleMessage(message Message) ([]byte, error) {
 }
 
 func (r *Room) performGameLogic(message Message) ([]byte, error) {
+	r.hub.service.Log.LogTrace("Room %v: perform game logic", r.id)
 	if !r.gameModel.IsReady() {
 		return nil, fmt.Errorf("room not ready yet")
 	}
@@ -186,8 +196,18 @@ func (r *Room) performGameLogic(message Message) ([]byte, error) {
 		return nil, err
 	}
 	if r.gameModel.Check() {
+		err := db.UpdateScoresAndWinRate(
+			r.gameModel.players[r.gameModel.whoseTurn].Username,
+			r.gameModel.players[(r.gameModel.whoseTurn+1)%2].Username,
+			db.DefaultScoreInc,
+			db.DefaultScoreDec)
+		if err != nil {
+			return nil, err
+		}
 		u := NewBroadcastEventMessage("win", map[string]interface{}{
-			"winner": r.gameModel.players[r.gameModel.whoseTurn],
+			"winner":    r.gameModel.players[r.gameModel.whoseTurn],
+			"score_inc": db.DefaultScoreInc,
+			"score_dec": -db.DefaultScoreDec,
 		})
 		msg, _ = json.Marshal(&u)
 		r.win = true
@@ -210,6 +230,7 @@ func (r *Room) performChatLogic(message Message) ([]byte, error) {
 }
 
 func (r *Room) performRegisterLogic(message Message) ([]byte, error) {
+	r.hub.service.Log.LogTrace("Room %v: perform register logic", r.id)
 	if r.gameModel.IsReady() {
 		return nil, fmt.Errorf("game is already running")
 	}
@@ -244,6 +265,7 @@ func (r *Room) CheckReady() ([]byte, error) {
 		return nil, fmt.Errorf("game is running")
 	}
 	if r.gameModel.IsReady() {
+		r.hub.service.Log.LogTrace("Room %v: ready", r.id)
 		r.gameModel.Init()
 		r.gameModel.running = true
 		var dat = NewBroadcastEventMessage("ready", map[string]interface{}{

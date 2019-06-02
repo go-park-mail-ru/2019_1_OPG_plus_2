@@ -58,7 +58,6 @@ func (c *Client) readPump() {
 	c.conn.SetPongHandler(
 		func(string) error {
 			_ = c.conn.SetReadDeadline(time.Now().Add(pongWait))
-			c.room.alertChan <- c
 			return nil
 		},
 	)
