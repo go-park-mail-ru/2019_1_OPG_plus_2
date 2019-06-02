@@ -26,7 +26,9 @@ var (
 )
 
 type Client struct {
-	username   string
+	username string
+	avatar   string
+
 	room       *Room
 	conn       *websocket.Conn
 	registered bool
@@ -56,7 +58,6 @@ func (c *Client) readPump() {
 	c.conn.SetPongHandler(
 		func(string) error {
 			_ = c.conn.SetReadDeadline(time.Now().Add(pongWait))
-			c.room.alertChan <- c
 			return nil
 		},
 	)
