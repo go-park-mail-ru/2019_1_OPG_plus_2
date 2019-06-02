@@ -242,7 +242,14 @@ func (r *Room) performRegisterLogic(message Message) ([]byte, error) {
 		return nil, err
 	}
 
-	if message.feedback.registered {
+	found := false
+	for _, v := range r.gameModel.players {
+		if message.feedback.username == v.Username {
+			found = true
+		}
+	}
+
+	if message.feedback.registered || found {
 		return nil, fmt.Errorf("already registered")
 	}
 
