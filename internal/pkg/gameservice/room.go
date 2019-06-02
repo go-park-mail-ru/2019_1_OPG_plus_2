@@ -244,7 +244,7 @@ func (r *Room) performRegisterLogic(message Message) ([]byte, error) {
 
 	found := false
 	for _, v := range r.gameModel.players {
-		if message.feedback.username == v.Username {
+		if registerMessage.User == v.Username {
 			found = true
 		}
 	}
