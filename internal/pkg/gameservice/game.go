@@ -156,5 +156,5 @@ func (g *GameModel) GetLocked() []Point {
 
 func (g *GameModel) Init() {
 	g.whoseTurn = randomgenerator.RandomInt(0, len(g.players))
-	g.field = NewFieldModel(false)
+	g.field = NewFieldModel(true)
 }
