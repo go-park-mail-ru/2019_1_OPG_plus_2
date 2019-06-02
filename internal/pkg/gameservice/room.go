@@ -65,7 +65,7 @@ func (r *Room) Run() {
 	for {
 		select {
 		case client := <-r.register:
-			r.hub.service.Log.LogTrace("Room %v: client registered: %v", r.id, client.username)
+			r.hub.service.Log.LogTrace("Room %v: client registered: %v", r.id, client.conn.RemoteAddr())
 			r.timer.Reset(timeToKillRoom)
 			if !(r.currentPlayersNum >= r.maxPlayersNum) {
 				r.clients[client] = true
@@ -202,6 +202,7 @@ func (r *Room) performGameLogic(message Message) ([]byte, error) {
 			db.DefaultScoreInc,
 			db.DefaultScoreDec)
 		if err != nil {
+			r.hub.service.Log.LogErr("Room %v: database err: %v", r.id, err)
 			return nil, err
 		}
 		u := NewBroadcastEventMessage("win", map[string]interface{}{
