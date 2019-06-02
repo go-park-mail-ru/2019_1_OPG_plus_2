@@ -81,7 +81,10 @@ func (r *Room) Run() {
 			for k := range r.clients {
 				if k != client {
 					bcMsg := NewBroadcastEventMessage("win", map[string]interface{}{
-						"winner": k.username,
+						"winner": models.RoomPlayer{
+							Avatar:   k.avatar,
+							Username: k.username,
+						},
 					})
 					breakMsg, _ := json.Marshal(&bcMsg)
 					r.broadcastMsg(breakMsg)
@@ -226,6 +229,7 @@ func (r *Room) performRegisterLogic(message Message) ([]byte, error) {
 		Avatar:   registerMessage.Avatar,
 	})
 	message.feedback.username = registerMessage.User
+	message.feedback.avatar = registerMessage.Avatar
 	message.feedback.registered = true
 
 	if len(r.gameModel.players) == r.maxPlayersNum {

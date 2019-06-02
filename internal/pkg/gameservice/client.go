@@ -26,7 +26,9 @@ var (
 )
 
 type Client struct {
-	username   string
+	username string
+	avatar   string
+
 	room       *Room
 	conn       *websocket.Conn
 	registered bool
