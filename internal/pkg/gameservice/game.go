@@ -135,7 +135,7 @@ func (g *GameModel) DoTurn(a GameMessage) error {
 }
 
 func (g *GameModel) Check() bool {
-	return g.field.freeCells <= 24
+	return g.field.freeCells <= 0
 }
 
 func (g *GameModel) IsReady() bool {
