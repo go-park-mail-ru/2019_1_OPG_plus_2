@@ -1,8 +1,11 @@
 package db
 
+var DefaultScoreInc = 25
+var DefaultScoreDec = 25
+
 func UpdateScoresAndWinRate(winnerNick string, loserNick string, scoreInc int, scoreDec int) error {
 
-	row, err := findRowBy(AuthDbName, AuthUsersTable, "nickname", "id=?", winnerNick)
+	row, err := findRowBy(AuthDbName, AuthUsersTable, "id", "username=?", winnerNick)
 	if err != nil {
 		return err
 	}
@@ -12,7 +15,7 @@ func UpdateScoresAndWinRate(winnerNick string, loserNick string, scoreInc int, s
 		return err
 	}
 
-	row, err = findRowBy(AuthDbName, AuthUsersTable, "nickname", "id=?", loserNick)
+	row, err = findRowBy(AuthDbName, AuthUsersTable, "id", "username=?", loserNick)
 	if err != nil {
 		return err
 	}
