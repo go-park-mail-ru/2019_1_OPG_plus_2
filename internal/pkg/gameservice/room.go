@@ -1,10 +1,16 @@
 package gameservice
 
 import (
-	"2019_1_OPG_plus_2/internal/pkg/tsLogger"
+	"2019_1_OPG_plus_2/internal/pkg/db"
 	"encoding/json"
 	"fmt"
+	"time"
+
+	"2019_1_OPG_plus_2/internal/pkg/models"
+	"2019_1_OPG_plus_2/internal/pkg/tsLogger"
 )
+
+var timeToKillRoom = 1 * time.Minute
 
 type Message struct {
 	msg      []byte
@@ -13,9 +19,10 @@ type Message struct {
 
 type Room struct {
 	gameModel *GameModel
-	id        int
+	id        string
 	hub       *Hub
 	clients   map[*Client]bool
+	timer     *time.Timer
 
 	// channel which messages are broadcasted from
 	messageHandler chan Message
@@ -26,40 +33,72 @@ type Room struct {
 	// Unregister requests from clients.
 	unregister chan *Client
 
+	alertChan chan *Client
+
 	maxPlayersNum     int
 	currentPlayersNum int
 	win               bool
 }
 
-func newRoom(hub *Hub, id int) *Room {
+func newRoom(hub *Hub, id string) *Room {
 	r := &Room{
 		hub:               hub,
 		id:                id,
-		messageHandler:    make(chan Message),
-		register:          make(chan *Client),
-		unregister:        make(chan *Client),
+		messageHandler:    make(chan Message, 1024),
+		register:          make(chan *Client, 2),
+		unregister:        make(chan *Client, 2),
+		alertChan:         make(chan *Client),
 		clients:           make(map[*Client]bool),
 		maxPlayersNum:     2,
 		currentPlayersNum: 0,
+		win:               false,
+		timer:             time.NewTimer(timeToKillRoom),
 	}
 	r.gameModel = NewGameModel(r)
 	return r
 }
 
 func (r *Room) Run() {
+	defer func() {
+		r.timer.Stop()
+	}()
 	for {
 		select {
 		case client := <-r.register:
+			r.hub.service.Log.LogTrace("Room %v: client registered: %v", r.id, client.conn.RemoteAddr())
+			r.timer.Reset(timeToKillRoom)
 			if !(r.currentPlayersNum >= r.maxPlayersNum) {
 				r.clients[client] = true
 				r.currentPlayersNum++
 			}
 		case client := <-r.unregister:
+			r.hub.service.Log.LogTrace("Room %v: client unregistered: %v", r.id, client.username)
+			r.timer.Reset(timeToKillRoom)
 			if _, ok := r.clients[client]; ok {
 				delete(r.clients, client)
 				close(client.send)
+				r.currentPlayersNum--
+			}
+		case client := <-r.alertChan:
+			r.hub.service.Log.LogTrace("Room %v: client alert: %v", r.id, client.username)
+			r.timer.Reset(timeToKillRoom)
+			delete(r.clients, client)
+			for k := range r.clients {
+				if k != client {
+					bcMsg := NewBroadcastEventMessage("win", map[string]interface{}{
+						"winner": models.RoomPlayer{
+							Avatar:   k.avatar,
+							Username: k.username,
+						},
+					})
+					breakMsg, _ := json.Marshal(&bcMsg)
+					r.broadcastMsg(breakMsg)
+					r.hub.closeRoom(r.id)
+				}
 			}
 		case message := <-r.messageHandler:
+			r.hub.service.Log.LogTrace("Room %v: message: %+v", r.id, message)
+			r.timer.Reset(timeToKillRoom)
 			m, err := r.handleMessage(message)
 			if err != nil {
 				var bMsg = NewBroadcastErrorMessage(err.Error())
@@ -71,11 +110,21 @@ func (r *Room) Run() {
 			if r.win {
 				r.hub.closeRoom(r.id)
 			}
+		case <-r.timer.C:
+			r.hub.service.Log.LogTrace("Room %v: timer fired", r.id)
+			r.hub.closeRoom(r.id)
 		case id := <-r.hub.closer:
+			r.hub.service.Log.LogTrace("Room %v: close", r.id)
+			r.timer.Reset(timeToKillRoom)
 			if id == r.id {
+				var cMsg = NewBroadcastEventMessage("room_close", fmt.Sprintf("room %q closes", r.id))
+				closeMsg, _ := json.Marshal(&cMsg)
+
 				for client := range r.clients {
+					client.send <- closeMsg
 					close(client.send)
 					delete(r.clients, client)
+					r.currentPlayersNum--
 				}
 				return
 			}
@@ -92,8 +141,7 @@ func (r *Room) broadcastMsg(message []byte) {
 		select {
 		case client.send <- message:
 		default:
-			close(client.send)
-			delete(r.clients, client)
+			r.alertChan <- client
 		}
 	}
 }
@@ -101,7 +149,7 @@ func (r *Room) broadcastMsg(message []byte) {
 func (r *Room) handleMessage(message Message) ([]byte, error) {
 	var msg GenericMessage
 	err := json.Unmarshal(message.msg, &msg)
-	tsLogger.Logger.LogInfo("ROOM %d: %+v", r.id, msg)
+	tsLogger.LogInfo("ROOM %q: %+v", r.id, msg)
 	if err != nil {
 		return nil, fmt.Errorf("JSON parsing: " + err.Error())
 	}
@@ -129,6 +177,7 @@ func (r *Room) handleMessage(message Message) ([]byte, error) {
 }
 
 func (r *Room) performGameLogic(message Message) ([]byte, error) {
+	r.hub.service.Log.LogTrace("Room %v: perform game logic", r.id)
 	if !r.gameModel.IsReady() {
 		return nil, fmt.Errorf("room not ready yet")
 	}
@@ -138,7 +187,7 @@ func (r *Room) performGameLogic(message Message) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	if gameAction.User != r.gameModel.players[r.gameModel.whoseTurn] {
+	if gameAction.User != r.gameModel.players[r.gameModel.whoseTurn].Username {
 		return nil, fmt.Errorf("it's not your turn")
 	}
 
@@ -147,8 +196,19 @@ func (r *Room) performGameLogic(message Message) ([]byte, error) {
 		return nil, err
 	}
 	if r.gameModel.Check() {
+		err := db.UpdateScoresAndWinRate(
+			r.gameModel.players[r.gameModel.whoseTurn].Username,
+			r.gameModel.players[(r.gameModel.whoseTurn+1)%2].Username,
+			db.DefaultScoreInc,
+			db.DefaultScoreDec)
+		if err != nil {
+			r.hub.service.Log.LogErr("Room %v: database err: %v", r.id, err)
+			return nil, err
+		}
 		u := NewBroadcastEventMessage("win", map[string]interface{}{
-			"winner": r.gameModel.players[r.gameModel.whoseTurn],
+			"winner":    r.gameModel.players[r.gameModel.whoseTurn],
+			"score_inc": db.DefaultScoreInc,
+			"score_dec": -db.DefaultScoreDec,
 		})
 		msg, _ = json.Marshal(&u)
 		r.win = true
@@ -171,6 +231,7 @@ func (r *Room) performChatLogic(message Message) ([]byte, error) {
 }
 
 func (r *Room) performRegisterLogic(message Message) ([]byte, error) {
+	r.hub.service.Log.LogTrace("Room %v: perform register logic", r.id)
 	if r.gameModel.IsReady() {
 		return nil, fmt.Errorf("game is already running")
 	}
@@ -181,11 +242,23 @@ func (r *Room) performRegisterLogic(message Message) ([]byte, error) {
 		return nil, err
 	}
 
-	if message.feedback.registered {
+	found := false
+	for _, v := range r.gameModel.players {
+		if registerMessage.User == v.Username {
+			found = true
+		}
+	}
+
+	if message.feedback.registered || found {
 		return nil, fmt.Errorf("already registered")
 	}
 
-	r.gameModel.players = append(r.gameModel.players, registerMessage.User)
+	r.gameModel.players = append(r.gameModel.players, models.RoomPlayer{
+		Username: registerMessage.User,
+		Avatar:   registerMessage.Avatar,
+	})
+	message.feedback.username = registerMessage.User
+	message.feedback.avatar = registerMessage.Avatar
 	message.feedback.registered = true
 
 	if len(r.gameModel.players) == r.maxPlayersNum {
@@ -200,12 +273,15 @@ func (r *Room) CheckReady() ([]byte, error) {
 		return nil, fmt.Errorf("game is running")
 	}
 	if r.gameModel.IsReady() {
+		r.hub.service.Log.LogTrace("Room %v: ready", r.id)
 		r.gameModel.Init()
 		r.gameModel.running = true
 		var dat = NewBroadcastEventMessage("ready", map[string]interface{}{
+			"field":       r.gameModel.GetField(),
+			"locked":      r.gameModel.GetLocked(),
 			"players_num": r.currentPlayersNum,
 			"players":     r.gameModel.players,
-			"whose_turn":  r.gameModel.players[r.gameModel.whoseTurn],
+			"whose_turn":  r.gameModel.players[r.gameModel.whoseTurn].Username,
 		})
 		m, _ := json.Marshal(&dat)
 		return m, nil

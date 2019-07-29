@@ -1,8 +1,10 @@
-package server
+package coreserver
 
 import (
-	"2019_1_OPG_plus_2/internal/pkg/gameservice"
+	"2019_1_OPG_plus_2/internal/pkg/monitoring"
 	"2019_1_OPG_plus_2/internal/pkg/tsLogger"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -21,23 +23,29 @@ type Params struct {
 	Port string
 }
 
-var logger = tsLogger.Logger
-
-func init() {
-	logger.Run()
-}
-
 func StartApp(params Params) error {
-	//fmt.Println("Server starting at " + params.Port)
-	logger.LogTrace("Server starting at " + params.Port)
+	tsLogger.Logger.Run()
 
 	if err := db.Open(); err != nil {
-		//fmt.Println(err.Error())
-		logger.LogErr("%v", err)
+		tsLogger.LogErr("%v", err)
 	}
 
-	a.SetStorages(user.NewStorage(), auth.NewStorage())
-	a.SetHandlers(controllers.NewUserHandlers(), controllers.NewAuthHandlers(), controllers.NewVkAuthHandlers())
+	a.SetStorages(
+		user.NewStorage(),
+		auth.NewStorage(),
+	)
+
+	a.SetHandlers(
+		controllers.NewUserHandlers(),
+		controllers.NewAuthHandlers(),
+		controllers.NewVkAuthHandlers(),
+	)
+
+	prometheus.MustRegister(
+		monitoring.ActiveRooms,
+		monitoring.ActiveConns,
+		monitoring.AccessSummary,
+	)
 
 	router := mux.NewRouter()
 	apiRouter := router.PathPrefix("/api").Subrouter()
@@ -45,12 +53,14 @@ func StartApp(params Params) error {
 	router.Use(middleware.CorsMiddleware)
 	router.Use(middleware.PanicMiddleware)
 
+	router.Handle("/metrics", promhttp.Handler())
 	router.HandleFunc("/", controllers.MainHandler)
 	router.PathPrefix("/docs").Handler(httpSwagger.WrapHandler)
 
 	apiRouter.Use(middleware.AuthMiddleware)
 	apiRouter.Use(middleware.ApplyJsonContentType)
-	apiRouter.Use(middleware.RequestLoggingMiddleware)
+	apiRouter.Use(middleware.AccessMonitoringMiddleware)
+	//apiRouter.Use(middleware.AccessLoggingMiddleware)
 
 	apiRouter.HandleFunc("/", controllers.IndexApiHandler)
 
@@ -69,25 +79,21 @@ func StartApp(params Params) error {
 
 	apiRouter.HandleFunc("/users", controllers.GetScoreboard).Methods("GET", "OPTIONS")
 
-	gameRouter := router.PathPrefix("/game").Subrouter()
-
-	router.PathPrefix("/static").Handler(http.StripPrefix(
-		"/static",
+	router.PathPrefix("/upload").Handler(http.StripPrefix(
+		"/upload",
 		http.FileServer(http.Dir(controllers.StaticPath)),
 	))
 
 	//apiRouter.HandleFunc("/vk_login", a.GetHandlers().OAuth.Login1stStageRetrieveCode)
 	//apiRouter.HandleFunc("/callback", a.GetHandlers().OAuth.Login2ndStageRetrieveTokenGetData)
-	gameservice.AddGameServicePaths(gameRouter)
 
+	tsLogger.LogTrace("Server starting at " + params.Port)
 	return http.ListenAndServe(":"+params.Port, router)
 }
 
 func StopApp() {
-	//fmt.Println("Stopping server...")
-	logger.LogTrace("Stopping server...")
+	tsLogger.LogTrace("Stopping core...")
 	if err := db.Close(); err != nil {
-		//fmt.Println(err.Error())
-		logger.LogErr("%s", err)
+		tsLogger.LogErr("%s", err)
 	}
 }

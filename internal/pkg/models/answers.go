@@ -1,5 +1,10 @@
 package models
 
+import "fmt"
+
+// TODO
+//go generate: easyjson -all
+
 // 100-199 - success answer
 // 200-299 - incorrect answer because of the user
 // 300-399 - incorrect answer because developers
@@ -30,7 +35,7 @@ type ScoreboardAnswer struct {
 type UploadAvatarAnswer struct {
 	Status  int    `json:"status, int" example:"108"`
 	Message string `json:"message, string" example:"avatar uploaded"`
-	Data    string `json:"data" example:"/static/1.jpg"`
+	Data    string `json:"data" example:"/upload/1.jpg"`
 }
 
 /* SUCCESS ANSWERS */
@@ -103,7 +108,7 @@ var UserRemovedAnswer = MessageAnswer{
 // func GetUserErrorAnswer(error string) *MessageAnswer {
 // 	return &MessageAnswer{
 // 		Status:  200,
-// 		Message: error,
+// 		ChatMessage: error,
 // 	}
 // }
 
@@ -167,4 +172,16 @@ var ImpossibleReadFileAnswer = MessageAnswer{
 var ImpossibleSaveFileAnswer = MessageAnswer{
 	Status:  303,
 	Message: "impossible save file",
+}
+
+var IncorrectQueryParams = MessageAnswer{
+	Status:  401,
+	Message: "incorrect query params",
+}
+
+func GetNotFoundRoomAnswer(id string) MessageAnswer {
+	return MessageAnswer{
+		Status:  402,
+		Message: fmt.Sprintf("Room %v not found", id),
+	}
 }

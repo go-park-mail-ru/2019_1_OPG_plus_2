@@ -1,0 +1,117 @@
+{
+  "oauth": {
+    "vk": {
+      "app_id": "6924682",
+      "app_key": "UE7pR5HINrm6zsM3S29I",
+      "app_secret": "70ed7b1c70ed7b1c70ed7b1cee7084d296770ed70ed7b1c2c4e3f65fc4e4f266a56dfb8"
+    }
+  },
+  "db": {
+    "auth_db_name": "colors_auth",
+    "auth_users_table": "users",
+    "core_db_name": "colors_core",
+    "core_users_table": "users",
+    "chat_db_name": "colors_chat",
+    "chat_messages_table": "messages",
+    "chat_types_table": "types",
+    "envs": {
+      "default": {
+        "env": false,
+        "host": "",
+        "port": "3306",
+        "username": "colors",
+        "password": "colors"
+      },
+      "IN_DOCKER_NET": {
+        "env": false,
+        "host": "colors-db",
+        "port": "3306",
+        "username": "root",
+        "password": "root"
+      },
+      "USE_DOCKER_DB": {
+        "env": false,
+        "host": "",
+        "port": "12345",
+        "username": "root",
+        "password": "root"
+      },
+      "PRODUCTION": {
+        "env": true,
+        "host": "DB_HOST",
+        "port": "DB_PORT",
+        "username": "DB_USERNAME",
+        "password": "DB_PASSWORD"
+      }
+    },
+    "auth_test_db": "colors_auth_test",
+    "core_test_db": "colors_core_test"
+  },
+  "auth": {
+    "secret": "this_is_key_will_be_used_in_production",
+    "envs": {
+      "IN_DOCKER_NET": {
+        "service_location": "colors-back-auth",
+        "port": "50242",
+        "cookie_service_location": "colors-back-cookie",
+        "cookie_service_port": "50243"
+      },
+      "default": {
+        "service_location": "127.0.0.1",
+        "port": "50242",
+        "cookie_service_location": "127.0.0.1",
+        "cookie_service_port": "50243"
+      }
+    }
+  },
+  "game": {
+    "envs":{
+      "IN_DOCKER_NET": {
+        "service_location": "colors-back-game",
+        "port": "8004"
+      },
+      "default": {
+        "service_location": "127.0.0.1",
+        "port": "8004"
+      }
+    }
+  },
+  "chat": {
+    "envs": {
+      "IN_DOCKER_NET": {
+        "service_location": "colors-back-chat",
+        "port": "8003"
+      },
+      "default": {
+        "service_location": "127.0.0.1",
+        "port": "8003"
+      }
+    }
+  },
+  "logging": {
+    "trace": {
+      "mode": "prompt",
+      "file": ".log"
+    },
+    "info": {
+      "mode": "suppress",
+      "file": "info.log"
+    },
+    "warn": {
+      "mode": "prompt",
+      "file": ".log"
+    },
+    "err": {
+      "mode": "prompt",
+      "file": ".log"
+    },
+    "access": {
+      "mode": "prompt",
+      "file": ".log"
+    },
+    "fatal": {
+      "mode": "prompt",
+      "file": ".log"
+    }
+  }
+}

@@ -1,8 +1,10 @@
 package controllers
 
+import "2019_1_OPG_plus_2/internal/pkg/config"
+
 // some constants for VK authorization service
-const (
-	AppId     = "6924682"
-	AppKey    = "UE7pR5HINrm6zsM3S29I"
-	AppSecret = "70ed7b1c70ed7b1c70ed7b1cee7084d296770ed70ed7b1c2c4e3f65fc4e4f266a56dfb8"
+var (
+	AppId     = config.VkOAuth.AppId
+	AppKey    = config.VkOAuth.AppKey
+	AppSecret = config.VkOAuth.AppSecret
 )

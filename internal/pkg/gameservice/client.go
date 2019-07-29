@@ -3,7 +3,6 @@ package gameservice
 import (
 	"bytes"
 	"github.com/gorilla/websocket"
-	"log"
 	"time"
 )
 
@@ -27,6 +26,9 @@ var (
 )
 
 type Client struct {
+	username string
+	avatar   string
+
 	room       *Room
 	conn       *websocket.Conn
 	registered bool
@@ -49,16 +51,22 @@ func (c *Client) readPump() {
 		_ = c.conn.Close()
 	}()
 	c.conn.SetReadLimit(maxMessageSize)
-	_ = c.conn.SetReadDeadline(time.Now().Add(pongWait))
-	c.conn.SetPongHandler(func(string) error {
-		_ = c.conn.SetReadDeadline(time.Now().Add(pongWait))
-		return nil
-	})
+	err := c.conn.SetReadDeadline(time.Now().Add(pongWait))
+	if err != nil {
+		return
+	}
+	c.conn.SetPongHandler(
+		func(string) error {
+			_ = c.conn.SetReadDeadline(time.Now().Add(pongWait))
+			return nil
+		},
+	)
 	for {
 		_, message, err := c.conn.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				log.Printf("error: %v", err)
+				c.room.alertChan <- c
+				return
 			}
 			break
 		}
@@ -89,11 +97,13 @@ func (c *Client) writePump() {
 			if !ok {
 				// The room closed the channel.
 				_ = c.conn.WriteMessage(websocket.CloseMessage, []byte{})
+				c.room.alertChan <- c
 				return
 			}
 
 			w, err := c.conn.NextWriter(websocket.TextMessage)
 			if err != nil {
+				c.room.alertChan <- c
 				return
 			}
 			_, _ = w.Write(message)
@@ -111,6 +121,7 @@ func (c *Client) writePump() {
 		case <-ticker.C:
 			_ = c.conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
+				c.room.alertChan <- c
 				return
 			}
 		}

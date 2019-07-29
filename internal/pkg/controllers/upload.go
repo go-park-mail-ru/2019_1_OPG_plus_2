@@ -14,7 +14,7 @@ import (
 
 const mByte = 1 << 20
 
-var StaticPath, _ = filepath.Abs("./static")
+var StaticPath, _ = filepath.Abs("./upload")
 var fileVault = fileStorage.NewLocalFileStorage(StaticPath)
 
 func isImage(header textproto.MIMEHeader) bool {
@@ -23,9 +23,9 @@ func isImage(header textproto.MIMEHeader) bool {
 
 // UploadAvatar godoc
 // @title Upload new avatar
-// @summary Saves new avatar image of client's User
-// @description This method saves avatar image in server storage and sets it as clients User avatar
-// @tags User
+// @summary Saves new avatar image of client's user
+// @description This method saves avatar image in core storage and sets it as clients user avatar
+// @tags user
 // @accept png
 // @accept jpeg
 // @produce json
@@ -67,7 +67,7 @@ func UploadAvatar(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	url := "/static/" + newName + "." + ext
+	url := "/upload/" + newName + "." + ext
 	err = db.ProfileUpdateAvatar(jwtData(r).Id, url)
 	if err != nil {
 		models.Send(w, http.StatusInternalServerError, models.GetDeveloperErrorAnswer(err.Error()))

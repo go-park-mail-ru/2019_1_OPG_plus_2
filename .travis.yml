@@ -1,26 +1,52 @@
 sudo: false
-
 language: go
 
+cache: false
 go:
   - 1.11.x
 
 services: docker
 
+deploy:
+  - provider: script
+    skip_cleanup: true
+    script: bash build/deploy_development.sh
+    on:
+      branch: dev
+
+  - provider: script
+    skip_cleanup: true
+    script: bash build/deploy_production.sh
+    on:
+      branch: production
+
 env:
-  - GO111MODULE=on USE_DOCKER_DB=on
+  - GO111MODULE=on
+    COLORS_DB=USE_DOCKER_DB
+    COLORS_CONFIG_PATH="$GOPATH/src/github.com/go-park-mail-ru/2019_1_OPG_plus_2/"
 
 install: true
 
 before_script:
   - go mod tidy
-  - go get github.com/golangci/golangci-lint/cmd/golangci-lint
-  - cd build && ./initial.sh && ./db_run_container.sh && cd ..
-
+  - curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh |
+    sh -s -- -b $(go env GOPATH)/bin v1.16.0
+  - cd build
+  - bash initial.sh
+  - bash run_container_db.sh
+  - bash run_container_cookie.sh
+  - bash run_container_auth.sh -t
+  - cd ..
 script:
-  - go build cmd/server/main.go
+  - go build -i cmd/core/core_server.go
+  - go build -i cmd/auth/auth_server.go
+  - go build -i cmd/game/game_server.go
+  - go build -i cmd/chat/chat_server.go
+  - go build -i cmd/cookiechecker/cookiechecker_server.go
   - go test -v -race ./...
   - golangci-lint run -c .golangci.yml
-
-after_script:
-  - cd build && ./clear_up_containers.sh & cd ..
+before_install:
+  - openssl aes-256-cbc -K $encrypted_dae2c75bd644_key -iv $encrypted_dae2c75bd644_iv
+    -in deploy_key_development.enc -out ./deploy_key_development -d
+  - openssl aes-256-cbc -K $encrypted_4df2aebce859_key -iv $encrypted_4df2aebce859_iv
+    -in deploy_key_production.enc -out ./deploy_key_production -d

@@ -1,3 +1,4 @@
+basePath: /api
 definitions:
   models.IncorrectFieldsAnswer:
     properties:
@@ -9,10 +10,10 @@ definitions:
           type: string
         type: array
       message:
-        example: Query processed successfully
+        example: incorrect fields
         type: string
       status:
-        example: 200
+        example: 204
         type: integer
     type: object
   models.MessageAnswer:
@@ -21,7 +22,7 @@ definitions:
         example: ok
         type: string
       status:
-        example: 200
+        example: 100
         type: integer
     type: object
   models.RemoveUserData:
@@ -54,7 +55,7 @@ definitions:
         example: Qwerty123
         type: string
     type: object
-  models.SingUpData:
+  models.SignUpData:
     properties:
       email:
         example: user_test@test.com
@@ -84,6 +85,18 @@ definitions:
         example: user_test
         type: string
     type: object
+  models.UploadAvatarAnswer:
+    properties:
+      data:
+        example: /upload/1.jpg
+        type: string
+      message:
+        example: avatar uploaded
+        type: string
+      status:
+        example: 108
+        type: integer
+    type: object
   models.UserData:
     properties:
       avatar:
@@ -107,28 +120,35 @@ definitions:
       win:
         type: integer
     type: object
-  models.UserDataAnswerMessage:
+  models.UserDataAnswer:
     properties:
       data:
         $ref: '#/definitions/models.UserData'
         type: object
       message:
-        example: ok
+        example: user found
         type: string
       status:
-        example: 200
+        example: 105
         type: integer
     type: object
+host: localhost:8002
 info:
-  contact: {}
-  license: {}
+  contact:
+    email: nikolsky.dan@gmail.com
+    name: '@DanikNik'
+  description: Game based on filling field with color cells
+  license:
+    name: Apache 2.0
+  title: Colors service API by OPG+2
+  version: "1.0"
 paths:
   /avatar:
     post:
       consumes:
       - image/png
       - image/jpeg
-      description: This method saves avatar image in server storage and sets it as
+      description: This method saves avatar image in core storage and sets it as
         clients user avatar
       produces:
       - application/json
@@ -136,7 +156,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.MessageAnswer'
+            $ref: '#/definitions/models.UploadAvatarAnswer'
             type: object
         "400":
           description: Bad Request
@@ -188,7 +208,7 @@ paths:
             type: object
       summary: Updates user password
       tags:
-      - auth
+      - Auth
   /session:
     delete:
       description: This method logs user out and deletes cookie
@@ -207,7 +227,7 @@ paths:
             type: object
       summary: Logs user out
       tags:
-      - auth
+      - Auth
     get:
       description: This method checks whether user is signed in or signed out
       produces:
@@ -225,7 +245,7 @@ paths:
             type: object
       summary: Checks user session
       tags:
-      - auth
+      - Auth
     post:
       consumes:
       - application/json
@@ -263,7 +283,7 @@ paths:
             type: object
       summary: Grants client access
       tags:
-      - auth
+      - Auth
   /user:
     delete:
       description: This method deletes all information about user, making a query,
@@ -299,21 +319,21 @@ paths:
           schema:
             $ref: '#/definitions/models.MessageAnswer'
             type: object
-      summary: Deletes user and user of client
+      summary: Deletes user and profile of client
       tags:
       - user
     post:
       consumes:
       - application/json
-      description: This method creates records about new user in auth-bd and user-db
+      description: This method creates records about new user in Auth-bd and user-db
         and then sends cookie to user in order to identify
       parameters:
-      - description: User data
+      - description: user data
         in: body
         name: profile_data
         required: true
         schema:
-          $ref: '#/definitions/models.SingUpData'
+          $ref: '#/definitions/models.SignUpData'
           type: object
       produces:
       - application/json
@@ -349,10 +369,10 @@ paths:
     put:
       consumes:
       - application/json
-      description: This method updates info in profile and auth-db record of user,
+      description: This method updates info in profile and Auth-db record of user,
         who is making a query
       parameters:
-      - description: User new profile data
+      - description: user new profile data
         in: body
         name: profile_data
         required: true
@@ -391,7 +411,7 @@ paths:
       - application/json
       description: This method provides client with user data, matching required ID
       parameters:
-      - description: ProfileData ID, if none, returned logged in user
+      - description: users ID, if none, returned logged in user
         in: path
         name: id
         type: integer
@@ -401,7 +421,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.UserDataAnswerMessage'
+            $ref: '#/definitions/models.UserDataAnswer'
             type: object
         "400":
           description: Bad Request
@@ -451,3 +471,4 @@ paths:
       summary: Produces scoreboard page with {limit} and {offset}
       tags:
       - scoreboard
+swagger: "2.0"

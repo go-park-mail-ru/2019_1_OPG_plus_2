@@ -1,12 +1,19 @@
 {
+    "swagger": "2.0",
     "info": {
-        "contact": {},
-        "license": {
-            "name": ""
+        "description": "Game based on filling field with color cells",
+        "title": "Colors service API by OPG+2",
+        "contact": {
+            "name": "@DanikNik",
+            "email": "nikolsky.dan@gmail.com"
         },
-        "title": "",
-        "version": ""
+        "license": {
+            "name": "Apache 2.0"
+        },
+        "version": "1.0"
     },
+    "host": "localhost:8002",
+    "basePath": "/api",
     "paths": {
         "/avatar": {
             "post": {
@@ -27,7 +34,7 @@
                         "description": "OK",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.MessageAnswer"
+                            "$ref": "#/definitions/models.UploadAvatarAnswer"
                         }
                     },
                     "400": {
@@ -54,7 +61,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "Auth"
                 ],
                 "summary": "Updates user password",
                 "parameters": [
@@ -108,7 +115,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "Auth"
                 ],
                 "summary": "Checks user session",
                 "responses": {
@@ -137,7 +144,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "Auth"
                 ],
                 "summary": "Grants client access",
                 "parameters": [
@@ -189,7 +196,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "Auth"
                 ],
                 "summary": "Logs user out",
                 "responses": {
@@ -212,7 +219,7 @@
         },
         "/user": {
             "put": {
-                "description": "This method updates info in profile and auth-db record of user, who is making a query",
+                "description": "This method updates info in profile and Auth-db record of user, who is making a query",
                 "consumes": [
                     "application/json"
                 ],
@@ -225,7 +232,7 @@
                 "summary": "Updates client's user",
                 "parameters": [
                     {
-                        "description": "User new profile data",
+                        "description": "user new profile data",
                         "name": "profile_data",
                         "in": "body",
                         "required": true,
@@ -267,7 +274,7 @@
                 }
             },
             "post": {
-                "description": "This method creates records about new user in auth-bd and user-db and then sends cookie to user in order to identify",
+                "description": "This method creates records about new user in Auth-bd and user-db and then sends cookie to user in order to identify",
                 "consumes": [
                     "application/json"
                 ],
@@ -280,13 +287,13 @@
                 "summary": "Registers user",
                 "parameters": [
                     {
-                        "description": "User data",
+                        "description": "user data",
                         "name": "profile_data",
                         "in": "body",
                         "required": true,
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.SingUpData"
+                            "$ref": "#/definitions/models.SignUpData"
                         }
                     }
                 ],
@@ -336,7 +343,7 @@
                 "tags": [
                     "user"
                 ],
-                "summary": "Deletes user and user of client",
+                "summary": "Deletes user and profile of client",
                 "parameters": [
                     {
                         "description": "Info required to remove current user",
@@ -397,10 +404,9 @@
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "ProfileData ID, if none, returned logged in user",
+                        "description": "users ID, if none, returned logged in user",
                         "name": "id",
-                        "in": "path",
-                        "required": true
+                        "in": "path"
                     }
                 ],
                 "responses": {
@@ -408,7 +414,7 @@
                         "description": "OK",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.UserDataAnswerMessage"
+                            "$ref": "#/definitions/models.UserDataAnswer"
                         }
                     },
                     "400": {
@@ -496,11 +502,11 @@
                 },
                 "message": {
                     "type": "string",
-                    "example": "Query processed successfully"
+                    "example": "incorrect fields"
                 },
                 "status": {
                     "type": "integer",
-                    "example": 200
+                    "example": 204
                 }
             }
         },
@@ -513,7 +519,7 @@
                 },
                 "status": {
                     "type": "integer",
-                    "example": 200
+                    "example": 100
                 }
             }
         },
@@ -560,7 +566,7 @@
                 }
             }
         },
-        "models.SingUpData": {
+        "models.SignUpData": {
             "type": "object",
             "properties": {
                 "email": {
@@ -603,6 +609,23 @@
                 }
             }
         },
+        "models.UploadAvatarAnswer": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "string",
+                    "example": "/upload/1.jpg"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "avatar uploaded"
+                },
+                "status": {
+                    "type": "integer",
+                    "example": 108
+                }
+            }
+        },
         "models.UserData": {
             "type": "object",
             "properties": {
@@ -636,7 +659,7 @@
                 }
             }
         },
-        "models.UserDataAnswerMessage": {
+        "models.UserDataAnswer": {
             "type": "object",
             "properties": {
                 "data": {
@@ -645,14 +668,13 @@
                 },
                 "message": {
                     "type": "string",
-                    "example": "ok"
+                    "example": "user found"
                 },
                 "status": {
                     "type": "integer",
-                    "example": 200
+                    "example": 105
                 }
             }
         }
-    },
-    "swagger": "2.0"
+    }
 }

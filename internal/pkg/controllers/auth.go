@@ -21,8 +21,8 @@ type AuthHandlers struct{}
 
 // IsAuth godoc
 // @title Check session
-// @summary Checks User session
-// @description This method checks whether User is signed in or signed out
+// @summary Checks user session
+// @description This method checks whether user is signed in or signed out
 // @tags Auth
 // @produce json
 // @success 200 {object} models.MessageAnswer
@@ -39,7 +39,7 @@ func (*AuthHandlers) IsAuth(w http.ResponseWriter, r *http.Request) {
 // SignIn godoc
 // @title Sign in
 // @summary Grants client access
-// @description This method logs User in and sets cookie
+// @description This method logs user in and sets cookie
 // @tags Auth
 // @accept json
 // @produce json
@@ -66,11 +66,19 @@ func (*AuthHandlers) SignIn(w http.ResponseWriter, r *http.Request) {
 	jwtData, err, fields := a.GetStorages().Auth.SignIn(signInData)
 	if err != nil {
 		if fields != nil {
-			models.Send(w, http.StatusBadRequest, models.GetIncorrectFieldsAnswer(fields))
+			if err == models.FieldsError {
+				models.Send(w, http.StatusBadRequest, models.GetIncorrectFieldsAnswer(fields))
+			} else {
+				models.Send(w, http.StatusBadRequest, &models.IncorrectFieldsAnswer{
+					Status:  200,
+					Message: err.Error(),
+					Data:    fields,
+				})
+			}
 			return
 		}
 		models.Send(w, http.StatusInternalServerError, models.GetDeveloperErrorAnswer(err.Error()))
-		tsLogger.Logger.LogErr(fmt.Sprintf("DEV ERR: %q ==> %e", r.RequestURI, err))
+		tsLogger.LogErr(fmt.Sprintf("DEV ERR: %q ==> %v", r.RequestURI, err))
 		return
 	}
 
@@ -80,8 +88,8 @@ func (*AuthHandlers) SignIn(w http.ResponseWriter, r *http.Request) {
 
 // SignOut godoc
 // @title Sign out
-// @summary Logs User out
-// @description This method logs User out and deletes cookie
+// @summary Logs user out
+// @description This method logs user out and deletes cookie
 // @tags Auth
 // @produce json
 // @success 200 {object} models.MessageAnswer
@@ -100,7 +108,7 @@ func (*AuthHandlers) SignOut(w http.ResponseWriter, r *http.Request) {
 
 // UpdatePassword godoc
 // @title Update password
-// @summary Updates User password
+// @summary Updates user password
 // @description This method updates users password, requiring password and confirmation. User data is pulled from jwt-token
 // @tags Auth
 // @accepts json
@@ -128,11 +136,19 @@ func (*AuthHandlers) UpdatePassword(w http.ResponseWriter, r *http.Request) {
 	err, fields := a.GetStorages().Auth.UpdatePassword(jwtData(r).Id, updateData)
 	if err != nil {
 		if fields != nil {
-			models.Send(w, http.StatusBadRequest, models.GetIncorrectFieldsAnswer(fields))
+			if err == models.FieldsError {
+				models.Send(w, http.StatusBadRequest, models.GetIncorrectFieldsAnswer(fields))
+			} else {
+				models.Send(w, http.StatusBadRequest, &models.IncorrectFieldsAnswer{
+					Status:  200,
+					Message: err.Error(),
+					Data:    fields,
+				})
+			}
 			return
 		}
 		models.Send(w, http.StatusInternalServerError, models.GetDeveloperErrorAnswer(err.Error()))
-		tsLogger.Logger.LogErr(fmt.Sprintf("DEV ERR: %q ==> %e", r.RequestURI, err))
+		tsLogger.LogErr(fmt.Sprintf("DEV ERR: %q ==> %v", r.RequestURI, err))
 		return
 	}
 

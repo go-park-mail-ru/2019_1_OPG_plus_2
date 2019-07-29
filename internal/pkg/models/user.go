@@ -11,12 +11,12 @@ import (
 /* COMMON CHECKERS */
 
 func CheckEmail(email string) bool {
-	matched, _ := regexp.MatchString(`^[\w\-.]+@[\w\-.]+\.[a-z]{2,6}$`, email)
+	matched, _ := regexp.MatchString(`^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$`, email)
 	return matched
 }
 
 func CheckUsername(username string) bool {
-	matched, _ := regexp.MatchString(`^\w+$`, username)
+	matched, _ := regexp.MatchString(`^[\w.-_@$]+$`, username)
 	return matched
 }
 

@@ -1,9 +1,9 @@
 package main
 
 import (
+	"2019_1_OPG_plus_2/internal/app/coreserver"
+	"2019_1_OPG_plus_2/internal/pkg/tsLogger"
 	"os"
-
-	"2019_1_OPG_plus_2/internal/app/server"
 )
 
 // @title Colors service API by OPG+2
@@ -18,14 +18,15 @@ import (
 // @BasePath /api
 
 func main() {
-	params := server.Params{Port: os.Getenv("PORT")}
+	params := coreserver.Params{Port: os.Getenv("PORT")}
 	if params.Port == "" {
 		params.Port = "8002"
 	}
 
-	err := server.StartApp(params)
+	err := coreserver.StartApp(params)
 	if err != nil {
-		panic(err)
+		coreserver.StopApp()
+		tsLogger.LogFatal("%s", err)
 	}
-	server.StopApp()
+
 }
