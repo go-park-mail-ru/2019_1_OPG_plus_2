@@ -37,6 +37,7 @@ docker run -d \
            -e DB_PASSWORD=${DB_PASSWORD} \
            --network=opg-net \
            --network-alias=colors-back-game \
+           --restart=always \
            -p ${port}:8004 \
            --name colors-back-game colors-back-game >> ~/docker.log && \
 echo [SERVER-GAME] Server is now running at: ${port}
