@@ -13,6 +13,7 @@ docker build --rm -t colors-back-cookie -f dockerfiles/cookie.Dockerfile .. && \
 docker run -d \
            --network=opg-net \
            --network-alias=colors-back-cookie \
+           --restart=always \
            -p ${port}:50243 \
            --name colors-back-cookie colors-back-cookie >> ~/docker.log && \
 echo [SERVER-COOKIE] Cookie-validation service is now running at: ${port}

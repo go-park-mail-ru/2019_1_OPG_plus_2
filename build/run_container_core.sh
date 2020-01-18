@@ -35,6 +35,7 @@ docker run -d \
            -e DB_PASSWORD=${DB_PASSWORD} \
            --network=opg-net \
            --network-alias=colors-back-core \
+           --restart=always \
            --mount type=bind,source=$PWD/../upload,target=/root/colors-core-service/upload \
            --mount type=bind,source=$PWD/../upload,target=/root/upload \
            -p ${port}:8002 \
