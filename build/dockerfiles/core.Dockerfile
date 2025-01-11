@@ -1,4 +1,4 @@
-FROM golang:latest as builder
+FROM golang:1.19 as builder
 ENV GO111MODULE=on
 WORKDIR /app
 
@@ -12,7 +12,7 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o colors-core-service/main -
 RUN cp config.json colors-core-service/config.json
 
 
-FROM alpine:latest
+FROM alpine:3.18
 ENV COLORS_SERVICE_USE_MODE=IN_DOCKER_NET
 ENV COLORS_DB=IN_DOCKER_NET
 ENV COLORS_CONFIG_PATH="/root/colors-core-service"
