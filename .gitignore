@@ -1,3 +1,18 @@
+# Project
+
+.env
+*.log
+
+db/
+static/
+tmp/
+upload/
+
+# Deploy keys
+deploy_key
+deploy_key_development
+deploy_key_production
+
 # Go
 
 # Binaries for programs and plugins
@@ -36,14 +51,3 @@ com_crashlytics_export_strings.xml
 crashlytics.properties
 crashlytics-build.properties
 fabric.properties
-
-*.log
-
-static/*
-tmp/*
-upload/*
-
-# Deploy keys
-deploy_key
-deploy_key_development
-deploy_key_production

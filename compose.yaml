@@ -1,0 +1,65 @@
+services:
+  db:
+    container_name: "colors-db"
+    build:
+      context: "."
+      dockerfile: "./build/dockerfiles/db.Dockerfile"
+    env_file: [".env"]
+    restart: "unless-stopped"
+    volumes:
+      - "./db:/var/lib/mysql"
+    networks:
+      default:
+        aliases: ["db", "colors-db"]
+
+  cookie:
+    container_name: "colors-back-cookie"
+    build:
+      context: "."
+      dockerfile: "./build/dockerfiles/cookie.Dockerfile"
+    networks:
+      default:
+        aliases: ["colors-back-cookie"]
+    restart: "unless-stopped"
+
+  auth:
+    container_name: "colors-back-auth"
+    build:
+      context: "."
+      dockerfile: "./build/dockerfiles/auth.Dockerfile"
+    env_file: [".env"]
+    depends_on: ["db"]
+    networks:
+      default:
+        aliases: ["colors-back-auth"]
+    restart: "unless-stopped"
+
+  game:
+    container_name: "colors-back-game"
+    build:
+      context: "."
+      dockerfile: "./build/dockerfiles/game.Dockerfile"
+    env_file: [".env"]
+    depends_on: ["db"]
+    ports:
+      - "127.0.0.1:6009:8004"
+    networks:
+      default:
+        aliases: ["colors-back-game"]
+    restart: "unless-stopped"
+
+  core:
+    container_name: "colors-back-core"
+    build:
+      context: "."
+      dockerfile: "./build/dockerfiles/core.Dockerfile"
+    env_file: [".env"]
+    depends_on: ["db"]
+    volumes:
+      - "./upload:/root/upload"
+    ports:
+      - "127.0.0.1:6007:8002"
+    networks:
+      default:
+        aliases: ["colors-back-core"]
+    restart: "unless-stopped"
